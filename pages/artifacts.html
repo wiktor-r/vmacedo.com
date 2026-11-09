@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Artifacts — Victor Aguiar-Macedo</title>
+<meta name="description" content="Twenty interactive prototypes: colour perception, abstract structure, and interfaces that teach a skill.">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<div class="column">
+  <nav class="top" data-base=".." data-page="artifacts"></nav>
+
+  <main>
+    <h1 class="title">Artifacts</h1>
+    <div class="filters" id="filters"></div>
+    <div class="grid" id="grid"></div>
+    <p class="count" id="count"></p>
+  </main>
+</div>
+
+<script src="../projects.js"></script>
+<script src="../js/site.js"></script>
+<script>
+/* The filters are tags, not categories: they overlap, so more than one can be lit at
+   once and a project shows up under every tag it carries. Nothing here partitions the
+   twenty — picking two tags widens the grid, it does not narrow it. */
+const grid = document.getElementById('grid');
+const filters = document.getElementById('filters');
+const count = document.getElementById('count');
+
+WORKS.forEach(w => grid.appendChild(card(w, '..')));
+
+const options = [{ tag: '*', label: 'show all' }]
+  .concat(TAGS.map(t => ({ tag: t.id, label: t.label })))
+  .concat([{ tag: 'active', label: 'in progress' }]);
+
+options.forEach(o => {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'filter';
+  b.dataset.filter = o.tag;
+  b.setAttribute('aria-pressed', 'false');
+  b.textContent = o.label;
+  filters.appendChild(b);
+});
+
+const buttons = [...filters.querySelectorAll('button')];
+const cards = [...grid.querySelectorAll('.card')];
+const chosen = new Set();          /* empty means everything */
+
+function matches(c) {
+  if (!chosen.size) return true;
+  if (chosen.has('active') && c.dataset.active === 'true') return true;
+  return c.dataset.tags.split(' ').some(t => chosen.has(t));
+}
+
+function render() {
+  buttons.forEach(b => {
+    const on = b.dataset.filter === '*' ? chosen.size === 0 : chosen.has(b.dataset.filter);
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', String(on));
+  });
+
+  let n = 0;
+  cards.forEach(c => {
+    const show = matches(c);
+    c.hidden = !show;
+    if (show) n++;
+  });
+  count.textContent = n + (n === 1 ? ' artifact' : ' artifacts');
+}
+
+filters.addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  const tag = b.dataset.filter;
+  if (tag === '*') chosen.clear();
+  else if (chosen.has(tag)) chosen.delete(tag);
+  else chosen.add(tag);
+  render();
+});
+
+render();
+</script>
+</body>
+</html>

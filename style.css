@@ -1,0 +1,190 @@
+/* style.css — high fidelity, same skeleton as the wireframe.
+ *
+ * What survived from the wireframe: the single column, the top menu with slash
+ * separators, the card (image + label + title), the two-column grid that becomes
+ * one when two no longer fit. Nothing moved; the type and the images are real now.
+ *
+ * Typographic base taken from a24films.com/films: a grotesque in light and medium,
+ * huge airy headings, small uppercase letterspaced labels, black on white, no
+ * borders around anything. A24 licenses Akzidenz-Grotesk through Typekit, so the
+ * stack here is the system grotesque — the closest relative that costs no download.
+ */
+
+:root {
+  --ink: #000;
+  --paper: #fff;
+  --muted: #767676;          /* passes contrast on white for small text */
+  --rule: #e2e2e2;
+  --accent: #e0261a;         /* the only colour on the site: the you-are-here dot */
+  --sans: "Helvetica Neue", Helvetica, Arial, "Segoe UI", sans-serif;
+  --column: 800px;           /* settled in the wireframe; the styling pass does not move it */
+  --measure: 62ch;           /* running text never gets wider than this */
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-font-smoothing: antialiased; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 300 17px/1.5 var(--sans);
+  letter-spacing: -0.003em;
+}
+
+img { display: block; max-width: 100%; }
+
+a { color: inherit; text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+.column { max-width: var(--column); margin: 0 auto; padding: 0 24px 120px; }
+
+/* ---------------- top menu ---------------- */
+/* A24's bar: small uppercase, wide tracking, items divided by slashes. The slash
+   hangs off the item before it, so a wrapped line on a phone starts with a word. */
+.top {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--paper);
+  padding: 26px 0 30px;
+}
+.menu { display: flex; flex-wrap: wrap; align-items: baseline; }
+.menu a {
+  font-size: 11px; font-weight: 500;
+  letter-spacing: .12em; text-transform: uppercase;
+}
+.menu a:not(:last-child)::after { content: " /"; margin-right: 8px; color: var(--muted); }
+.menu a[aria-current="page"] { color: var(--ink); }
+.menu a:not([aria-current="page"]) { color: var(--muted); }
+.menu a:hover { color: var(--ink); text-decoration: none; }
+
+/* you-are-here: a red dot before the current item. The colour is not carrying the
+   message alone — the current item is also the only black one — so it still reads
+   without colour vision. The slot is always there and only fills in on the current
+   item, so the row doesn't jog when you change pages. */
+.menu a::before {
+  content: "";
+  display: inline-block;
+  width: 5px; height: 5px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: transparent;
+  vertical-align: 1px;
+}
+.menu a[aria-current="page"]::before { background: var(--accent); }
+
+/* ---------------- headings and running text ---------------- */
+/* Every page opens with its own heading, including the ones the menu already names.
+   The repetition is deliberate: the bar is 11px navigation, the heading is the page
+   announcing itself. .title also carries an artifact's name and an essay's title. */
+.title {
+  margin: 0 0 34px;
+  font-size: clamp(38px, 6vw, 60px);
+  font-weight: 300;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+}
+.title-sm {
+  margin: 0 0 6px;
+  font-size: clamp(26px, 3.4vw, 34px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.label {
+  margin: 0 0 10px;
+  font-size: 11px; font-weight: 500;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--muted);
+}
+.prose { max-width: var(--measure); }
+.prose p { margin: 0 0 20px; }
+.prose p:last-child { margin-bottom: 0; }
+
+.block { margin: 0 0 44px; max-width: var(--measure); }
+.block:last-child { margin-bottom: 0; }
+.block p { margin: 0 0 18px; }
+.block p:last-child { margin-bottom: 0; }
+
+/* ---------------- home header ---------------- */
+/* photo left, name and identification right — the one shape that survives 390px */
+.profile { display: flex; align-items: flex-start; gap: 22px; margin: 0 0 56px; }
+.portrait { flex: none; width: 132px; aspect-ratio: 1079 / 1430; object-fit: cover; }
+.profile-text { min-width: 0; max-width: var(--measure); }
+.profile-text .title-sm { margin-bottom: 10px; }
+
+/* ---------------- filters ---------------- */
+.filters { display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 0 0 52px; }
+.filter {
+  appearance: none; border: 0; padding: 0; background: none; cursor: pointer;
+  color: var(--muted); font: inherit;
+  font-size: 11px; font-weight: 500;
+  letter-spacing: .12em; text-transform: uppercase;
+}
+.filter:hover { color: var(--ink); }
+.filter.on { color: var(--ink); border-bottom: 1px solid var(--ink); }
+
+/* ---------------- artifact card ---------------- */
+/* A24's card order: image, then the small uppercase label, then the title.
+   No frame around it — the screenshot is the edge. */
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 64px 34px; align-items: start; }
+.card[hidden] { display: none; }
+.card a { display: block; }
+.card a:hover { text-decoration: none; }
+.card a:hover .card-title { text-decoration: underline; text-underline-offset: 3px; }
+.card-media {
+  width: 100%; aspect-ratio: 4 / 3;
+  object-fit: cover; object-position: top center;
+  background: #f4f4f4;
+  margin: 0 0 16px;
+}
+.card-label {
+  font-size: 11px; font-weight: 500;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+.card-title { font-size: 22px; font-weight: 400; line-height: 1.15; letter-spacing: -0.02em; }
+.card-desc { margin-top: 7px; color: var(--muted); font-size: 15px; line-height: 1.45; }
+
+.count { margin: 56px 0 0; font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+
+/* ---------------- artifact detail ---------------- */
+.back {
+  display: inline-block; margin-bottom: 40px;
+  font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--muted);
+}
+.back:hover { color: var(--ink); }
+.detail-media { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top center; background: #f4f4f4; margin: 0 0 48px; }
+.detail-meta { margin: 0 0 40px; font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+
+/* ---------------- entry list (writing) ---------------- */
+.list { border-top: 1px solid var(--rule); }
+.list-item { display: block; padding: 26px 0; border-bottom: 1px solid var(--rule); }
+.list-item:hover { text-decoration: none; }
+.list-item:hover .list-title { text-decoration: underline; text-underline-offset: 3px; }
+.list-date { font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
+.list-title { font-size: 24px; font-weight: 400; line-height: 1.15; letter-spacing: -0.02em; }
+.list-summary { margin-top: 7px; color: var(--muted); max-width: var(--measure); }
+
+/* ---------------- the long text ---------------- */
+.entry-body { max-width: var(--measure); }
+.entry-body .lede { font-size: 21px; line-height: 1.42; margin: 0 0 52px; }
+.entry-body h2 {
+  margin: 0 0 10px;
+  font-size: 11px; font-weight: 500;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--muted);
+}
+.entry-body section { margin: 0 0 40px; }
+.entry-body section:last-child { margin-bottom: 0; }
+.entry-body section p { margin: 0; }
+
+/* The only width rule in the whole site: when two cards no longer fit side by side,
+   it becomes one per row. Nothing moves, nothing appears, nothing disappears. */
+@media (max-width: 620px) {
+  .grid { grid-template-columns: 1fr; gap: 48px; }
+  .profile { gap: 16px; }
+  .portrait { width: 104px; }
+}
