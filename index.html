@@ -1,202 +1,198 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Victor Aguiar-Macedo</title>
-<meta name="description" content="Interface, colour and information design. Interactive prototypes on colour perception, abstract structure and interfaces that teach a skill.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6' fill='%23e0261a'/%3E%3C/svg%3E">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Victor</title>
+<link rel="icon" type="image/svg+xml" href="logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&display=swap" rel="stylesheet">
 <style>
-/* Flat version of floor-site: same content, type and palette, drawn as a plain page. */
+/* jaydip.me-inspired: warm, linear, generous whitespace, typographic */
+
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 :root {
-  --paper: #ffffff; --ink: #161616; --muted: #7a7a77; --accent: #e0261a;
-  --clay: #f4f4f2; --rule: #dcdcd8;
-  --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --lift: 0 1px 2px rgba(0,0,0,.06), 0 6px 18px rgba(0,0,0,.07);
+    --bg: #FAFAF8;
+    --fg: #1C1917;
+    --muted: #9A9490;
+    --accent: #CC785C;
+    --border: #E8E4DF;
 }
-* { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
-body { margin: 0; background: var(--paper); color: var(--ink); font: 400 17px/1.6 var(--sans); }
-a { color: inherit; }
-.wrap { max-width: 1120px; margin: 0 auto; padding: 36px 40px 40px; }
-.label { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0; font-weight: 400; }
 
-/* header */
-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
-  padding-bottom: 26px; border-bottom: 1px solid var(--rule); }
-.name { font-weight: 700; font-size: 22px; letter-spacing: -.01em; text-decoration: none; }
-nav { display: flex; gap: 14px; }
-nav a { position: relative; display: block; padding: 9px 16px; border-radius: 8px; background: var(--clay);
-  box-shadow: var(--lift); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
-  color: var(--muted); text-decoration: none; transition: transform .15s, color .15s; }
-nav a:hover { transform: translateY(-2px); color: var(--ink); }
-nav a[aria-current] { color: var(--ink); }
-nav a[aria-current]::after { content: ""; position: absolute; left: 50%; bottom: -16px; width: 9px; height: 9px;
-  margin-left: -4.5px; border-radius: 50%; background: var(--accent); }
-
-main { padding-top: 64px; min-height: 60vh; }
-section[hidden] { display: none; }
-h1 { font-size: clamp(44px, 7vw, 84px); line-height: 1.02; letter-spacing: -.03em; margin: 0; font-weight: 700; }
-.lede { max-width: 640px; margin: 22px 0 0; }
-
-/* about */
-.hero { display: grid; grid-template-columns: 1fr 300px; gap: 64px; align-items: start; }
-.hero .label { margin-bottom: 26px; }
-.portrait { width: 100%; aspect-ratio: 362/480; object-fit: cover; display: block; padding: 10px;
-  background: var(--clay); border-radius: 6px; box-shadow: var(--lift); }
-.buttons { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 36px; }
-.btn { font: 700 13px/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; padding: 17px 24px;
-  border-radius: 8px; border: 0; cursor: pointer; text-decoration: none; background: var(--clay); color: var(--ink);
-  box-shadow: var(--lift); transition: transform .15s; }
-.btn:hover { transform: translateY(-2px); }
-.btn.primary { background: var(--ink); color: var(--paper); }
-.selected { margin-top: 96px; }
-.selected .label { margin-bottom: 22px; }
-
-/* cards */
-.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
-.card { background: var(--clay); border-radius: 8px; padding: 14px; box-shadow: var(--lift);
-  text-decoration: none; display: block; transition: transform .15s; }
-a.card:hover { transform: translateY(-3px); }
-.card img { width: 100%; aspect-ratio: 1.6; object-fit: cover; display: block; border-radius: 3px; background: #ddd; }
-.card .label { font-size: 11px; margin: 16px 0 4px; }
-.card h3 { margin: 0; font-size: 21px; line-height: 1.25; letter-spacing: -.01em; }
-.card p { margin: 10px 0 2px; font-size: 14.5px; line-height: 1.55; }
-
-/* writing */
-.essay { margin-top: 44px; padding: 26px 28px; }
-.essay h2 { font-size: 26px; line-height: 1.25; margin: 8px 0 10px; letter-spacing: -.01em; }
-.essay p { margin: 0; font-size: 16px; }
-
-/* contact */
-.email { display: inline-block; margin: 34px 0 30px; font-weight: 700; font-size: clamp(22px, 4.2vw, 40px);
-  letter-spacing: -.01em; text-decoration: none; overflow-wrap: anywhere; }
-.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 72px; }
-.cols p:not(.label) { margin: 10px 0 0; }
-
-footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 96px;
-  padding-top: 20px; border-top: 1px solid var(--rule); font-size: 13px; color: var(--muted); }
-#toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); padding: 10px 16px; border-radius: 999px;
-  background: var(--ink); color: var(--paper); font-size: 13px; }
-
-@media (max-width: 760px) {
-  .wrap { padding: 24px 20px 32px; }
-  header { flex-direction: column; align-items: flex-start; }
-  nav { gap: 8px; }
-  nav a { padding: 8px 11px; font-size: 11px; }
-  main { padding-top: 44px; }
-  .hero { grid-template-columns: 1fr; gap: 0; }
-  .hero figure { order: -1; width: 62%; margin: 0 0 36px; }
-  .grid, .cols { grid-template-columns: 1fr; gap: 22px; }
-  .selected { margin-top: 64px; }
+html {
+    background: var(--bg);
 }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--fg);
+    background: var(--bg);
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* narrow reading column, pushed down for breathing room */
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 128px 28px 96px;
+}
+
+/* Name */
+nav {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 40px;
+}
+
+.logo {
+    width: 60px;
+    height: auto;
+    display: block;
+}
+
+nav .name {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 500;
+    font-size: 30px;
+    letter-spacing: -0.015em;
+    color: var(--fg);
+}
+
+/* Intro */
+.intro {
+    font-size: 21px;
+    line-height: 1.65;
+    font-weight: 400;
+    margin-bottom: 26px;
+    letter-spacing: -0.005em;
+}
+
+.intro em {
+    font-family: "Fraunces", Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+}
+
+.blog-line {
+    font-size: 21px;
+    line-height: 1.65;
+    font-weight: 400;
+    color: var(--muted);
+    margin-bottom: 48px;
+    letter-spacing: -0.005em;
+}
+
+a {
+    color: var(--fg);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1px;
+    transition: color 0.18s, border-color 0.18s;
+}
+
+a:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+.blog-line a {
+    color: var(--fg);
+}
+
+/* Contact icon row */
+.links {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+}
+
+.links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    border-bottom: none;
+    padding-bottom: 0;
+    font-size: 14px;
+    letter-spacing: 0.01em;
+    transition: color 0.18s;
+}
+
+.links a:hover {
+    color: var(--fg);
+}
+
+.links svg {
+    width: 17px;
+    height: 17px;
+    flex: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 80px 24px 72px;
+    }
+    nav .name {
+        font-size: 26px;
+    }
+    .intro,
+    .blog-line {
+        font-size: 18px;
+    }
+}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <a class="name" href="#about">Victor Aguiar-Macedo</a>
-    <nav aria-label="Main">
-      <a href="#about">About</a><a href="#artifacts">Artifacts</a><a href="#writing">Writing</a><a href="#contact">Contact</a>
+<div class="container">
+
+    <nav>
+        <img class="logo" src="logo.svg" alt="Victor">
+        <span class="name">Victor</span>
     </nav>
-  </header>
 
-  <main>
-    <section id="page-about">
-      <div class="hero">
-        <div>
-          <p class="label">Interface, colour and information design</p>
-          <h1>Interfaces that<br>teach a skill.</h1>
-          <p class="lede">For about a year I have kept a continuous body of self-directed work: interactive prototypes on colour perception, visualisation of abstract structure, and interfaces that teach a skill.</p>
-          <div class="buttons">
-            <a class="btn primary" href="#artifacts">See the artifacts</a>
-            <a class="btn" href="#contact">Get in touch</a>
-          </div>
+    <main>
+        <p class="intro">
+            hello. i'm victor and i build software for <em>human flourishing</em>.
+            right now this takes the form of <em>drill apps</em> &mdash; i strive to
+            make them the best teaching resources for their categories on the internet.
+            thanks for stopping by.
+        </p>
+        <p class="blog-line">
+            i also log some personal learning at <a href="https://ordinary.vision">ordinary.vision</a>,
+            and shorter thoughts on a <a href="microblog.html">microblog</a>.
+        </p>
+
+        <div class="links">
+            <a href="mailto:cavictoor@gmail.com">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="3" y="5" width="18" height="14" rx="2"/>
+                    <path d="m3 7 9 6 9-6"/>
+                </svg>
+                email
+            </a>
+            <a href="https://ordinary.vision">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9"/>
+                    <path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>
+                </svg>
+                ordinary.vision
+            </a>
         </div>
-        <figure style="margin:0"><img class="portrait" src="assets/photo.jpg" alt="Portrait of Victor Aguiar-Macedo"></figure>
-      </div>
-      <div class="selected">
-        <h2 class="label">Selected artifacts</h2>
-        <div class="grid" data-works="3"></div>
-      </div>
-    </section>
+    </main>
 
-    <section id="page-artifacts" hidden>
-      <h1>Artifacts</h1>
-      <p class="lede">Projects in progress. Each one is an interactive prototype on colour, abstract structure, or learning a skill.</p>
-      <div class="grid" data-works="all" style="margin-top:48px"></div>
-    </section>
-
-    <section id="page-writing" hidden>
-      <h1>Writing</h1>
-      <article class="card essay">
-        <p class="label" style="margin:0">2026</p>
-        <h2>What prototyping learning software taught me</h2>
-        <p>Some things I learned while exploring and tinkering with my own projects.</p>
-      </article>
-    </section>
-
-    <section id="page-contact" hidden>
-      <h1>Contact</h1>
-      <p class="lede">Email is the best way to reach me.</p>
-      <a class="email" href="mailto:victormac@edu.unifor.br">victormac@edu.unifor.br</a>
-      <div><button class="btn primary" id="copy">Copy email</button></div>
-      <div class="cols">
-        <div><h2 class="label">Now</h2><p>Messing around with handwriting recognition experiments.</p></div>
-        <div><h2 class="label">Based in</h2><p>Fortaleza, Brazil</p></div>
-      </div>
-    </section>
-  </main>
-
-  <footer><span>Victor Aguiar-Macedo · 2026</span><span>FORTALEZA, BRAZIL</span></footer>
 </div>
-<div id="toast" role="status" hidden></div>
-
-<script>
-const WORKS = [
-  { id: 'munselltools', name: 'MunsellTools', tags: 'Skill drills',
-    what: 'A flat-lit 3D scene with one tool per variable of the Munsell system: hue is the gear, value is the plumb bob, chroma is the pump.' },
-  { id: 'unparse', name: 'Unparse', tags: 'Abstract made visible · Skill drills',
-    what: 'Assemble the syntactic structure of a sentence by fitting pieces together, instead of drawing the tree with lines and labels.' },
-  { id: 'spatialmath', name: 'SpatialMath', tags: 'Abstract made visible · Controls',
-    what: 'A spatial notation for power, root and logarithm: the base is a sphere, the exponent is a cone, the result is a target.' },
-  { id: 'keyview', name: 'Keyview', tags: 'Intuitive controls',
-    what: 'Typing practice with three fixed acts per round.' },
-  { id: 'desktopshell', name: 'DesktopShell', tags: 'Interaction models',
-    what: 'A desktop paradigm where the desktop is a half-open book and the windows are pages.' },
-  { id: 'nightwatch', name: 'Nightwatch', tags: 'Built from need',
-    what: 'The app that manages all these projects. The categories and states on this site come out of it.' }
-];
-const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-document.querySelectorAll('[data-works]').forEach(grid => {
-  const short = grid.dataset.works === '3';
-  grid.innerHTML = WORKS.slice(0, short ? 3 : WORKS.length).map(w => `
-    <${short ? 'a href="#artifacts"' : 'article'} class="card">
-      <img src="assets/${w.id}.jpg" alt="" loading="lazy">
-      <p class="label">${esc(w.tags)}</p>
-      <h3>${esc(w.name)}</h3>
-      ${short ? '' : `<p>${esc(w.what)}</p>`}
-    </${short ? 'a' : 'article'}>`).join('');
-});
-
-const PAGES = ['about', 'artifacts', 'writing', 'contact'];
-function show() {
-  const key = PAGES.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'about';
-  PAGES.forEach(k => document.getElementById('page-' + k).hidden = k !== key);
-  document.querySelectorAll('nav a').forEach(a => a.toggleAttribute('aria-current', a.hash === '#' + key));
-  document.title = key === 'about' ? 'Victor Aguiar-Macedo' : `${key[0].toUpperCase() + key.slice(1)} · Victor Aguiar-Macedo`;
-  scrollTo(0, 0);
-}
-addEventListener('hashchange', show);
-show();
-
-document.getElementById('copy').addEventListener('click', async () => {
-  const toast = document.getElementById('toast');
-  try { await navigator.clipboard.writeText('victormac@edu.unifor.br'); toast.textContent = 'Email copied'; }
-  catch { toast.textContent = 'victormac@edu.unifor.br'; }
-  toast.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => toast.hidden = true, 2000);
-});
-</script>
 </body>
 </html>
