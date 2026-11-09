@@ -5,45 +5,198 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Victor Aguiar-Macedo</title>
 <meta name="description" content="Interface, colour and information design. Interactive prototypes on colour perception, abstract structure and interfaces that teach a skill.">
-<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6' fill='%23e0261a'/%3E%3C/svg%3E">
+<style>
+/* Flat version of floor-site: same content, type and palette, drawn as a plain page. */
+:root {
+  --paper: #ffffff; --ink: #161616; --muted: #7a7a77; --accent: #e0261a;
+  --clay: #f4f4f2; --rule: #dcdcd8;
+  --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --lift: 0 1px 2px rgba(0,0,0,.06), 0 6px 18px rgba(0,0,0,.07);
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 17px/1.6 var(--sans); }
+a { color: inherit; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 36px 40px 40px; }
+.label { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0; font-weight: 400; }
+
+/* header */
+header { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  padding-bottom: 26px; border-bottom: 1px solid var(--rule); }
+.name { font-weight: 700; font-size: 22px; letter-spacing: -.01em; text-decoration: none; }
+nav { display: flex; gap: 14px; }
+nav a { position: relative; display: block; padding: 9px 16px; border-radius: 8px; background: var(--clay);
+  box-shadow: var(--lift); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); text-decoration: none; transition: transform .15s, color .15s; }
+nav a:hover { transform: translateY(-2px); color: var(--ink); }
+nav a[aria-current] { color: var(--ink); }
+nav a[aria-current]::after { content: ""; position: absolute; left: 50%; bottom: -16px; width: 9px; height: 9px;
+  margin-left: -4.5px; border-radius: 50%; background: var(--accent); }
+
+main { padding-top: 64px; min-height: 60vh; }
+section[hidden] { display: none; }
+h1 { font-size: clamp(44px, 7vw, 84px); line-height: 1.02; letter-spacing: -.03em; margin: 0; font-weight: 700; }
+.lede { max-width: 640px; margin: 22px 0 0; }
+
+/* about */
+.hero { display: grid; grid-template-columns: 1fr 300px; gap: 64px; align-items: start; }
+.hero .label { margin-bottom: 26px; }
+.portrait { width: 100%; aspect-ratio: 362/480; object-fit: cover; display: block; padding: 10px;
+  background: var(--clay); border-radius: 6px; box-shadow: var(--lift); }
+.buttons { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 36px; }
+.btn { font: 700 13px/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; padding: 17px 24px;
+  border-radius: 8px; border: 0; cursor: pointer; text-decoration: none; background: var(--clay); color: var(--ink);
+  box-shadow: var(--lift); transition: transform .15s; }
+.btn:hover { transform: translateY(-2px); }
+.btn.primary { background: var(--ink); color: var(--paper); }
+.selected { margin-top: 96px; }
+.selected .label { margin-bottom: 22px; }
+
+/* cards */
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+.card { background: var(--clay); border-radius: 8px; padding: 14px; box-shadow: var(--lift);
+  text-decoration: none; display: block; transition: transform .15s; }
+a.card:hover { transform: translateY(-3px); }
+.card img { width: 100%; aspect-ratio: 1.6; object-fit: cover; display: block; border-radius: 3px; background: #ddd; }
+.card .label { font-size: 11px; margin: 16px 0 4px; }
+.card h3 { margin: 0; font-size: 21px; line-height: 1.25; letter-spacing: -.01em; }
+.card p { margin: 10px 0 2px; font-size: 14.5px; line-height: 1.55; }
+
+/* writing */
+.essay { margin-top: 44px; padding: 26px 28px; }
+.essay h2 { font-size: 26px; line-height: 1.25; margin: 8px 0 10px; letter-spacing: -.01em; }
+.essay p { margin: 0; font-size: 16px; }
+
+/* contact */
+.email { display: inline-block; margin: 34px 0 30px; font-weight: 700; font-size: clamp(22px, 4.2vw, 40px);
+  letter-spacing: -.01em; text-decoration: none; overflow-wrap: anywhere; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 72px; }
+.cols p:not(.label) { margin: 10px 0 0; }
+
+footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 96px;
+  padding-top: 20px; border-top: 1px solid var(--rule); font-size: 13px; color: var(--muted); }
+#toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); padding: 10px 16px; border-radius: 999px;
+  background: var(--ink); color: var(--paper); font-size: 13px; }
+
+@media (max-width: 760px) {
+  .wrap { padding: 24px 20px 32px; }
+  header { flex-direction: column; align-items: flex-start; }
+  nav { gap: 8px; }
+  nav a { padding: 8px 11px; font-size: 11px; }
+  main { padding-top: 44px; }
+  .hero { grid-template-columns: 1fr; gap: 0; }
+  .hero figure { order: -1; width: 62%; margin: 0 0 36px; }
+  .grid, .cols { grid-template-columns: 1fr; gap: 22px; }
+  .selected { margin-top: 64px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
 </head>
 <body>
-
-<div class="column">
-  <nav class="top" data-base="." data-page="home"></nav>
+<div class="wrap">
+  <header>
+    <a class="name" href="#about">Victor Aguiar-Macedo</a>
+    <nav aria-label="Main">
+      <a href="#about">About</a><a href="#artifacts">Artifacts</a><a href="#writing">Writing</a><a href="#contact">Contact</a>
+    </nav>
+  </header>
 
   <main>
-    <h1 class="title">About</h1>
-
-    <div class="profile">
-      <img class="portrait" src="images/photo.jpg" alt="Portrait of Victor Aguiar-Macedo">
-      <div class="profile-text">
-        <h2 class="title-sm">Victor Aguiar-Macedo</h2>
-        <p class="label">Interface, colour and information design · Fortaleza, Brazil</p>
-        <p>Fourth-semester Design undergraduate at the University of Fortaleza.</p>
+    <section id="page-about">
+      <div class="hero">
+        <div>
+          <p class="label">Interface, colour and information design</p>
+          <h1>Interfaces that<br>teach a skill.</h1>
+          <p class="lede">For about a year I have kept a continuous body of self-directed work: interactive prototypes on colour perception, visualisation of abstract structure, and interfaces that teach a skill.</p>
+          <div class="buttons">
+            <a class="btn primary" href="#artifacts">See the artifacts</a>
+            <a class="btn" href="#contact">Get in touch</a>
+          </div>
+        </div>
+        <figure style="margin:0"><img class="portrait" src="assets/photo.jpg" alt="Portrait of Victor Aguiar-Macedo"></figure>
       </div>
-    </div>
+      <div class="selected">
+        <h2 class="label">Selected artifacts</h2>
+        <div class="grid" data-works="3"></div>
+      </div>
+    </section>
 
-    <div class="block">
-      <h2 class="label">what I do</h2>
-      <p>For about a year I have kept a continuous body of self-directed work: interactive
-      prototypes concentrated on three fronts — colour perception, visualisation of abstract
-      structure, and interfaces that teach a skill. More broadly, I'm interested in Human–Computer
-      Interaction, Ergonomics and Information Design.</p>
-    </div>
+    <section id="page-artifacts" hidden>
+      <h1>Artifacts</h1>
+      <p class="lede">Projects in progress. Each one is an interactive prototype on colour, abstract structure, or learning a skill.</p>
+      <div class="grid" data-works="all" style="margin-top:48px"></div>
+    </section>
 
-    <div class="block">
-      <h2 class="label">contact</h2>
-      <p><a href="mailto:victormac@edu.unifor.br">victormac@edu.unifor.br</a></p>
-    </div>
+    <section id="page-writing" hidden>
+      <h1>Writing</h1>
+      <article class="card essay">
+        <p class="label" style="margin:0">2026</p>
+        <h2>What prototyping learning software taught me</h2>
+        <p>Some things I learned while exploring and tinkering with my own projects.</p>
+      </article>
+    </section>
 
-    <div class="block">
-      <h2 class="label">now</h2>
-      <p>Messing around with handwriting recognition experiments.</p>
-    </div>
+    <section id="page-contact" hidden>
+      <h1>Contact</h1>
+      <p class="lede">Email is the best way to reach me.</p>
+      <a class="email" href="mailto:victormac@edu.unifor.br">victormac@edu.unifor.br</a>
+      <div><button class="btn primary" id="copy">Copy email</button></div>
+      <div class="cols">
+        <div><h2 class="label">Now</h2><p>Messing around with handwriting recognition experiments.</p></div>
+        <div><h2 class="label">Based in</h2><p>Fortaleza, Brazil</p></div>
+      </div>
+    </section>
   </main>
-</div>
 
-<script src="js/site.js"></script>
+  <footer><span>Victor Aguiar-Macedo · 2026</span><span>FORTALEZA, BRAZIL</span></footer>
+</div>
+<div id="toast" role="status" hidden></div>
+
+<script>
+const WORKS = [
+  { id: 'munselltools', name: 'MunsellTools', tags: 'Skill drills',
+    what: 'A flat-lit 3D scene with one tool per variable of the Munsell system: hue is the gear, value is the plumb bob, chroma is the pump.' },
+  { id: 'unparse', name: 'Unparse', tags: 'Abstract made visible · Skill drills',
+    what: 'Assemble the syntactic structure of a sentence by fitting pieces together, instead of drawing the tree with lines and labels.' },
+  { id: 'spatialmath', name: 'SpatialMath', tags: 'Abstract made visible · Controls',
+    what: 'A spatial notation for power, root and logarithm: the base is a sphere, the exponent is a cone, the result is a target.' },
+  { id: 'keyview', name: 'Keyview', tags: 'Intuitive controls',
+    what: 'Typing practice with three fixed acts per round.' },
+  { id: 'desktopshell', name: 'DesktopShell', tags: 'Interaction models',
+    what: 'A desktop paradigm where the desktop is a half-open book and the windows are pages.' },
+  { id: 'nightwatch', name: 'Nightwatch', tags: 'Built from need',
+    what: 'The app that manages all these projects. The categories and states on this site come out of it.' }
+];
+const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+document.querySelectorAll('[data-works]').forEach(grid => {
+  const short = grid.dataset.works === '3';
+  grid.innerHTML = WORKS.slice(0, short ? 3 : WORKS.length).map(w => `
+    <${short ? 'a href="#artifacts"' : 'article'} class="card">
+      <img src="assets/${w.id}.jpg" alt="" loading="lazy">
+      <p class="label">${esc(w.tags)}</p>
+      <h3>${esc(w.name)}</h3>
+      ${short ? '' : `<p>${esc(w.what)}</p>`}
+    </${short ? 'a' : 'article'}>`).join('');
+});
+
+const PAGES = ['about', 'artifacts', 'writing', 'contact'];
+function show() {
+  const key = PAGES.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'about';
+  PAGES.forEach(k => document.getElementById('page-' + k).hidden = k !== key);
+  document.querySelectorAll('nav a').forEach(a => a.toggleAttribute('aria-current', a.hash === '#' + key));
+  document.title = key === 'about' ? 'Victor Aguiar-Macedo' : `${key[0].toUpperCase() + key.slice(1)} · Victor Aguiar-Macedo`;
+  scrollTo(0, 0);
+}
+addEventListener('hashchange', show);
+show();
+
+document.getElementById('copy').addEventListener('click', async () => {
+  const toast = document.getElementById('toast');
+  try { await navigator.clipboard.writeText('victormac@edu.unifor.br'); toast.textContent = 'Email copied'; }
+  catch { toast.textContent = 'victormac@edu.unifor.br'; }
+  toast.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => toast.hidden = true, 2000);
+});
+</script>
 </body>
 </html>
