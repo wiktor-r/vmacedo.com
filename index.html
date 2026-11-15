@@ -6,7 +6,7 @@
 <style>
 @font-face{font-family:'EB Garamond';font-style:normal;font-weight:400 800;src:url(/fonts/EBGaramond-normal-latin.woff2) format('woff2')}
 @font-face{font-family:'EB Garamond';font-style:italic;font-weight:400 800;src:url(/fonts/EBGaramond-italic-latin.woff2) format('woff2')}
-:root{--tilt:34deg;--paper:#f4f1ea;--ink:#1a1916;--soft:#4b463e;--mut:#9a9387;--mx:0;--my:0;--y:0px;--s:1}
+:root{--tilt:0deg;--paper:#f4f1ea;--ink:#1a1916;--soft:#4b463e;--mut:#9a9387;--mx:0;--my:0;--y:0px;--s:1}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{background:var(--paper);color:var(--ink);font:400 19px/1.6 "EB Garamond",Georgia,serif;-webkit-font-smoothing:antialiased}
 a{color:inherit}
@@ -19,9 +19,7 @@ nav.top .r{display:flex;gap:30px;color:var(--soft)}
 /* the surface: one long sheet, tilted away from us; scrolling slides it under the camera */
 .surface{position:absolute;left:50%;top:0;width:1500px;height:4600px;margin-left:-750px;transform-style:preserve-3d;transform-origin:50% 0;
  will-change:transform;
- background-color:var(--paper);
- background-image:linear-gradient(rgba(26,25,22,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(26,25,22,.045) 1px,transparent 1px);
- background-size:100px 100px;background-position:-1px -1px}
+ background-color:var(--paper);}
 .surface>*{position:absolute}
 canvas.m3d{display:block}
 .flat{box-shadow:0 1px 2px rgba(40,30,15,.08),0 18px 40px -12px rgba(40,30,15,.25)}
@@ -114,12 +112,12 @@ a.up{display:block}
 <footer id="contact"><p class="line">Let's make something people can actually use.</p><a class="mail" href="mailto:victormac@edu.unifor.br">victormac@edu.unifor.br</a>
 <nav class="links"><a href="/cv.html">CV</a><a href="/files/curriculo-carlos-victor-aguiar-de-macedo.pdf">Currículo (PDF)</a><a href="/files/portfolio-carlos-victor-aguiar-de-macedo.pdf">Portfolio (PDF)</a><a href="https://ordinary.vision">ordinary.vision</a><a href="/microblog.html">microblog</a></nav><div class="name">Victor Aguiar-Macedo</div></footer>
 <script>
-const marks=[0,560,1330,2080,2950], TILT=34; let END=3420;
+const marks=[0,560,1330,2080,2950], TILT=0; let END=3420;
 const root=document.documentElement, surf=document.getElementById('surface'), idx=[...document.querySelectorAll('#idx a')], track=document.querySelector('.track');
 const hero=document.querySelector('.surface .print');
 let cur=0, mx=0, my=0, tmx=0, tmy=0, s=1, offY=0, offX=0, running=false, last=-1;
 const span=()=>track.offsetHeight-innerHeight;
-function place(y,ax,ay){ surf.style.transform=`translate3d(${offX}px,${offY}px,0) scale(${s}) rotateX(${TILT+ay*3}deg) rotateZ(${ax*-1.4}deg) translate3d(${ax*-26}px,${-y}px,0)`; }
+function place(y,ax,ay){ surf.style.transform=`translate3d(${offX}px,${offY}px,0) scale(${s}) rotateX(${TILT+ay*1.5}deg) rotateZ(${ax*-1.4}deg) translate3d(${ax*-26}px,${-y}px,0)`; }
 function calibrate(){ // fit the intro group (headline + portrait) into the window and centre it
   s=1; offY=0; offX=0; place(cur,0,0);
   const els=[hero, document.querySelector('.surface .up')].map(e=>e.getBoundingClientRect());
