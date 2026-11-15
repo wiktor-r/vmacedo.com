@@ -62,7 +62,8 @@ footer .name{font-size:clamp(56px,12vw,200px);line-height:.8;letter-spacing:-.03
 footer{margin-top:10vh}
 
 /* ---- depth ---- */
-html{background:linear-gradient(var(--paper) 50%,var(--ink) 50%) fixed}
+html{background-color:var(--paper)}
+html.at-end{background-color:var(--ink)}
 body{background:var(--paper);position:relative;isolation:isolate}
 body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
  background:radial-gradient(ellipse 80% 60% at 22% 8%,rgba(255,252,244,.95),rgba(255,252,244,0) 60%),
@@ -118,6 +119,9 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 <nav class="links"><a href="/cv.html">CV</a><a href="/files/curriculo-carlos-victor-aguiar-de-macedo.pdf">Currículo (PDF)</a><a href="/files/portfolio-carlos-victor-aguiar-de-macedo.pdf">Portfolio (PDF)</a><a href="https://ordinary.vision">ordinary.vision</a><a href="/microblog.html">microblog</a></nav><div class="name">Victor Aguiar-Macedo</div></footer>
 <script>
 document.documentElement.classList.add('js');
+const endFlag=()=>document.documentElement.classList.toggle('at-end', scrollY > (document.documentElement.scrollHeight-innerHeight)/2);
+addEventListener('scroll',endFlag,{passive:true}); addEventListener('resize',endFlag); endFlag();
+
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{rootMargin:'0px 0px -8% 0px'});
 document.querySelectorAll('.rv').forEach(el=>io.observe(el));
 const links=[...document.querySelectorAll('.idx a')], secs=links.map(a=>document.querySelector(a.hash));
