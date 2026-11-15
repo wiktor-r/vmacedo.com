@@ -260,3 +260,5 @@ figcaption{font-size:15.5px;margin-top:12px}
 .item.lead .txt .desc,.item.lead .txt .cta{grid-column:2}.item.lead .txt .title{grid-row:2 / span 2}
 article{padding-top:48px}.byline{padding-left:0!important}
 @media (max-width:900px){.item.lead .txt .desc,.item.lead .txt .cta,.item.lead .txt .title{grid-column:1;grid-row:auto}}
+
+.intro .actions a{align-self:flex-start}
