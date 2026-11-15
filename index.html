@@ -1,7 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Victor Aguiar-Macedo — design</title>
 <meta name="description" content="Victor Aguiar-Macedo — design student at Unifor, Fortaleza. Research, visual identity, wayfinding and prototypes.">
-<meta property="og:title" content="Victor Aguiar-Macedo"><meta property="og:description" content="I take projects from the field to the screen."><meta property="og:image" content="https://vmacedo.com/img/kv-rk.webp">
+<meta property="og:title" content="Victor Aguiar-Macedo"><meta property="og:description" content="I take projects from the field to the screen."><meta property="og:image" content="https://vmacedo.com/img/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <link rel="icon" href="/logo.svg"><link rel="preload" href="/fonts/EBGaramond-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>
 @font-face{font-family:'EB Garamond';font-style:normal;font-weight:400 800;font-display:swap;src:url(/fonts/EBGaramond-normal-latin.woff2) format('woff2')}
@@ -174,6 +174,22 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 .idx{z-index:30}
 html.at-end .idx a{color:rgba(243,239,230,.45)}html.at-end .idx a[aria-current]{color:#f3efe6}
 html.at-end .idx a::after{background:currentColor}
+/* background depth: grain + lighter page/deeper margins + window light */
+
+body::before{background:url(/img/grain-light.webp) 0 0/128px,
+  radial-gradient(ellipse 55% 45% at 18% 0%,rgba(255,253,246,1),rgba(255,253,246,0) 70%),
+  linear-gradient(115deg,rgba(255,251,240,.0) 40%,rgba(255,251,240,.55) 52%,rgba(255,251,240,0) 64%),
+  radial-gradient(ellipse 120% 90% at 50% 50%,rgba(0,0,0,0) 55%,rgba(110,85,50,.16) 100%),
+  radial-gradient(ellipse 70% 60% at 90% 100%,rgba(120,95,60,.14),rgba(120,95,60,0) 65%)
+!important}
+
+@media (min-width:1101px){
+ html,body{background-color:#ebe5d8}
+ main{position:relative;isolation:isolate}
+ main::before{content:"";position:absolute;top:-200px;bottom:0;left:50%;transform:translateX(-50%);z-index:-1;
+  width:calc(min(var(--wrap),calc(100vw - 2*(var(--fout) + var(--fpad)))) + 2*var(--fpad));background:linear-gradient(#f7f4ed,#f3efe6);
+  box-shadow:0 0 0 1px rgba(120,86,52,.06),0 0 60px rgba(90,70,40,.10)}
+}
 </style></head><body>
 <a class="skip" href="#work">Skip to the work</a>
 <header class="top"><a href="/">Victor Aguiar-Macedo</a><nav aria-label="Main"><a class="wide" href="#work">Work</a><a href="#contact">Contact</a></nav></header>
