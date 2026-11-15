@@ -171,3 +171,7 @@ figcaption::before{content:"Fig. " counter(fig) ". ";font-style:italic}
 .big-foot{border-top:0;font-size:18px;color:#f4f1ea;padding-bottom:0}
 .big-foot .wrap{display:block}
 .bf-name{font-size:clamp(48px,9.4vw,138px);white-space:nowrap;overflow:hidden}
+
+/* no widows */
+h1,h2,h3,.pull,.lede{text-wrap:balance}
+p,li,figcaption,dd{text-wrap:pretty}
