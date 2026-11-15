@@ -61,7 +61,8 @@ p,li{text-wrap:pretty}
 .work h2,.sec h2,.play h2{text-wrap:balance}
 
 @media (min-width:1101px){.idx{right:24px;font-size:11.5px;letter-spacing:.12em}.idx a::after{width:12px;margin-left:8px}.idx a[aria-current]::after{width:26px}}
-@media (max-width:1679px){.idx{display:none!important}}
+@media (min-width:1101px) and (max-width:1679px){:root{--fout:140px}html body .idx{right:20px;font-size:10.5px;letter-spacing:.12em;gap:8px}html body .idx a::after{width:0;margin-left:0}html body .idx a[aria-current]::after{width:14px;margin-left:6px}}
+@media (max-width:1279px){.idx{display:none!important}}
 @media (min-width:1680px){:root{--fout:248px}}
 /* photo stack behind the portrait (placeholders for now) */
 @media (min-width:821px){.hello>div:first-child{padding-right:clamp(48px,6vw,110px)}}
@@ -195,7 +196,7 @@ html.at-end .idx a::after{background:currentColor}
  <div class="media desk ira rv"><img class="s1" src="/img/ir_pr-01.webp" width="1600" height="1132" alt="A3 board: location map of the proposed signs along the Praia de Iracema waterfront" loading="lazy" decoding="async"><img class="s2" src="/img/ir_pr-02.webp" width="1600" height="1132" alt="A3 technical board for the directional totem: front view with dimensions, palette and type" loading="lazy" decoding="async"></div>
 </section>
 </main>
-<ul class="idx" aria-label="Sections"><li><a href="#intro">Intro</a></li><li><a href="#work">Work</a></li><li><a href="#voar">UX research</a></li><li><a href="#kennedy">Visual identity</a></li><li><a href="#iracema">Wayfinding</a></li></ul>
+<ul class="idx" aria-label="Sections"><li><a href="#intro">Intro</a></li><li><a href="#work">Work</a></li><li><a href="#voar">Research</a></li><li><a href="#kennedy">Identity</a></li><li><a href="#iracema">Wayfinding</a></li></ul>
 <footer id="contact"><p class="line">Let's make something people can&nbsp;actually&nbsp;use.</p><a class="mail" href="mailto:victormac@edu.unifor.br">victormac@edu.unifor.br</a>
 <nav class="links"><a href="/cv.html">CV</a><a href="/files/curriculo-carlos-victor-aguiar-de-macedo.pdf">Currículo (PDF)</a><a href="/files/portfolio-carlos-victor-aguiar-de-macedo.pdf">Portfolio (PDF)</a><a href="https://ordinary.vision">ordinary.vision</a><a href="/microblog.html">microblog</a></nav><div class="name">Victor Aguiar-Macedo</div></footer>
 <script>
