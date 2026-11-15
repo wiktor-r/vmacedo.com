@@ -62,7 +62,8 @@ footer .name{font-size:clamp(56px,12vw,200px);line-height:.8;letter-spacing:-.03
 footer{margin-top:10vh}
 
 /* ---- depth ---- */
-html{background:var(--paper)} body{background:transparent;position:relative}
+html{background:linear-gradient(var(--paper) 50%,var(--ink) 50%) fixed}
+body{background:var(--paper);position:relative;isolation:isolate}
 body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
  background:radial-gradient(ellipse 80% 60% at 22% 8%,rgba(255,252,244,.95),rgba(255,252,244,0) 60%),
             radial-gradient(ellipse 90% 70% at 85% 105%,rgba(120,100,70,.10),rgba(120,100,70,0) 60%)}
