@@ -173,5 +173,4 @@ figcaption::before{content:"Fig. " counter(fig) ". ";font-style:italic}
 .bf-name{font-size:clamp(48px,9.4vw,138px);white-space:nowrap;overflow:hidden}
 
 /* no widows */
-h1,h2,h3,.pull,.lede{text-wrap:balance}
 p,li,figcaption,dd{text-wrap:pretty}
