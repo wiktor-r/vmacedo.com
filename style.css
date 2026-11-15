@@ -90,4 +90,4 @@ figcaption::before{content:"Fig. " counter(fig) ". ";font-style:italic}
  nav.top ul{gap:16px}section{padding:56px 0}.wrap{padding:0 22px}
  .list li{flex-direction:column;gap:2px}.list li span:last-child{text-align:left}
 }
-@media (max-width:520px){.play{grid-template-columns:1fr}nav.top ul li.hide{display:none}}
+@media (max-width:520px){nav.top .name{font-size:16px;white-space:nowrap}nav.top ul{font-size:16px;gap:14px}.facts{flex-direction:column;gap:6px}.facts .pill+.pill::before{content:none}.play{grid-template-columns:1fr}nav.top ul li.hide{display:none}}
