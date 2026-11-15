@@ -1,0 +1,1936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keyview</title>
+<link rel="stylesheet" href="../family.css">
+<style>
+  :root {
+    --face: var(--panel);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100%;
+    color: var(--ink);
+    font-family: var(--font);
+  }
+  /* NB: no CSS `zoom` here. it looks like browser zoom but it isn't — CSS zoom
+     multiplies getBoundingClientRect and element transforms while leaving
+     pointer clientX/Y alone, so the drag ghost (and the falling letter, glow,
+     fx canvas) drift off the cursor by the zoom factor. for a bigger view use
+     the browser's own zoom (Cmd +), which scales the render without touching
+     the coordinates JS reads, so dragging stays exact. */
+  body {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    outline: none;
+  }
+
+  /* ---- metrics block ---- */
+  .metrics {
+    position: fixed; top: 10px; left: 14px; z-index: 90;
+    font-size: 11px;
+    line-height: 1.9;
+    transition: opacity .5s ease;
+  }
+  .vignette { transition: background .6s ease; }
+  .sys-hint { transition: opacity .4s ease; }
+  /* ---- blind mode: two screens, alternating. one holds the word and nothing
+     else; the other holds the board and nothing else. neither ever shows both,
+     which is the whole mechanism — you type from memory or not at all. ---- */
+  /* the hint is pinned to the bottom of the window, not stacked under the
+     board: the board's keys hang well outside its layout box, so anything in
+     the flow beneath it lands on top of the bottom row */
+  .blind-hint {
+    display: none; position: fixed; left: 0; right: 0; bottom: 26px;
+    text-align: center; color: var(--muted); font-size: 13px;
+  }
+  body.blind .stream,
+  body.blind .sys-hint { display: none; }
+  /* nothing behind it either — no vessel filling up. (the wash and the vignette
+     are already off everywhere, see the black-background rule further down.) an
+     empty screen with the board on it, and that's the mode */
+  body.blind #liquid { display: none; }
+  body.blind .blind-hint { display: block; }
+  /* with the stream gone the board is the only thing in the column — drop the
+     offset it carried to sit under the words, so centred means centred */
+  body.blind #hands { margin-top: 0; }
+  /* ---- the ordinary-keyboard board ----
+     rows, staggered, plain caps. every cut shape, ridge and mark is off: a key
+     is a coloured AREA and nothing else, which is the point of this board — the
+     finger zones read as regions of colour rather than as objects to identify.
+     the cells are the same elements as on the constellation, so every state
+     rule, the cursor and the path preview all still apply. ---- */
+  body.kbmode #hands { flex-direction: column; gap: 7px; padding: 40px 0; }
+  .kbrow { display: flex; gap: 7px; }
+  body.kbmode .finglyph, body.kbmode .sat {
+    position: relative; left: auto; top: auto; transform: none;
+    width: 50px; height: 50px;
+  }
+  body.kbmode .finglyph.thumb { width: 340px; height: 44px; }
+  body.kbmode .finglyph.lit, body.kbmode .sat.lit { transform: scale(1.06); }
+  /* the halo would smear the row into one glow — the caps sit edge to edge here */
+  body.kbmode .finglyph::before, body.kbmode .sat::before { display: none; }
+  body.kbmode .finglyph::after, body.kbmode .sat::after {
+    content: ""; inset: 0; border-radius: 7px;
+    clip-path: none; -webkit-mask: none; mask: none;
+    background: linear-gradient(160deg,
+      color-mix(in srgb, var(--c) calc(var(--mix) * 1.35), #000) 0%,
+      color-mix(in srgb, var(--c) var(--mix), #000) 62%,
+      color-mix(in srgb, var(--c) calc(var(--mix) * .6), #000) 100%);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,var(--rim));
+  }
+  /* the areas have to be readable AS areas, so this board sits above the
+     constellation's resting dimness — still well under the cursor */
+  body.kbmode .finglyph, body.kbmode .sat { --mix: 34%; --rim: .1; }
+  body.kbmode .ridge { display: none; }
+
+  /* ---- the cursor ----
+     ONE object, and it travels. it hovers the key you owe next and slides
+     there — the line it takes between two keys is the thing being taught, so it
+     must never cut and reappear. transform only (GPU, and WebKit keeps the
+     baked gradient rasterised), never left/top, never an animated blur. ---- */
+  #keycursor {
+    position: fixed; left: 0; top: 0; z-index: 93;
+    width: 58px; height: 58px; margin: -29px 0 0 -29px;
+    border-radius: 50%;
+    background: radial-gradient(circle,
+      color-mix(in srgb, var(--cc, #fff) 78%, transparent) 0%,
+      color-mix(in srgb, var(--cc, #fff) 26%, transparent) 38%,
+      transparent 68%);
+    opacity: 0; pointer-events: none;
+    /* the travel is the point, so it's slower than a UI transition and eased
+       like something with weight: leaves quickly, arrives softly */
+    transition: transform .34s cubic-bezier(.32,.72,.16,1), opacity .3s ease;
+    will-change: transform, opacity;
+  }
+  /* the rim is what makes it an object and not a smudge of light */
+  #keycursor::after {
+    content: ""; position: absolute; inset: 14px; border-radius: 50%;
+    border: 1.5px solid color-mix(in srgb, var(--cc, #fff) 88%, transparent);
+  }
+  body.hascursor #keycursor { opacity: 1; }
+  /* the pieces it goes to. angular, lit along one edge and dark along the other
+     — glass, not confetti. transform and opacity only, so they cost a frame. */
+  .shard {
+    position: fixed; z-index: 94; width: 10px; height: 10px;
+    pointer-events: none; will-change: transform, opacity;
+    background: linear-gradient(150deg,
+      color-mix(in srgb, var(--cc, #fff) 55%, #fff) 0%,
+      var(--cc, #fff) 45%,
+      color-mix(in srgb, var(--cc, #fff) 35%, #000) 100%);
+    clip-path: polygon(50% 0%, 100% 74%, 14% 100%);
+  }
+  /* the word, alone. it stands in the same middle of the screen the board does,
+     so the board comes up exactly where the word was */
+  #blindword {
+    display: none; position: fixed; inset: 0; z-index: 96;
+    align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 54px; letter-spacing: 3px;
+    color: var(--ink); pointer-events: none; user-select: none;
+  }
+  body.blind.showing #blindword { display: flex; }
+  /* the show beat is a BLANK screen. previewing the route across the keys was
+     tried here and dropped: it gives the answer away, and more than that, the
+     screen holding NOTHING but the word is the mechanism — anything else on it
+     is somewhere for the eye to go instead of into remembering. */
+  body.blind.showing #hands,
+  body.blind.showing .metrics,
+  body.blind.showing #keycursor,
+  body.blind.showing .blind-hint { visibility: hidden; }
+  .metrics .row { display: flex; }
+  .metrics .label {
+    padding-right: 8px;
+    color: var(--muted);
+  }
+  .metrics .val { color: var(--ink); }
+  .keychips { display: flex; gap: 3px; flex-wrap: wrap; }
+  .chip {
+    border: 1px solid var(--line);
+    min-width: 16px; text-align: center;
+    padding: 0 3px; font-size: 12px; line-height: 18px;
+    color: var(--muted);
+  }
+  .chip.active { border-color: var(--ink); color: var(--ink); }
+  .bar {
+    width: 160px; height: 9px; margin-top: 5px;
+    border: 1px solid var(--line); background: var(--panel);
+  }
+  .bar > span { display: block; height: 100%; width: 0%; background: #7fa055; transition: width .2s; }
+
+  /* ---- text stream ----
+     the whole passage sits on the page as a wrapped block (monkeytype-style)
+     and the cursor travels through it. it used to be one endless line sliding
+     sideways under the cursor, which meant you could never see where you were
+     going. words wrap as units — a word never splits across two lines. ---- */
+  .stream {
+    width: min(900px, 86vw); margin: 34px 0;
+    font-family: var(--font-mono);
+    font-size: 26px; line-height: 1.6;
+    letter-spacing: 1px;
+    color: #52525b;
+    user-select: none;
+    position: relative;
+    /* four lines deep: the passage fits in view, and a long session's repeats
+       roll up a line at a time instead of stretching the page */
+    height: calc(1.6em * 4); overflow: hidden;
+    transition: opacity .5s ease;
+  }
+  .stream .inner {
+    display: flex; flex-wrap: wrap; align-content: flex-start;
+    transition: transform .18s ease-out; will-change: transform;
+  }
+  /* one word (or one space, or one ? round) — an unbreakable unit */
+  .stream .grp { display: inline-flex; white-space: nowrap; }
+  .stream .ch.done { color: #a1a1aa; }
+  .stream .ch.cur {
+    color: var(--ink);
+    border-bottom: 2px solid var(--ink);
+  }
+  .stream .ch.bad {
+    color: #000; background: #c87b6b; border-radius: 2px;
+  }
+  .stream .dot { color: #3f3f46; }
+
+  /* ---- the round as a liquid container ----
+     the vessel is the whole screen, not a bar in a corner. the level rises as
+     the round is typed, so the dark space still above the surface IS what's
+     left to type — the round's remainder as a volume rather than a number.
+     a miss requeues a word, the round gets longer, and the level visibly drops
+     back: losing ground is the same picture as gaining it.
+     transform only, never height/filter — this runs in Nightwatch's WebKit
+     (see HOUSE-THEME.md) and animated height would judder the whole page. */
+  #liquid {
+    position: fixed; inset: 0; z-index: 0;
+    overflow: hidden; pointer-events: none;
+    transition: opacity .4s ease;
+  }
+  #liquid .fluid {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 100%;
+    transform: translateY(100%);
+    transition: transform .3s cubic-bezier(.4,0,.2,1);
+    will-change: transform;
+    background:
+      linear-gradient(to top,
+        rgba(111,156,143,.11) 0%,
+        rgba(111,156,143,.055) 40%,
+        rgba(122,168,155,.03) 88%,
+        rgba(178,222,208,.05) 100%);
+    border-top: 1px solid rgba(190,232,216,.22);
+  }
+  /* the sandbox has no round at all — nothing to hold a level, vessel empty */
+
+  /* ---- keyboard ---- */
+  /* vignette frame — darkens the edges, soft falloff toward the center */
+  /* TEST (Victor's request): pitch-black background on Keyview — wash + vignette off */
+  html, body { background: #000 !important; background-image: none !important; }
+  .vignette { display: none; }
+
+  /* ---- finger constellation (the ethereal glyph pattern, see HOUSE-THEME.md):
+     the keyboard is gone. each finger owns a small cluster of cells where its
+     keys physically sit, and one of them — the key that finger rests on, marked
+     with a bump — anchors the cluster. that resting key is whatever you use, not
+     the home row. a correct stroke lights the cell; a miss lights the exact cell
+     you hit until the right key gets pressed ---- */
+  #hands { display: flex; align-items: center; margin-top: 20px; gap: 74px;
+    padding: 70px 0; position: relative; z-index: 1; }
+  /* a fixed anchor point per finger. every cell — the home one included — hangs
+     off it by an offset, so which key a finger rests on is just a flag, not a
+     position. that's what lets a hand rest off the home row. */
+  .fing { position: relative; width: 40px; height: 35px; }
+  /* the middle finger is the tallest one on the hand, so its whole column
+     stands a few px proud of the row — enough that the crown clears the caps
+     either side of it and reads as sitting over them, not level with them */
+  .fing.middle { transform: translateY(-7px); }
+  /* the home key is a cell like any other — same footprint as its column's
+     keys, so the whole board is one grid of caps. (it used to be a tall
+     finger-length pill; that made sense when the map was a hand, but here it's
+     just the biggest cell in an area of equal cells) */
+  /* PERF: the glow is BAKED. each cell paints a crisp cap (::after) over a
+     static, pre-blurred halo (::before — a radial-gradient that never changes
+     shape or blur radius). only opacity animates, which is GPU-composited, so
+     WebKit keeps the rasterised halo cached instead of re-blurring a box-shadow
+     every frame (that stuttered near-fullscreen on retina). --c is the display
+     colour; round states just reassign it. no box-shadow glow, no filter. */
+  /* a cell is OPAQUE: its dimness is mixed into the colour (over the black
+     field it sits on), not applied as element opacity. it used to be a
+     translucent cell, so the necks running underneath showed straight through
+     the caps that are meant to cover them. --mix is how much colour the cap
+     carries, --halo the glow's strength, --rim the edge light. */
+  .finglyph, .sat { --c: var(--g); --mix: 16%; --halo: .13; --rim: .07; background: transparent; }
+  .finglyph::before, .sat::before {          /* the baked halo — never reshapes */
+    content: ""; position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%); border-radius: 50%;
+    background: radial-gradient(closest-side, var(--c), transparent 70%);
+    opacity: var(--halo); pointer-events: none; will-change: opacity;
+    transition: opacity .3s ease;
+  }
+  .finglyph::after, .sat::after {             /* the crisp cap, over the halo */
+    content: ""; position: absolute; inset: 0; border-radius: 9px;
+    background: color-mix(in srgb, var(--c) var(--mix), #000);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,var(--rim));
+    transition: background-color .3s ease, box-shadow .3s ease;
+  }
+  /* the home cell is placed exactly like any other cell — z-index, not auto,
+     because the necks are appended after the cells and would paint over it */
+  .finglyph {
+    position: absolute; left: 50%; top: 50%; z-index: 1;
+    width: 40px; height: 35px;
+    transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 0px)));
+    transition: transform .18s cubic-bezier(.22,.9,.3,1);
+  }
+  .finglyph::before { width: 154px; height: 154px; }
+  /* the space bar is still the one wide cap. its margins are what set the
+     distance between the two hands, and they used to add 78px of nothing —
+     F to J came out 3.68 columns apart when it is 3 on a real board. at 13px
+     the whole home row lands on one grid: a s d f _ _ _ j k l ; */
+  .fing.thumbwrap { width: 128px; margin: 0 13px; }
+  .finglyph.thumb { width: 128px; height: 35px; }
+  .finglyph.thumb::before { width: 252px; height: 138px; }
+  /* the space bar is out of sight. it was the biggest, brightest thing on the
+     board and it sat dead in the middle, for a key nobody has ever had to find.
+     hidden, not removed: it still holds the two hands their true distance apart,
+     and the cursor still has a place to stand on the modes that type a space. */
+  .finglyph.thumb { visibility: hidden; }
+
+  /* ---- the six landmark home keys aren't rectangles: the cap itself is cut
+     to the shape. middle (D,K) a crown, ring (S,L) a ring with a punched-out
+     void, index (F,J) a cube. they still sit above the plain keys — a
+     landmark has to be findable — but the whole board is now held well under
+     the cursor, which is the only thing on it meant to be looked AT.
+     these rules come BEFORE .lit / .target / .hit on purpose: same specificity,
+     later wins, so the round states still take the cap over. ---- */
+  .finglyph.middle, .finglyph.ring,
+  .finglyph.indexL, .finglyph.indexR { --mix: 38%; --halo: .17; --rim: .18; }
+  /* all of them lit from the same upper left, so the board reads as one set of
+     objects under one light rather than a row of icons */
+  .finglyph.middle::after {
+    border-radius: 0;
+    background: linear-gradient(147deg,
+      color-mix(in srgb, var(--c) calc(var(--mix) * 2), #000) 0%,
+      color-mix(in srgb, var(--c) var(--mix), #000) 52%,
+      color-mix(in srgb, var(--c) calc(var(--mix) * .35), #000) 100%);
+    clip-path: polygon(0% 100%, 100% 100%, 100% 26%, 72% 60%,
+                       50% 2%, 28% 60%, 0% 26%);
+  }
+  /* a true circle in the 40x35 cell — 28px across — with a hole that is BLACK,
+     not see-through: the column has to stop at the ring, not run through it */
+  /* two layers: the punched-out void on top, the band of the ring under it, so
+     the band catches the light on one side the way a band of metal does */
+  .finglyph.ring::after {
+    inset: 3.5px 6px; border-radius: 50%;
+    background:
+      radial-gradient(circle at 50% 50%, #000 6px, transparent 6.5px),
+      linear-gradient(147deg,
+        color-mix(in srgb, var(--c) calc(var(--mix) * 2), #000) 0%,
+        color-mix(in srgb, var(--c) var(--mix), #000) 52%,
+        color-mix(in srgb, var(--c) calc(var(--mix) * .35), #000) 100%);
+  }
+  /* the index caps were balls, and the cursor is a ball — two round glows on a
+     board where one of them means "here, now" is a collision of meaning. they
+     are blocks instead: a hexagon silhouette cut into three faces by a conic
+     gradient, so it reads as a solid cube seen from above. hard edges, three
+     flat planes, nothing round about it. */
+  .finglyph.indexL::after, .finglyph.indexR::after {
+    inset: 2.5px 6px; border-radius: 0;
+    clip-path: polygon(50% 0%, 100% 26%, 100% 74%, 50% 100%, 0% 74%, 0% 26%);
+    background: conic-gradient(from -60deg at 50% 50%,
+      color-mix(in srgb, var(--c) calc(var(--mix) * 2.4), #000) 0deg 120deg,
+      color-mix(in srgb, var(--c) calc(var(--mix) * .4), #000) 120deg 240deg,
+      color-mix(in srgb, var(--c) var(--mix), #000) 240deg 360deg);
+  }
+  /* every other key is cut to its own silhouette — no two alike, so a key is a
+     thing you recognise and not a square at a position. the cut arrives per key
+     as --clip (see SYMBOL below); the families carry the row: top-row shapes
+     rise to a point, bottom-row shapes hang, and G and H are arrows aimed the
+     way the index travels.
+     (the letters themselves were tried here and taken back out: swap the clip
+     line for `content: attr(data-ch)` with background-clip:text to see them.) */
+  .sat::after {
+    border-radius: 0; box-shadow: none;
+    clip-path: var(--clip, none);
+    /* lit from the same upper left as everything else, and the light is scaled
+       BY --mix rather than mixed toward white — so dimming the board dims the
+       highlight with it instead of leaving a white edge burning on a dark shape */
+    background: linear-gradient(147deg,
+      color-mix(in srgb, var(--c) calc(var(--mix) * 2), #000) 0%,
+      color-mix(in srgb, var(--c) var(--mix), #000) 48%,
+      color-mix(in srgb, var(--c) calc(var(--mix) * .35), #000) 100%);
+  }
+  .finglyph.lit  {
+    --mix: 74%; --halo: .7; --rim: .26;
+    transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 0px))) scale(1.12);
+  }
+
+  /* the reach: a thread from a home pill out to one of its keys. invisible at
+     rest — a line only appears once that particular key has been touched, so
+     the board never shows a path you haven't taken. fades out at the pill end
+     so it doesn't smear across the glyph itself */
+  /* the neck: fills the gap between a home cell and one of its keys so the
+     whole column reads as ONE area rather than pieces joined by a hair. it
+     sits under the cells; the seam you see is the cells' own rims */
+  /* opaque like the cells, for the same reason: two necks crossing (the index
+     columns do) used to pile their transparencies into a bright seam */
+  .band {
+    position: absolute; left: 50%; top: 50%; z-index: 0;
+    height: 27px; width: var(--len);
+    background: color-mix(in srgb, var(--g) 6%, #000);
+    /* starts at the home cell wherever it now sits, not at the anchor point */
+    transform-origin: 0 0;
+    transform: translate(var(--hx, 0px), var(--hy, 0px)) rotate(var(--a)) translate(0, -13.5px);
+    pointer-events: none;
+    transition: background-color .3s ease;
+  }
+  .sat.lit + .band, .sat.hit + .band {
+    background: color-mix(in srgb, var(--g) 34%, #000);
+    transition: background-color .06s ease;
+  }
+  .sat.target + .band {
+    background: color-mix(in srgb, var(--ink) 34%, #000);
+    transition: background-color .06s ease;
+  }
+  /* each key is a cell of that area — a keycap footprint, axis-aligned the way
+     real caps are, with a rim that draws the partition where cells meet */
+  .sat {
+    z-index: 1; position: absolute; left: 50%; top: 50%;
+    width: 40px; height: 35px;
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy)));
+    transition: transform .18s cubic-bezier(.22,.9,.3,1);
+  }
+  .sat::before { width: 122px; height: 122px; }
+  /* lighting up inflates the cell a touch */
+  .sat.lit {
+    --mix: 82%; --halo: .8; --rim: .26;
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.18);
+  }
+  /* ---- the ghost board ----
+     where the keys WOULD end, if this were a keyboard: one full key footprint
+     per position, staggered the way the rows really are, drawn as the faintest
+     line the screen can hold. it says the thing the constellation can't — that
+     these little marks sit inside big physical keys, and how much of the board
+     is space you never have to aim at. it sits IN FRONT of the board — the keys
+     are inside those bounds, not on top of them, and a line that passes behind
+     a shape reads as scenery instead of as the edge of the key. ---- */
+  .keygrid { position: absolute; inset: 0; z-index: 6; pointer-events: none; }
+  .gridcell {
+    position: absolute; left: 50%; top: 50%;
+    width: 114px; height: 82px; border-radius: 4px;
+    border: 1px solid rgba(255,255,255,.045);
+    transform: translate(calc(-50% + var(--gx)), calc(-50% + var(--gy)));
+  }
+
+  /* the rest mark: a DOT, and the smallest thing on the board by a long way —
+     five pixels, low in the cap. the pinkies don't need a landmark so much as a
+     full stop: they are the outermost keys, there is nothing past them to
+     confuse them with, and the bar they used to wear read as a shape you were
+     meant to identify. it lives INSIDE the cell, so it travels with the key. */
+  .ridge {
+    position: absolute; left: 50%; top: 50%; z-index: 2;
+    width: 5px; height: 5px; border-radius: 50%;
+    background: radial-gradient(circle at 36% 32%,
+      color-mix(in srgb, var(--rc, var(--g)) 55%, #fff) 0%,
+      var(--rc, var(--g)) 70%,
+      color-mix(in srgb, var(--rc, var(--g)) 55%, #000) 100%);
+    transform: translate(-50%, calc(-50% + 6px));
+    opacity: .8; pointer-events: none;
+    transition: opacity .3s ease, background .2s ease;
+  }
+  /* ---- the board sits DOWN. it is the ground the cursor moves over, not the
+     thing being read: every shape is still legible if you look for it, and none
+     of it competes with the one bright object travelling across it. ---- */
+  .finglyph { --mix: 13%; --halo: .07; --rim: .05; }
+  .sat { --mix: 15%; --halo: .06; --rim: .06; }
+  .lit > .ridge { opacity: 1; }
+  /* during a recall round the cell goes colourless — the ridge follows, so it
+     stays a position cue and never leaks the finger colour */
+  .target > .ridge { --rc: var(--ink); opacity: 1; }
+  .hit > .ridge    { --rc: #7fa055; opacity: 1; }
+  /* the two toggles, top-right */
+  /* z above the metrics block and free to wrap: the row of toggles is long
+     enough now to reach the metrics, and whichever paints on top swallows the
+     other's clicks */
+  #modes {
+    position: fixed; top: 10px; right: 14px; z-index: 95;
+    max-width: 62vw;
+    display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px;
+    transition: opacity .4s ease;
+  }
+  #modes button {
+    background: var(--panel); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 7px 16px; font: 600 14px var(--font); cursor: pointer;
+    transition: border-color .15s, color .15s, background .15s;
+  }
+  #modes button:hover { border-color: var(--ink); }
+  /* off reads as off: the pill dims and hollows out */
+  #modes button.off { color: var(--muted); background: transparent; }
+  /* the mode picker wears the same pill as the toggles beside it */
+  #modepick {
+    background: var(--panel); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 7px 32px 7px 16px; font: 600 14px var(--font); cursor: pointer;
+    appearance: none; -webkit-appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+                      linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+    background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+    transition: border-color .15s;
+  }
+  #modepick:hover { border-color: var(--ink); }
+  #modepick option { background: var(--panel); color: var(--ink); }
+  /* the toggles stay reachable during a round — a round is exactly when you'd
+     want to switch them off, so hiding them there was backwards */
+
+  /* ---- the naming step: one key's spot on the map lights white — position
+     only, no letter, no colour — and you name it from the keyboard. the words
+     stay where they are; this is the same room, not a new one. ---- */
+  body.challenge .stream { pointer-events: none; }
+  body.challenge .sys-hint { opacity: 0; }
+  /* during a round, hide the red char you slipped on. it sits right after the
+     ? and reads as "type me next", which fights the round — the round is about
+     the key you HIT (lit on the map), not the one you owe. the slot stays (so
+     the line doesn't jump); the letter just isn't shown until the round ends */
+  body.challenge .stream .ch.bad { visibility: hidden; }
+  /* round states: colour is --c, intensity is opacity, and the pulse is the
+     glow layer's own opacity — all composited, no box-shadow anywhere. */
+  .finglyph.target, .sat.target { --c: var(--ink); --mix: 100%; --halo: .9; --rim: .3; }
+  .finglyph.target::before, .sat.target::before {
+    animation: haloPulse 1.15s ease-in-out infinite;
+  }
+  @keyframes haloPulse { 0%,100% { opacity: .5; } 50% { opacity: 1; } }
+  .finglyph.hit, .sat.hit { --c: #7fa055; --mix: 100%; --halo: .9; --rim: .3; }
+  /* the socket swells while a carried key hovers over it — the pulse stops so
+     this steady bloom reads as "let go here". a wrong key dropped on it flashes
+     red instead. both override the target pulse, so kill the animation. the
+     sat keeps its column offset in the transform; only the finglyph is centred */
+  .finglyph.target.reject, .sat.target.reject { --c: #c87b6b; }
+  .finglyph.target.reject::before, .sat.target.reject::before { animation: none; opacity: 1; }
+  /* ---- the kill: an enemy squats on a key's spot. it's the same socket as the
+     naming step, asking the opposite thing — don't tell me what lives here,
+     hit it. red where naming is white, and it beats faster. only the glow
+     layer's opacity animates, so WebKit isn't re-blurring anything. ---- */
+  .finglyph.enemy, .sat.enemy { --c: #8c3b34; --mix: 62%; --halo: .55; --rim: .18; }
+  .finglyph.enemy::before, .sat.enemy::before {
+    animation: haloPulse .78s ease-in-out infinite;
+  }
+  .finglyph.enemy.reject, .sat.enemy.reject { --c: #d6b45e; }   /* wrong key: it shrugs */
+  /* the thing itself. a red dot on a cell read as a status light, not a threat,
+     so the enemy is a body: a spiked carapace with two eyes, crouched over the
+     key and twitching. drawn with clip-path over a baked gradient — only the
+     transform animates, so WebKit composites it and never re-rasterises. */
+  .bug {
+    position: absolute; left: 50%; top: 50%; z-index: 5;
+    width: 34px; height: 30px; margin: -15px 0 0 -17px;
+    background:
+      radial-gradient(closest-side at 50% 62%, #d4564a 0%, #7e211c 52%, #35090a 100%);
+    clip-path: polygon(
+      50% 0%, 62% 13%, 82% 4%, 76% 24%, 97% 34%, 82% 50%,
+      100% 70%, 78% 70%, 84% 92%, 62% 80%, 50% 100%,
+      38% 80%, 16% 92%, 22% 70%, 0% 70%, 18% 50%, 3% 34%, 24% 24%, 18% 4%, 38% 13%);
+    animation: bugtwitch .42s steps(2, end) infinite;
+    pointer-events: none;
+  }
+  /* eyes: two cold points that don't blink */
+  .bug .eye {
+    position: absolute; top: 34%; width: 6px; height: 6px; border-radius: 50%;
+    background: #ffe9b0;
+  }
+  .bug .eye.l { left: 30%; }
+  .bug .eye.r { right: 30%; }
+  @keyframes bugtwitch {
+    0%   { transform: translate(0, 0)      rotate(-4deg) scale(1); }
+    50%  { transform: translate(1px, -1px) rotate(4deg)  scale(1.06); }
+    100% { transform: translate(0, 0)      rotate(-4deg) scale(1); }
+  }
+  /* struck: it stops dead and drops away */
+  .bug.dead { animation: none; transform: scale(.2) rotate(28deg); opacity: 0;
+    transition: transform .3s ease-in, opacity .3s ease-in; }
+  body.killing #recallprompt { opacity: 1; }
+  body.killing .sys-hint { opacity: 0; }
+  /* the words go away the moment the naming starts. they are answers: leaving
+     them up means the letter you're being asked for is sitting there in print. */
+  body.challenge .stream, body.killing .stream { opacity: 0; }
+  #recallprompt {
+    position: fixed; left: 0; right: 0; top: 58px; text-align: center; z-index: 90;
+    font: 400 15px var(--font); color: var(--muted); letter-spacing: .02em;
+    opacity: 0; pointer-events: none; transition: opacity .45s ease;
+  }
+  #recallprompt b { color: var(--ink); font-weight: 600; }
+  body.challenge #recallprompt { opacity: 1; }
+  /* ---- the letters, sitting directly above the board ----
+     you never press a letter to answer — that would send you hunting for it on
+     the physical keyboard, which is the looking-down this drill exists to stop.
+     the arrow keys walk a cursor along this grid instead: four keys you already
+     know by feel, and your eyes stay on the map. two fixed rows of thirteen, so
+     up/down is always ±13. it holds its space whether it's showing or not. */
+  #alphabet {
+    display: grid; grid-template-columns: repeat(13, 1fr); gap: 5px;
+    width: min(524px, 92vw); margin-top: 6px;
+    opacity: 0; pointer-events: none;
+    transition: opacity .35s ease;
+  }
+  body.challenge #alphabet { opacity: 1; }
+  #alphabet .letter {
+    min-width: 30px; height: 32px; padding: 0 7px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--line); border-radius: 7px;
+    background: var(--panel); color: #52525b;
+    font: 600 15px var(--font-mono);
+    user-select: none; -webkit-user-select: none;
+    transition: color .12s, border-color .12s, transform .12s, background .12s;
+  }
+  /* where the cursor is standing — not committed until space */
+  #alphabet .letter.sel {
+    color: var(--ink); border-color: var(--ink);
+    background: #26262b; transform: translateY(-2px) scale(1.12);
+  }
+  /* the click reaction: a green ring pops out of the socket when a key snaps home */
+  .snapring {
+    position: fixed; z-index: 97; pointer-events: none;
+    width: 40px; height: 40px; margin: -20px 0 0 -20px;
+    border-radius: 50%; border: 2.5px solid #7fa055;
+    box-shadow: 0 0 12px #7fa055;
+    animation: snapring .42s cubic-bezier(.2,.7,.2,1) forwards;
+  }
+  @keyframes snapring {
+    0%   { transform: scale(.35); opacity: .95; }
+    100% { transform: scale(2.6);  opacity: 0; }
+  }
+  /* a symbol slip isn't a round — the key you hit just glows amber where it
+     sits, paired with the notice below. amber marks it as a note, apart from
+     the white drag-socket and the green correct-hit. */
+  .finglyph.slip, .sat.slip { --c: #d6b45e; --mix: 100%; --halo: .9; --rim: .3; }
+  /* the guiding line, standing where the drag tray would have risen */
+  #slipnotice {
+    position: fixed; left: 50%; bottom: 44px; z-index: 92;
+    transform: translateX(-50%) translateY(10px);
+    padding: 10px 18px; border-radius: 10px;
+    background: var(--panel); border: 1px solid var(--line);
+    font: 500 15px var(--font); color: var(--muted); white-space: nowrap;
+    opacity: 0; pointer-events: none;
+    transition: opacity .3s ease, transform .3s ease;
+  }
+  #slipnotice.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #slipnotice b { color: #d6b45e; font-weight: 700; }
+  /* a pressed physical key drops its printed letter into the spiritual
+     keyboard — seen from straight above, so it falls TOWARD you: it looms
+     large and soft up high, then rushes down into sharp focus onto its own
+     pill. depth is scale + focus, never a slide down the screen */
+  .fallingletter {
+    position: fixed; left: 0; top: 0; z-index: 95;
+    font: 700 22px var(--font-mono); line-height: 1;
+    color: var(--ink); pointer-events: none;
+    text-shadow: 0 0 12px var(--glow), 0 0 26px var(--glow);
+    will-change: transform, opacity;
+  }
+  /* the letter stays on the key it struck; only its light travels back to the
+     home key, the way the finger does */
+  .letterglow {
+    position: fixed; left: 0; top: 0; z-index: 94;
+    width: 36px; height: 36px; border-radius: 50%;
+    /* softness baked into the gradient, not a filter — so animating its
+       transform/opacity doesn't re-rasterise a blur each frame */
+    background: radial-gradient(circle, var(--glow) 0%, transparent 58%);
+    pointer-events: none;
+    will-change: transform, opacity;
+  }
+</style>
+</head>
+<body tabindex="0">
+  <div class="vignette"></div>
+  <div id="liquid"><div class="fluid"></div></div>
+  <div id="modes">
+    <select id="modepick" aria-label="Mode"></select>
+    <button id="restkeys">Home row only: ON</button>
+    <button id="boardpick">Board: constellation</button>
+  </div>
+
+  <div class="metrics">
+    <div class="row"><div class="label">Metrics:</div>
+      <div class="val">Speed: <span id="wpm">0.0wpm</span>&nbsp;&nbsp;Accuracy: <span id="acc">0%</span>&nbsp;&nbsp;Score: <span id="score">0</span></div></div>
+    <div class="row"><div class="label">All keys:</div>
+      <div class="keychips" id="keychips"></div></div>
+    <div class="row"><div class="label">Current key:</div>
+      <div class="val" id="curkey">— hidden until you slip</div></div>
+    <div class="row"><div class="label">Accuracy:</div>
+      <div class="val" id="streaks">No accuracy streaks.</div></div>
+  </div>
+
+  <div class="stream" id="stream"></div>
+
+  <div id="hands"></div>
+  <p class="sys-hint">every round is the same three things: type three words · name three keys on the map (arrows, then space or enter) · kill three enemies sitting on them</p>
+  <p class="blind-hint">type what you saw — right keys carry the tune, a wrong one breaks the ball · Enter shows the word again</p>
+  <div id="blindword"></div>
+  <div id="keycursor"></div>
+
+<script src="syllables.js"></script>
+<script>
+// ---- lesson text: every word is one real English syllable, drawn from
+// the full Moby set (syllables.js, ranked common-first). the cubed random
+// leans hard on common syllables but can reach all 13,936. every so often
+// a mirror alternation slips in instead (below) ----
+// mirror alternations: the same finger in the same spot, hand to hand
+// (r↔u, fjfj) — the position generalizes across the body's midline
+// letters only — the x/. pair used to spit out "x.x.x." lines that read as
+// punctuation noise in the stream rather than as a drill
+const MIRRORS = [["q","p"],["a",";"],["w","o"],["e","i"],
+  ["d","k"],["r","u"],["f","j"],["v","m"],["t","y"],["g","h"],["b","n"]];
+function makeAlt(){
+  let pair = MIRRORS[Math.floor(Math.random() * MIRRORS.length)];
+  if(restOnly){
+    // with the pool narrowed, alternate between the two hands' resting keys
+    const L = restLetters().filter(c => LEFTHAND.has(c));
+    const R = restLetters().filter(c => !LEFTHAND.has(c));
+    if(!L.length || !R.length) return pool()[0];
+    const l = L[Math.floor(Math.random()*L.length)];
+    // the focus key takes the other hand's slot when it lives there
+    const r = (FOCUS && R.includes(FOCUS) && Math.random() < FOCUS_SHARE)
+      ? FOCUS : R[Math.floor(Math.random()*R.length)];
+    pair = [l, r];
+  }
+  const len = 4 + Math.floor(Math.random() * 3); // 4–6 strokes
+  const start = Math.random() < .5 ? 0 : 1;
+  return Array.from({length: len}, (_, i) => pair[(start + i) % 2]).join("");
+}
+// ---- the pool can be narrowed to the keys the hands are already sitting on:
+// nothing but the resting keys, so a round of practice never asks a finger to
+// leave its key. it follows the map — retag a resting key and the words change.
+let restOnly = true;                 // set from storage once PREF exists (below)
+let poolCache = null, poolKey = "";
+function restLetters(){
+  return Object.keys(HOMES).map(fid => HOMES[fid]).filter(c => /^[a-z]$/.test(c));
+}
+function pool(){
+  if(!restOnly) return SYLLABLES;
+  const letters = restLetters(), key = letters.slice().sort().join("");
+  if(poolKey === key && poolCache) return poolCache;
+  const set = new Set(letters);
+  const p = SYLLABLES.filter(w => [...w].every(c => set.has(c)));
+  poolKey = key;
+  poolCache = p.length >= 20 ? p : SYLLABLES;   // too thin a set to drill on
+  return poolCache;
+}
+// ---- the focus key: the one that's actually giving trouble. most words are
+// drawn from the slice of the pool that contains it, so it comes up several
+// times a line instead of by luck. change FOCUS to drill a different key, or
+// set it to "" to spread evenly again.
+const FOCUS = "o";
+const FOCUS_SHARE = .65;
+let focusCache = null, focusKey = "";
+function focusPool(){
+  if(!FOCUS) return null;
+  const src = pool();
+  const key = (restOnly ? poolKey : "all") + FOCUS;
+  if(focusCache && focusKey === key) return focusCache;
+  const p = src.filter(w => w.includes(FOCUS));
+  focusKey = key;
+  focusCache = p.length >= 8 ? p : null;
+  return focusCache;
+}
+// n-grams only. real English words were mixed in here for a while and are gone
+// again: a word is a thing you already know, so typing it tests your spelling
+// and your habits rather than your hands. an n-gram has nothing to fall back on
+// — every key in it has to be found.
+function makeWord(){
+  if(Math.random() < .12) return makeAlt();
+  const fp = focusPool();
+  const src = (fp && Math.random() < FOCUS_SHARE) ? fp : pool();
+  return src[Math.floor(Math.pow(Math.random(), 3) * src.length)];
+}
+// a round is THREE words. the old 22-word passage was a wall you got angry at
+// halfway through — nothing to reach, no way to see how far in you were. three
+// words is a beat you can finish, and the liquid level makes the end visible.
+const ROUND_WORDS = 3;
+function makeText(){
+  if(blindMode()) return blindDeal();     // no spaces there, and every word twice
+  const w = [];
+  for (let i = 0; i < ROUND_WORDS; i++) w.push(makeWord());
+  return w.join(" ");
+}
+let TEXT = "";
+
+// keys are colored by the FINGER that presses them (keybr's actual scheme),
+// not a heatmap. Pinky/ring/middle share a hue across hands; the two index
+// fingers get distinct colors; the thumb (space) and modifiers are their own.
+const FINGER = {
+  pinky:  "#7fa055",  // green        — ` 1 q a z   0 - = p [ ] \ ; ' /
+  ring:   "#a8bd5e",  // yellow-green — 2 w s x     9 o l .
+  middle: "#d6c257",  // gold         — 3 e d c     8 i k ,
+  indexL: "#6f9c8f",  // teal         — 4 5 r t f g v b
+  indexR: "#c2849a",  // rose         — 6 7 y u h j n m
+  thumb:  "#8f86b8",  // violet       — space (red is reserved for mistakes)
+  mod:    "#33333b",  // near-bg gray — Tab Caps Shift Ctrl Alt Enter Backspace (recedes)
+};
+const KEYZONE = {};
+const assign = (zone, keys) => keys.forEach(k => KEYZONE[k] = zone);
+assign("pinky",  ["`","1","q","a","z","0","-","=","p","[","]","\\",";","'","/"]);
+assign("ring",   ["2","w","s","x","9","o","l","."]);
+assign("middle", ["3","e","d","c","8","i","k",","]);
+assign("indexL", ["4","5","r","t","f","g","v","b"]);
+assign("indexR", ["6","7","y","u","h","j","n","m"]);
+// a key's colour is its FINGER's colour (fingerIdFor reads the map)
+function tint(key){
+  if(key===" ") return FINGER.thumb;
+  if(/^{/.test(key)) return FINGER.mod;
+  const fid = typeof fingerIdFor === "function" ? fingerIdFor(key) : null;
+  const z = (fid && FID_ZONE[fid]) || KEYZONE[key.toLowerCase()];
+  return z ? FINGER[z] : FINGER.mod;
+}
+// ---- all-keys chips ----
+const chipChars = [...new Set(SYLLABLES.join(""))].sort();
+const chipWrap = document.getElementById("keychips");
+chipChars.forEach(c=>{
+  const s=document.createElement("span"); s.className="chip"; s.textContent=c.toUpperCase();
+  s.dataset.ch=c; chipWrap.appendChild(s);
+});
+
+// ---- finger constellation ----
+// each finger: the keys it covers, offset from the key it rests on in REAL
+// KEYBOARD UNITS — [columns across, rows down], straight off an ANSI board's
+// stagger (home row starts at 1.75u, the top row at 1.5u, the bottom at 2.25u,
+// so every top-row key is a quarter column left of its home key and every
+// bottom-row key half a column right). numbers row left out; this lesson never
+// asks for it.
+//
+// these used to be hand-tuned pixels, and the index clusters were squeezed to
+// about half the spacing used everywhere else: R and T ended up 8px apart —
+// tangent, indistinguishable — and C and B were drawn nowhere near where they
+// actually are. a map for finding keys by position cannot lie about position.
+// one column across is UX, and it is the SAME distance the resting keys are
+// apart, so the whole board is one grid.
+const UX = 114, UY = 82;   // one key across, one row down, in px
+const HANDROW = [
+  {id:'Lp', z:'pinky',  home:'a', sats:[['q',-0.25,-1],['z',0.5,1]]},
+  {id:'Lr', z:'ring',   home:'s', sats:[['w',-0.25,-1],['x',0.5,1]]},
+  {id:'Lm', z:'middle', home:'d', sats:[['e',-0.25,-1],['c',0.5,1]]},
+  {id:'Li', z:'indexL', home:'f', sats:[['r',-0.25,-1],['t',0.75,-1],['g',1,0],['v',0.5,1],['b',1.5,1]]},
+  {id:'T',  z:'thumb',  home:' ', sats:[]},
+  {id:'Ri', z:'indexR', home:'j', sats:[['u',-0.25,-1],['y',-1.25,-1],['h',-1,0],['m',0.5,1],['n',-0.5,1]]},
+  {id:'Rm', z:'middle', home:'k', sats:[['i',-0.25,-1]]},
+  {id:'Rr', z:'ring',   home:'l', sats:[['o',-0.25,-1],['.',0.5,1]]},
+  {id:'Rp', z:'pinky',  home:';', sats:[['p',-0.25,-1]]},
+];
+// the fingers whose resting cap is cut to a shape rather than a rounded square
+const SHAPED = new Set(['middle', 'ring', 'indexL', 'indexR']);
+// keys drawn loose from their finger's body — no neck back to the resting key
+const DETACHED = new Set(['t', 'y', 'n', 'm', 'c', 'v', 'b']);
+
+// ---- one silhouette per key. the home row is the only place shapes repeat
+// (crown, ring, sphere, bar — the same on both hands, because that pair IS the
+// pair). everything else is its own cut, and the family says which row:
+//   top row     — the shape rises to a point or a crest
+//   bottom row  — the shape hangs, pointing or opening downward
+//   G and H     — the two inner reaches, arrows aimed the way the index goes
+// none of them draw their letter. the board hides letters on purpose; a shape
+// that spelled one would hand over the answer during a naming round.
+const SYMBOL = {
+  // --- top row: upward ---
+  q: "polygon(50% 4%, 96% 96%, 4% 96%)",                                   // spire
+  w: "polygon(50% 4%, 96% 62%, 96% 96%, 50% 38%, 4% 96%, 4% 62%)",         // caret
+  e: "polygon(50% 2%, 96% 38%, 96% 96%, 4% 96%, 4% 38%)",                  // gable
+  r: "polygon(4% 96%, 4% 46%, 12% 24%, 30% 8%, 50% 3%, 70% 8%, 88% 24%, 96% 46%, 96% 96%)", // dome
+  t: "polygon(6% 4%, 96% 26%, 22% 48%, 22% 96%, 6% 96%)",                  // pennant
+  y: "polygon(50% 4%, 92% 46%, 66% 46%, 66% 96%, 34% 96%, 34% 46%, 8% 46%)", // arrow up
+  u: "polygon(4% 96%, 4% 26%, 30% 26%, 30% 6%, 70% 6%, 70% 26%, 96% 26%, 96% 96%)", // plinth
+  i: "polygon(50% 2%, 76% 30%, 68% 96%, 32% 96%, 24% 30%)",                // obelisk
+  o: "polygon(30% 3%, 70% 3%, 97% 30%, 97% 70%, 70% 97%, 30% 97%, 3% 70%, 3% 30%)", // octagon
+  p: "polygon(26% 5%, 74% 5%, 96% 95%, 4% 95%)",                           // keystone
+  // --- bottom row: downward ---
+  z: "polygon(4% 4%, 96% 4%, 50% 96%)",                                    // wedge
+  x: "polygon(4% 4%, 50% 58%, 96% 4%, 96% 38%, 50% 96%, 4% 38%)",          // chevron
+  c: "polygon(4% 4%, 96% 4%, 96% 62%, 50% 98%, 4% 62%)",                   // shield
+  v: "polygon(4% 4%, 96% 4%, 96% 54%, 88% 76%, 70% 92%, 50% 97%, 30% 92%, 12% 76%, 4% 54%)", // bowl
+  b: "polygon(6% 4%, 94% 4%, 56% 50%, 94% 96%, 6% 96%, 44% 50%)",          // hourglass
+  n: "polygon(4% 5%, 96% 5%, 74% 95%, 26% 95%)",                           // hopper
+  m: "polygon(4% 4%, 96% 4%, 96% 96%, 70% 96%, 70% 52%, 30% 52%, 30% 96%, 4% 96%)", // tuning fork
+  ".": "polygon(50% 24%, 76% 50%, 50% 76%, 24% 50%)",                      // pip
+  // --- the inner reaches ---
+  g: "polygon(4% 32%, 58% 32%, 58% 8%, 96% 50%, 58% 92%, 58% 68%, 4% 68%)", // arrow right
+  h: "polygon(96% 32%, 42% 32%, 42% 8%, 4% 50%, 42% 92%, 42% 68%, 96% 68%)", // arrow left
+};
+const handsEl = document.getElementById('hands');
+// which board is drawn: the finger constellation, or an ordinary keyboard.
+// read straight from storage — the toggle that writes it is set up much later,
+// and buildHands() runs long before that.
+let kbMode = false;
+try { kbMode = localStorage.getItem("keyview.kbmode") === "1"; } catch(e){}
+let fingerEls = {}; // finger id -> pill
+let dotEls = {};    // satellite char -> dot
+let homeEls = {};   // home char -> pill
+// ---- the map is DATA, not layout: KEYMAP says which finger each key belongs
+// to and where it hangs. it is fixed — the board can no longer be dragged
+// about, and nothing about it is stored between sessions.
+const FID_ZONE = {};
+HANDROW.forEach(f=>{ FID_ZONE[f.id] = f.z; });
+// every key is a cell: which finger owns it, and where it hangs off that
+// finger's anchor. the home key is the one the finger rests on — the standard
+// home row, the same every session. an old saved map, if any, is ignored.
+// dx/dy are stored in PIXELS: the column/row units above are resolved here once,
+// so everything downstream (cells, necks) works in one space
+const KEYMAP = {}, HOMES = {};
+HANDROW.forEach(f=>{
+  HOMES[f.id] = f.home;
+  KEYMAP[f.home] = {fid:f.id, dx:0, dy:0};
+  f.sats.forEach(([ch,col,row]) => KEYMAP[ch] = {fid:f.id, dx: col * UX, dy: row * UY});
+});
+// old saves from the days of a draggable board and an endless passage
+try { localStorage.removeItem("keyview.map"); localStorage.removeItem("keyview.infinite"); } catch(e){}
+
+// ---- the other board: an ordinary keyboard ----
+// the same keys in the shape everyone already knows, staggered rows, each cap
+// filled with its FINGER's colour — the areas are the key faces themselves, not
+// a mark laid over them. it builds the same dotEls/homeEls maps and the same
+// cell classes as the constellation, so the cursor, the path preview and every
+// round state work on it without knowing which board they are on.
+const KBROWS = [
+  ["q","w","e","r","t","y","u","i","o","p"],
+  ["a","s","d","f","g","h","j","k","l",";"],
+  ["z","x","c","v","b","n","m","."],
+];
+const KBSTAGGER = [0, 22, 60];        // px each row is pushed right, as on a real board
+function buildKeyboard(){
+  handsEl.innerHTML = '';
+  fingerEls = {}; dotEls = {}; homeEls = {};
+  KBROWS.forEach((row, ri) => {
+    const r = document.createElement('span');
+    r.className = 'kbrow';
+    r.style.paddingLeft = KBSTAGGER[ri] + 'px';
+    row.forEach(ch => {
+      const m = KEYMAP[ch];
+      if(!m) return;                  // only the keys this drill actually uses
+      const z = FID_ZONE[m.fid];
+      const isHome = HOMES[m.fid] === ch;
+      const d = document.createElement('i');
+      d.className = (isHome ? 'finglyph ' : 'sat ') + z;
+      d.dataset.ch = ch; d.dataset.fid = m.fid;
+      d.style.setProperty('--g', FINGER[z]);
+      r.appendChild(d);
+      if(isHome){ fingerEls[m.fid] = d; homeEls[ch] = d; }
+      else dotEls[ch] = d;
+    });
+    handsEl.appendChild(r);
+  });
+  // the space bar on its own row, under the thumbs
+  const r = document.createElement('span');
+  r.className = 'kbrow';
+  const sp = document.createElement('i');
+  sp.className = 'finglyph thumb thumb';
+  sp.dataset.ch = ' '; sp.dataset.fid = 'T';
+  sp.style.setProperty('--g', FINGER.thumb);
+  r.appendChild(sp);
+  handsEl.appendChild(r);
+  fingerEls['T'] = sp; homeEls[' '] = sp;
+}
+
+function buildHands(){
+  if(kbMode) return buildKeyboard();
+  handsEl.innerHTML = '';
+  fingerEls = {}; dotEls = {}; homeEls = {};
+  HANDROW.forEach(f=>{
+    const wrap = document.createElement('span');
+    wrap.className = 'fing ' + f.z + (f.id==='T' ? ' thumbwrap' : '');
+    const home = HOMES[f.id];
+    const keys = Object.keys(KEYMAP).filter(ch => KEYMAP[ch].fid === f.id);
+    const hm = KEYMAP[home] || {dx:0, dy:0};
+    // the resting key first — the necks start from it, so it has to exist
+    // before them, and the cells that follow paint over their own necks
+    [home, ...keys.filter(ch => ch !== home)].forEach(ch=>{
+      if(!KEYMAP[ch]) return;
+      const {dx, dy} = KEYMAP[ch];
+      const isHome = ch === home;
+      const d = document.createElement('i');
+      d.className = (isHome ? 'finglyph ' : 'sat ') + f.z + (isHome && ch===' ' ? ' thumb' : '');
+      d.dataset.ch = ch; d.dataset.fid = f.id;
+      d.style.setProperty('--g', FINGER[f.z]);
+      d.style.setProperty('--dx', dx+'px');
+      d.style.setProperty('--dy', dy+'px');
+      if(SYMBOL[ch]) d.style.setProperty('--clip', SYMBOL[ch]);
+      // the mark on the key the finger sits on — the F/J ridge, moved to
+      // wherever the hand actually rests. only the pinkies and the thumb carry
+      // it: the middle, ring and index caps are cut to a crown, a ring and a
+      // sphere, and a shaped cap doesn't need a bar drawn on it as well
+      if(isHome && !SHAPED.has(f.z)){
+        const r = document.createElement('i');
+        r.className = 'ridge';
+        r.style.setProperty('--g', FINGER[f.z]);
+        d.appendChild(r);
+      }
+      wrap.appendChild(d);
+      if(isHome){ fingerEls[f.id] = d; homeEls[ch] = d; }
+      else {
+        dotEls[ch] = d;
+        // T and Y stand free of the body. they are the long sideways stretches,
+        // and drawing them joined to the index column made that column read as
+        // one crowded mass instead of a hand with a reach. no neck — the colour
+        // is what still says whose they are.
+        if(DETACHED.has(ch)) return;
+        // the neck runs from the resting cell out to this one, filling the gap
+        // so the column is one continuous area. it lives right after the cell
+        // so the cell's own state (lit/target/hit) can drive it
+        const vx = dx - hm.dx, vy = dy - hm.dy;
+        const ln = document.createElement('i');
+        ln.className = 'band';
+        ln.style.setProperty('--g', FINGER[f.z]);
+        ln.style.setProperty('--len', Math.hypot(vx, vy) + 'px');
+        ln.style.setProperty('--a', Math.atan2(vy, vx) + 'rad');
+        ln.style.setProperty('--hx', hm.dx + 'px');
+        ln.style.setProperty('--hy', hm.dy + 'px');
+        wrap.appendChild(ln);
+      }
+    });
+    handsEl.appendChild(wrap);
+  });
+  buildKeyGrid(handsEl.firstChild);
+}
+// ---- the ghost board ----
+// every key of a real three-row board, drawn as an empty footprint. the columns
+// are the true ANSI ones (top row starts at 1.5, home at 1.75, bottom at 2.25),
+// and it hangs off the LEFT PINKY's cell, which is column 1.75 — so it is
+// positioned by the same anchor the constellation is and can never drift from it.
+const GRID_ROWS = [
+  {row: -1, from: 1.5,  n: 10},   // Q..P
+  {row:  0, from: 1.75, n: 10},   // A..;
+  {row:  1, from: 2.25, n: 10},   // Z../
+];
+const GRID_ORIGIN = 1.75;         // the column the anchor cell sits in
+function buildKeyGrid(anchorWrap){
+  if(!anchorWrap) return;
+  const layer = document.createElement('i');
+  layer.className = 'keygrid';
+  GRID_ROWS.forEach(({row, from, n}) => {
+    for(let i = 0; i < n; i++){
+      const c = document.createElement('i');
+      c.className = 'gridcell';
+      c.style.setProperty('--gx', ((from + i - GRID_ORIGIN) * UX) + 'px');
+      c.style.setProperty('--gy', (row * UY) + 'px');
+      layer.appendChild(c);
+    }
+  });
+  anchorWrap.appendChild(layer);
+}
+buildHands();
+const LEFTHAND = new Set("`12345qwertasdfgzxcvb");
+function fingerIdFor(ch){
+  const c = ch === ' ' ? ' ' : ch.toLowerCase();
+  if (KEYMAP[c]) return KEYMAP[c].fid;      // wherever the map puts it now
+  const z = KEYZONE[c];                      // keys off the map (numbers, symbols)
+  if (!z) return null;
+  if (z === 'indexL') return 'Li';
+  if (z === 'indexR') return 'Ri';
+  return (LEFTHAND.has(c) ? 'L' : 'R') + z[0];
+}
+// a tap just lights the cell in place. (the home cell used to hop upward on
+// every stroke — the ftap lift, a hand-metaphor gesture. now that every key is
+// an equal cell in a grid, a key jumping out of its column just looks broken)
+function flashDot(d){
+  d.classList.add('lit');
+  clearTimeout(d._t); d._t = setTimeout(()=>d.classList.remove('lit'), 340);
+}
+function flashPill(el){
+  el.classList.add('lit');
+  clearTimeout(el._t); el._t = setTimeout(()=>el.classList.remove('lit'), 340);
+}
+function fingerTap(ch){
+  const d = dotEls[ch.toLowerCase()];
+  if (d) return flashDot(d);
+  const el = fingerEls[fingerIdFor(ch)];
+  if (el) flashPill(el);
+}
+// pressing a physical key writes its letter into the spiritual keyboard. by
+// the time the key is down the stretch already happened, so the letter lights
+// where the key actually sits, presses in, and STAYS there — the letter belongs
+// to its key. what travels is only its light, which slides back to the finger's
+// home key the way the finger returns. a home-row key's light has nowhere to go.
+function dropLetter(ch){
+  const c = ch===" " ? " " : ch.toLowerCase();
+  const g = dotEls[c] || homeEls[c];
+  if(!g) return;
+  const home = fingerEls[fingerIdFor(c)] || g;   // where the finger rests
+  const mid = e=>{ const b=e.getBoundingClientRect(); return [b.left+b.width/2, b.top+b.height/2]; };
+  const [hx,hy] = mid(home), [x,y] = mid(g);
+  const el = document.createElement("div");
+  el.className = "fallingletter";
+  el.textContent = ch===" " ? "␣" : ch.toUpperCase();
+  const col = tint(c);
+  el.style.color = col; el.style.setProperty("--glow", col);
+  document.body.appendChild(el);
+  const at = (px,py,s)=>`translate(${px}px,${py}px) translate(-50%,-50%) scale(${s})`;
+  const H = s=>at(hx,hy,s), K = s=>at(x,y,s);
+  el.animate([
+    { offset:0,   transform: K(1.2), opacity:0, easing:"ease-out" },   // strikes the key it reached
+    { offset:.13, transform: K(1),   opacity:1, easing:"ease-in" },    // lands
+    { offset:.26, transform: K(.88), opacity:1, easing:"ease-out" },   // presses / sinks in
+    { offset:.40, transform: K(1),   opacity:1 },                      // settles on the face
+    { offset:1,   transform: K(1),   opacity:0 }                       // fades into the key, never moving
+  ], { duration: 640 }).onfinish = function(){ el.remove(); };
+  if (home === g) return;                       // home key: no light to send back
+  const gl = document.createElement("div");
+  gl.className = "letterglow";
+  gl.style.setProperty("--glow", col);
+  document.body.appendChild(gl);
+  gl.animate([
+    { offset:0,   transform: K(.7),  opacity:0,  easing:"ease-out" },                        // gathers on the key
+    { offset:.2,  transform: K(1.1), opacity:.9, easing:"cubic-bezier(.4,0,.25,1)" },        // brightest, about to leave
+    { offset:1,   transform: H(.5),  opacity:0 }                                             // draws back to home and dies
+  ], { duration: 520, delay: 170 }).onfinish = function(){ gl.remove(); };
+}
+
+// ---- render stream ----
+const streamEl = document.getElementById("stream");
+let chars = []; // {ch, el}
+let streamInner = null;
+function makeSpan(ch){
+  const span = document.createElement("span");
+  if(ch===" "){ span.className="dot"; span.textContent="·"; }
+  else { span.className="ch"; span.textContent=ch; }
+  return span;
+}
+// re-hang the existing spans into word groups so wrapping happens between
+// words, never inside one. the elements themselves are reused, so whatever
+// state they carry (done / bad / a solved ?) survives the regroup.
+function relayout(){
+  streamInner.innerHTML = "";
+  let word = null;
+  chars.forEach(c=>{
+    if(c.ch===" "){                         // a space stands alone
+      word = null;
+      const g = document.createElement("span");
+      g.className = "grp";
+      g.appendChild(c.el);
+      streamInner.appendChild(g);
+    } else {
+      if(!word){
+        word = document.createElement("span");
+        word.className = "grp";
+        streamInner.appendChild(word);
+      }
+      word.appendChild(c.el);
+    }
+  });
+}
+function render(){
+  streamEl.innerHTML="";
+  chars = [];
+  streamInner = document.createElement("div");
+  streamInner.className = "inner";
+  streamEl.appendChild(streamInner);
+  [...TEXT].forEach(ch=> chars.push({ch, el: makeSpan(ch)}));
+  relayout();
+}
+TEXT = makeText();   // the map has to exist first — the pool is drawn from it
+render();
+
+// ---- state ----
+let pos=0, typed=0, correct=0, mistakes=0, startTime=null;
+// one slip anywhere in a word and the word comes back — see requeueWord()
+let wordMissed = false;
+
+// ---- a missed word repeats ----
+// the word you slipped on is spliced in again directly behind itself, so you
+// type it a second time while the mistake is still warm rather than meeting it
+// again at the end of the round. the round gets longer by exactly that word,
+// which is what the liquid level drops to show: ground lost, drawn the same way
+// ground gained is.
+function requeueWord(word){
+  const at = pos;                                   // just past the space
+  const ins = (at >= TEXT.length) ? (" " + word) : (word + " ");
+  const keep = chars.map(c => c.el.className);      // what is already typed
+  TEXT = TEXT.slice(0, at) + ins + TEXT.slice(at);
+  render();
+  // the insert is at the cursor, so everything behind it lines up index for
+  // index and keeps the state it had
+  for(let i = 0; i < at && i < keep.length; i++) chars[i].el.className = keep[i];
+}
+
+function updateCursor(){
+  chars.forEach((c,i)=>{
+    c.el.classList.remove("cur");
+    if(i===pos && c.ch!==" ") c.el.classList.add("cur");
+  });
+  // the block stays put until the cursor drops past the second line; from then
+  // on it rolls up a whole line at a time, so the cursor sits on line two with
+  // two lines of what's coming still in view
+  const anchorEl = chars[Math.min(pos, chars.length - 1)];
+  if (streamInner && anchorEl) {
+    const lh = parseFloat(getComputedStyle(streamEl).lineHeight) || 42;
+    const line = Math.round(anchorEl.el.offsetTop / lh);
+    streamInner.style.transform = "translateY(" + (-Math.max(0, line - 1) * lh) + "px)";
+  }
+  // active chip
+  const cur = chars[pos] ? chars[pos].ch : null;
+  document.querySelectorAll(".chip").forEach(ch=>{
+    ch.classList.toggle("active", cur && ch.dataset.ch===cur);
+  });
+  moveKeyCursor();
+}
+
+// ---- the travelling cursor ----
+// the key you owe next is HOVERED, not flashed after the fact: the board stops
+// answering your presses and starts leading them. one element, moved by
+// transform, so between two keys it crosses the ground between them — that
+// crossing is the path being learnt, and a cut would teach nothing.
+const keyCursorEl = document.getElementById("keycursor");
+let cursorPlaced = false, cursorBroken = false;
+function cellFor(ch){
+  if(ch == null) return null;
+  const c = ch === " " ? " " : ch.toLowerCase();
+  return dotEls[c] || homeEls[c] || null;
+}
+function moveKeyCursor(){
+  // updateCursor() runs once while the page is still being built, before the
+  // phase state is declared — reading it there is a dead-zone throw that takes
+  // the rest of the script with it. the round's own updateCursor() places it.
+  let ch;
+  try { ch = (phase === "type" && !challengeActive && pos < chars.length) ? chars[pos].ch : null; }
+  catch(e){ return; }
+  const g = cellFor(ch);
+  if(!g || !keyCursorEl){ document.body.classList.remove("hascursor"); return; }
+  const b = g.getBoundingClientRect();
+  if(!b.width){ document.body.classList.remove("hascursor"); return; }   // board not laid out yet
+  const to = "translate(" + (b.left + b.width / 2) + "px," + (b.top + b.height / 2) + "px)";
+  if(!cursorPlaced){
+    // the first key of a session would otherwise be flown in from the corner
+    keyCursorEl.style.transition = "none";
+    keyCursorEl.style.transform = to;
+    void keyCursorEl.offsetWidth;                 // commit before the easing returns
+    keyCursorEl.style.transition = "";
+    cursorPlaced = true;
+  } else {
+    keyCursorEl.style.transform = to;
+  }
+  keyCursorEl.style.setProperty("--cc", tint(ch));
+  // while it's broken it still gets moved into place — it just isn't there to
+  // be seen yet. that way it comes BACK at the origin rather than sliding to it.
+  document.body.classList.toggle("hascursor", !cursorBroken);
+}
+// ---- a mistake breaks it ----
+// the ball goes to pieces where it stood and is gone for a beat. it does not
+// travel back to the start of the word — it reappears there, which is the one
+// place a cut is right: the object that was crossing the board no longer exists.
+function shatterCursor(){
+  if(!keyCursorEl || cursorBroken) return;
+  glassBreak();
+  const b = keyCursorEl.getBoundingClientRect();
+  const cx = b.left + b.width / 2, cy = b.top + b.height / 2;
+  const col = keyCursorEl.style.getPropertyValue("--cc") || "#fff";
+  const N = 11;
+  for(let i = 0; i < N; i++){
+    const s = document.createElement("i");
+    s.className = "shard";
+    s.style.left = cx + "px"; s.style.top = cy + "px";
+    s.style.setProperty("--cc", col);
+    document.body.appendChild(s);
+    const a = (i / N) * Math.PI * 2 + Math.random() * .5;
+    const dist = 24 + Math.random() * 34;
+    const spin = Math.random() * 260 - 130;
+    s.animate([
+      {transform: "translate(-50%,-50%) rotate(0deg) scale(1)", opacity: .95},
+      {transform: "translate(calc(-50% + " + (Math.cos(a) * dist).toFixed(1) + "px), calc(-50% + " +
+                  (Math.sin(a) * dist).toFixed(1) + "px)) rotate(" + spin.toFixed(0) + "deg) scale(.35)",
+       opacity: 0}
+    ], {duration: 380 + Math.random() * 200, easing: "cubic-bezier(.15,.75,.3,1)", fill: "forwards"})
+     .onfinish = () => s.remove();
+    // onfinish doesn't always come — a backgrounded tab, an engine that never
+    // ran the animation — and eleven invisible shards per miss would pile up
+    setTimeout(() => s.remove(), 900);
+  }
+  cursorBroken = true;
+  cursorPlaced = false;                       // no easing on the way back
+  document.body.classList.remove("hascursor");
+  setTimeout(()=>{ cursorBroken = false; moveKeyCursor(); }, 300);
+}
+// the board is laid out from the window, so a resize moves every key under it
+addEventListener("resize", moveKeyCursor);
+updateCursor();
+
+// ---- the level: how much of this ROUND is behind you. the round's phases split
+// the vessel evenly — three phases means thirds, one phase means the whole thing
+// — so the same beats fill it every time and the level always means one thing. ----
+const fluidEl = document.querySelector("#liquid .fluid");
+function phaseFrac(){
+  return phase === "type" ? Math.min(1, pos / (chars.length || 1)) : phaseStep / PHASE_N;
+}
+function updateLiquid(){
+  const n = MODES[runMode].phases.length;
+  const done = Math.min(1, (phaseIdx + phaseFrac()) / n);
+  fluidEl.style.transform = "translateY(" + ((1 - done) * 100).toFixed(2) + "%)";
+}
+
+function updateMetrics(){
+  let wpm=0;
+  if(startTime){
+    const mins=(performance.now()-startTime)/60000;
+    if(mins>0) wpm=(correct/5)/mins;
+  }
+  document.getElementById("wpm").textContent = wpm.toFixed(1)+"wpm";
+  const acc = typed? Math.round(correct/typed*100):0;
+  document.getElementById("acc").textContent = acc+"%";
+  document.getElementById("score").textContent = correct - mistakes*2;
+}
+
+// ---- synesthetic FX removed (Victor's call, 2026-07-25): the per-keystroke
+// particle bursts (fireworks) are gone. burst() is a no-op so its call sites stay valid. ----
+function burst(el, hex){}
+
+// there is ONE thing to be in now: the cycle. no sandbox, no board to put away,
+// nothing to switch between. the two toggles that remain are remembered in
+// localStorage so the app comes back the way you left it.
+const PREF = {
+  get(k, dflt){ try { const v = localStorage.getItem("keyview." + k); return v === null ? dflt : v === "1"; } catch(e){ return dflt; } },
+  set(k, on){ try { localStorage.setItem("keyview." + k, on ? "1" : "0"); } catch(e){} },
+  str(k, dflt){ try { return localStorage.getItem("keyview." + k) ?? dflt; } catch(e){ return dflt; } },
+  setStr(k, v){ try { localStorage.setItem("keyview." + k, v); } catch(e){} },
+};
+try { localStorage.removeItem("keyview.reactive"); localStorage.removeItem("keyview.keyboard"); } catch(e){}
+
+// ---- the cycle: three words, three selections, three kills. always. ----
+// the shape of a round never changes and never depends on how you did. you type
+// three words; then the same three keys are named (walk the arrows to the
+// letter, space to commit) and struck (an enemy takes each spot — press to kill).
+// what varies is only WHICH keys: the ones you got wrong come first, and the
+// rest are filled from the words you just typed. nothing is ever sprung on you
+// mid-word, and nothing is ever skipped for doing well.
+const RECALL_LETTERS = "abcdefghijklmnopqrstuvwxyz".split("").filter(c => dotEls[c] || homeEls[c]);
+function targetGlyph(ch){ return dotEls[ch] || homeEls[ch] || null; }
+function quizzable(ch){ return RECALL_LETTERS.includes(ch === " " ? " " : ch.toLowerCase()); }
+const alphabetEl = document.createElement("div");
+alphabetEl.id = "alphabet";
+RECALL_LETTERS.forEach(c=>{
+  const b = document.createElement("div");
+  b.className = "letter"; b.textContent = c.toUpperCase(); b.dataset.ch = c;
+  alphabetEl.appendChild(b);
+});
+// straight above the board: the answer is given with the hands already there
+handsEl.parentNode.insertBefore(alphabetEl, handsEl);
+const recallPrompt = document.createElement("div");
+recallPrompt.id = "recallprompt";
+recallPrompt.innerHTML = '<span id="recalltext"></span><b id="recallstreak"></b>';
+document.body.appendChild(recallPrompt);
+
+// the keys missed while typing THIS cycle's words — typing is never interrupted
+// to ask about them; they go to the front of the queue for the two phases that
+// follow. each key is listed once, in the order it was first missed.
+let roundMisses = [];
+function noteMiss(ch){
+  const c = ch === " " ? " " : ch.toLowerCase();
+  if(!RECALL_LETTERS.includes(c)) return;   // a missed space has no spot to quiz
+  if(!roundMisses.includes(c)) roundMisses.push(c);
+}
+
+try { localStorage.removeItem("keyview.rounds"); } catch(e){}   // the old Drills toggle
+// words built only from the resting keys — the pool narrows to the home row the
+// hands are already on. flipping it deals fresh words from the whole board.
+restOnly = PREF.get("restonly", true);
+const restBtn = document.getElementById("restkeys");
+function paintRest(){
+  restBtn.textContent = "Home row only: " + (restOnly ? "ON" : "OFF");
+  restBtn.classList.toggle("off", !restOnly);
+}
+restBtn.addEventListener("click", ()=>{
+  restOnly = !restOnly;
+  PREF.set("restonly", restOnly);
+  paintRest();
+  poolCache = null; focusCache = null;
+  restart();
+  document.body.focus();
+});
+
+// ---- which board ----
+// swapping it rebuilds the cells from scratch, so the cursor has to be told
+// where everything went — its old target element no longer exists
+const boardBtn = document.getElementById("boardpick");
+function paintBoard(){
+  boardBtn.textContent = "Board: " + (kbMode ? "keyboard" : "constellation");
+  boardBtn.classList.toggle("off", kbMode);
+  document.body.classList.toggle("kbmode", kbMode);
+}
+boardBtn.addEventListener("click", ()=>{
+  kbMode = !kbMode;
+  PREF.set("kbmode", kbMode);
+  paintBoard();
+  buildHands();
+  cursorPlaced = false;          // it belongs to the new board now, no fly-in
+  restart();
+  document.body.focus();
+});
+paintBoard();
+paintRest();
+let challengeActive = false, challengeTarget = null, challengeStreak = 0;
+function clearTargets(){
+  document.querySelectorAll(".finglyph.target, .sat.target, .finglyph.hit, .sat.hit, .finglyph.enemy, .sat.enemy")
+    .forEach(e=>e.classList.remove("target", "hit", "enemy", "reject", "armed"));
+  document.querySelectorAll(".bug").forEach(b=>b.remove());
+}
+function updateChallengeStreak(){
+  const s = document.getElementById("recallstreak");
+  if(s) s.textContent = challengeStreak ? ("   ·   streak " + challengeStreak) : "";
+}
+// ---- the three keys this cycle is about ----
+// your misses first, in the order you made them, then whatever the words
+// themselves offer. always exactly three, so the phases are always the same size.
+const PHASE_N = 3;
+function pickCycleKeys(){
+  const keys = roundMisses.slice(0, PHASE_N);
+  const fromWords = [...new Set(TEXT.split("").filter(quizzable))];
+  for(const c of fromWords){ if(keys.length >= PHASE_N) break; if(!keys.includes(c)) keys.push(c); }
+  for(const c of RECALL_LETTERS){ if(keys.length >= PHASE_N) break; if(!keys.includes(c)) keys.push(c); }
+  return keys.slice(0, PHASE_N);
+}
+// ---- what a round is made of, per mode ----
+// "type" (three words) · "select" (arrows name the lit spot) · "kill" (strike it).
+// the whole cycle is the default; the other three modes are one phase on its own,
+// repeating. every mode still deals words each round — they set the vocabulary
+// the three keys are drawn from, even in the modes where you never type them.
+const MODES = {
+  cycle: {label: "Full cycle — words, naming, kills", phases: ["type","select","kill"]},
+  words: {label: "Words only — just typing",          phases: ["type"]},
+  name:  {label: "Naming only — arrows and commit",   phases: ["select"]},
+  kill:  {label: "Kills only — strike the enemy",     phases: ["kill"]},
+  // the word is shown alone, taken away, and typed from memory — twice, with
+  // the tune under it. see the blind-mode block further down.
+  blind: {label: "Blind — see it, then type it from memory", phases: ["type"], blind: true},
+};
+let runMode = PREF.str("mode", "cycle");
+if(!MODES[runMode]) runMode = "cycle";
+let phase = "type", cycleKeys = [], phaseStep = 0, phaseIdx = 0;
+// a solved step leaves its green glow up for a beat before the map is wiped. if
+// the next step opens inside that beat, the pending wipe would erase the NEW
+// socket — so each step takes a ticket, and a stale wipe does nothing.
+let roundGen = 0;
+function setPrompt(text){
+  const t = document.getElementById("recalltext");
+  if(t) t.textContent = text + "   (" + (phaseStep + 1) + "/" + PHASE_N + ")";
+}
+
+// the word the cursor is standing in — or, standing on a space, the one it is
+// about to enter
+function wordAt(i){
+  if(i >= TEXT.length) return "";
+  let s = TEXT.lastIndexOf(" ", Math.max(0, i - 1)) + 1;
+  if(TEXT[i] === " ") s = i + 1;
+  let e = TEXT.indexOf(" ", s);
+  if(e < 0) e = TEXT.length;
+  return TEXT.slice(s, e);
+}
+
+// ================= blind mode =================
+// the word is shown alone on an otherwise empty screen, then taken away, and
+// you type it from memory with nothing on the page but the board. then you type
+// it again. there are no spaces in this mode — the words run into each other,
+// so the thumb never comes into it and a word ends when its letters end.
+// makeWord() asks this before MODES is declared, on the very first deal — so it
+// answers "no" rather than throwing on the temporal-dead-zone read
+function blindMode(){ try { return !!MODES[runMode].blind; } catch(e){ return false; } }
+// the words in the order they must be typed, one pass each. a word is only
+// passed when it comes out whole and clean — see blindRestartWord().
+let units = [], unitIdx = 0, showTimer = 0, blindShowing = false;
+function unitEnd(i){ let n = 0; for(let k = 0; k <= i && k < units.length; k++) n += units[k].length; return n; }
+function unitStart(i){ return i > 0 ? unitEnd(i - 1) : 0; }
+function blindDeal(){
+  units = [];
+  for(let i = 0; i < ROUND_WORDS; i++) units.push(makeWord());
+  unitIdx = 0; melodyStep = 0;
+  return units.join("");                 // no separator: no space to type
+}
+// the word you're on goes back to its first letter. used by Enter, when you've
+// asked to see the word again — half a word typed and then patched isn't the word.
+function blindRestartWord(){
+  const s = unitStart(unitIdx);
+  for(let i = s; i < pos && i < chars.length; i++) chars[i].el.className = "ch";
+  pos = s;
+  melodyStep = 0;                        // the phrase starts over with the word
+  updateCursor();
+  updateLiquid();
+}
+// ---- a broken ball moves you on ----
+// the word you fumbled is not ground out on the spot. it comes off the front of
+// the queue and goes on the back, you get the next one, and it returns later —
+// by which time you have to remember it rather than merely repeat it. the round
+// is the same length either way; only the order changes.
+function blindDefer(){
+  const w = units[unitIdx];
+  if(!w) return;
+  const at = unitStart(unitIdx);              // where the fumbled word began
+  const keep = chars.map(c => c.el.className);
+  units.splice(unitIdx, 1);
+  units.push(w);
+  TEXT = units.join("");
+  render();
+  // everything before the fumbled word is untouched by the reshuffle
+  for(let i = 0; i < at && i < keep.length; i++) chars[i].el.className = keep[i];
+  pos = at;
+  wordMissed = false;
+  melodyStep = 0;
+  updateCursor();
+  updateLiquid();
+  blindShow(units[unitIdx]);                  // the next one, shown as any new word is
+}
+// the show beat: everything goes, the word stands alone, and after a moment it
+// goes too. long enough to read twice over, scaled to how much there is to hold.
+const blindWordEl = () => document.getElementById("blindword");
+function blindShow(word){
+  if(!word) return;
+  clearTimeout(showTimer);
+  blindShowing = true;
+  const el = blindWordEl();
+  if(el) el.textContent = word;
+  document.body.classList.add("showing");
+  showTimer = setTimeout(()=>{
+    blindShowing = false;
+    document.body.classList.remove("showing");
+  }, 800 + 260 * word.length);
+}
+function blindClear(){
+  clearTimeout(showTimer);
+  blindShowing = false;
+  document.body.classList.remove("showing");
+}
+// a word's letters are done — and done clean, or it wouldn't have got here.
+// move on to the next one. no requeue: a fumbled word was already retyped from
+// the start as many times as it took.
+function blindAdvance(){
+  if(pos < unitEnd(unitIdx)) return;          // still inside the word
+  wordMissed = false;
+  unitIdx++;
+  melodyStep = 0;                              // every word starts the tune again
+  if(unitIdx < units.length) blindShow(units[unitIdx]);
+}
+
+// ---- the tune ----
+// a right key is the next note of a phrase, so a word typed clean is a line of
+// music and you hear the shape of it before you can see whether it was right.
+// a wrong key is the same note with a semitone and a tritone stacked on it — the
+// two most grating intervals there are — on a harsher wave. it isn't a buzzer;
+// it's the melody going wrong under your hands.
+const MELODY = [0, 2, 4, 7, 9, 12, 9, 7, 4, 2];   // pentatonic: nothing in it can clash
+let melodyStep = 0, AC = null;
+function ac(){
+  if(!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+  if(AC.state === "suspended") AC.resume();
+  return AC;
+}
+function hz(semis){ return 261.63 * Math.pow(2, semis / 12); }
+function tone(freqs, {dur = .85, gain = .16, type = "triangle"} = {}){
+  let a; try { a = ac(); } catch(e){ return; }
+  const t = a.currentTime;
+  const g = a.createGain();
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(gain, t + .008);      // struck, not faded in
+  g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  g.connect(a.destination);
+  freqs.forEach(f => {
+    // a plain sine sounds like a test tone; the octave and fifth above it, quiet,
+    // are enough to read as a struck string
+    [[f, 1], [f * 2, .3], [f * 3, .1]].forEach(([hf, amp]) => {
+      const o = a.createOscillator(), og = a.createGain();
+      o.type = type; o.frequency.value = hf; og.gain.value = amp;
+      o.connect(og); og.connect(g); o.start(t); o.stop(t + dur);
+    });
+  });
+}
+function noteRight(){
+  const n = MELODY[melodyStep % MELODY.length];
+  melodyStep++;
+  tone([hz(n)]);
+}
+// ---- glass ----
+// the sound of the ball going. a short burst of noise with everything low
+// filtered out of it — that's the crack — and behind it a scatter of high,
+// unrelated pings that don't line up with each other or with the tune: the
+// pieces landing. it is the whole of what a mistake says now.
+function glassBreak(){
+  let a; try { a = ac(); } catch(e){ return; }
+  const t = a.currentTime;
+  const len = Math.floor(a.sampleRate * .45);
+  const buf = a.createBuffer(1, len, a.sampleRate);
+  const data = buf.getChannelData(0);
+  for(let i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 7);
+  const src = a.createBufferSource(); src.buffer = buf;
+  const hp = a.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 2400;
+  const g = a.createGain(); g.gain.value = .3;
+  src.connect(hp); hp.connect(g); g.connect(a.destination);
+  src.start(t); src.stop(t + .45);
+  for(let i = 0; i < 8; i++){
+    const at = t + .01 + Math.random() * .2;
+    const o = a.createOscillator(); o.type = "sine";
+    o.frequency.value = 1900 + Math.random() * 4400;
+    const og = a.createGain();
+    og.gain.setValueAtTime(0, at);
+    og.gain.linearRampToValueAtTime(.05 + Math.random() * .05, at + .004);
+    og.gain.exponentialRampToValueAtTime(.0001, at + .1 + Math.random() * .2);
+    o.connect(og); og.connect(a.destination);
+    o.start(at); o.stop(at + .4);
+  }
+}
+// ---- the enemy says its name ----
+// the kill asks for a spot, not a letter, so the letter's name is never in the
+// room — you can strike the right key for three rounds and still not know what
+// lives there. so it says itself out loud when it appears. nothing is asked
+// about it and nothing is scored on it; it just soaks in while you aim.
+// spelled out phonetically because a lone "a" gets read as the word, not the
+// letter, and "y" comes out as a sigh.
+const LETTER_NAME = {
+  a:"ay", b:"bee", c:"see", d:"dee", e:"ee", f:"eff", g:"jee", h:"aitch",
+  i:"eye", j:"jay", k:"kay", l:"ell", m:"em", n:"en", o:"oh", p:"pee",
+  q:"cue", r:"ar", s:"ess", t:"tee", u:"you", v:"vee", w:"double you",
+  x:"ex", y:"why", z:"zee",
+};
+function sayLetter(ch){
+  const name = LETTER_NAME[ch];
+  if(!name || !window.speechSynthesis) return;
+  try {
+    speechSynthesis.cancel();                 // a fast round shouldn't stack voices
+    const u = new SpeechSynthesisUtterance(name);
+    u.lang = "en-US"; u.rate = .85; u.pitch = 1; u.volume = .9;
+    speechSynthesis.speak(u);
+  } catch(e){}
+}
+// step into the phase sitting at phaseIdx — or, past the end, deal a new round
+function runPhase(){
+  const list = MODES[runMode].phases;
+  if(phaseIdx >= list.length) return nextRound();
+  phase = list[phaseIdx];
+  phaseStep = 0;
+  document.body.classList.toggle("blind", blindMode());
+  if(phase === "type"){                    // the words are already on screen
+    document.body.classList.remove("challenge", "killing");
+    challengeActive = false;
+    updateLiquid();
+    // that class just moved the whole board (blind mode drops the stream out of
+    // the column), so anything positioned FROM the board — the cursor, the path
+    // — has to be measured again after it, not before. and once more on a
+    // settled frame, because the move isn't always finished by the next read.
+    updateCursor();
+    requestAnimationFrame(()=> requestAnimationFrame(moveKeyCursor));
+    if(blindMode()) blindShow(units[unitIdx]); else blindClear();
+    return;
+  }
+  blindClear();
+  if(!cycleKeys.length) cycleKeys = pickCycleKeys();
+  engageStep();
+}
+function nextPhase(){
+  phaseIdx++;
+  runPhase();
+}
+function engageStep(){
+  roundGen++;
+  challengeActive = true;                       // no typing into the stream
+  challengeTarget = cycleKeys[phaseStep];
+  clearTargets();
+  // the cursor shows only while naming, and stands where you last left it
+  if(phase === "select") movePick(0); else clearPick();
+  const g = targetGlyph(challengeTarget);
+  if(g){
+    g.classList.add(phase === "kill" ? "enemy" : "target");
+    if(phase === "kill") spawnBug(g);
+  }
+  document.body.classList.toggle("challenge", phase === "select");
+  document.body.classList.toggle("killing", phase === "kill");
+  if(phase === "kill") sayLetter(challengeTarget);
+  setPrompt(phase === "kill"
+    ? "Kill it — press the key it sits on"
+    : "Name it — arrows to choose, space or enter to commit");
+  updateCursor();
+  updateLiquid();
+}
+// the enemy's body, crouched on the key it's taken
+function spawnBug(cell){
+  const bug = document.createElement("i");
+  bug.className = "bug";
+  bug.innerHTML = '<i class="eye l"></i><i class="eye r"></i>';
+  cell.appendChild(bug);
+}
+// a step is done: green flash, then the next one — or the next phase
+function resolveStep(){
+  challengeActive = false;
+  challengeTarget = null;
+  phaseStep++;
+  const gen = ++roundGen;
+  setTimeout(()=>{ if(gen === roundGen) clearTargets(); }, 450);
+  updateLiquid();
+  document.body.focus();
+  if(phaseStep < PHASE_N) return engageStep();
+  document.body.classList.remove("challenge", "killing");
+  nextPhase();
+}
+// ---- answering with the arrow keys: walk the cursor, space to commit ----
+// the socket is a spot on the map with no letter on it. you say which letter
+// lives there by walking a cursor to it with the arrows and pressing space.
+// pressing the letter itself is deliberately NOT an answer: hunting for a key
+// on the physical board is exactly the looking-down this is meant to end.
+// the cursor stays where you left it between steps, so nearby answers are near.
+const ALPHA_COLS = 13;                    // matches the CSS grid, so ±13 is a row
+function socketEl(){ return document.querySelector(".finglyph.target, .sat.target, .finglyph.enemy, .sat.enemy"); }
+let pick = null, pickIdx = 0;
+function setPick(ch){
+  pick = ch;
+  alphabetEl.querySelectorAll(".letter").forEach(t => t.classList.toggle("sel", !!ch && t.dataset.ch === ch));
+}
+function movePick(d){
+  const n = RECALL_LETTERS.length;
+  pickIdx = (pickIdx + d % n + n) % n;
+  setPick(RECALL_LETTERS[pickIdx]);
+}
+function clearPick(){ setPick(null); }
+// a ring pops out of the socket — the "click" of a key going home
+function popRing(el){
+  const r = el.getBoundingClientRect();
+  const ring = document.createElement("div");
+  ring.className = "snapring";
+  ring.style.left = (r.left + r.width/2) + "px";
+  ring.style.top = (r.top + r.height/2) + "px";
+  document.body.appendChild(ring);
+  setTimeout(() => ring.remove(), 440);
+}
+function submitAnswer(ch){
+  if(!challengeActive || !challengeTarget) return;
+  const g = socketEl();
+  if(ch === challengeTarget){
+    if(g){ g.classList.remove("target", "enemy"); g.classList.add("hit"); popRing(g); }
+    clearPick();
+    challengeStreak++; updateChallengeStreak();
+    setTimeout(resolveStep, 450);
+  } else {
+    // wrong: the socket flashes and the cursor stays put, ready to walk on
+    if(g){ g.classList.add("reject"); setTimeout(()=>g && g.classList.remove("reject"), 350); }
+    challengeStreak = 0; updateChallengeStreak();
+  }
+}
+// the kill: the enemy's cell is the socket, and the weapon is the key itself.
+// no picking, no space — you strike it directly. a wrong key bounces off; there
+// is nothing to lose, only the one right stroke to find.
+function strike(k){
+  const g = socketEl();
+  if(k !== challengeTarget){
+    if(g){ g.classList.add("reject"); setTimeout(()=>g && g.classList.remove("reject"), 300); }
+    challengeStreak = 0; updateChallengeStreak();
+    return;
+  }
+  fingerTap(k);
+  if(g){
+    popRing(g);
+    const bug = g.querySelector(".bug");
+    if(bug) bug.classList.add("dead");
+    g.classList.remove("enemy"); g.classList.add("hit");
+  }
+  challengeStreak++; updateChallengeStreak();
+  setTimeout(resolveStep, 400);
+}
+// ---- slips onto a key that isn't a letter -----------------------------------
+// teaching the symbols themselves is out of scope, and the tray can't hold
+// every one, so a symbol slip is NOT a drag round. it just shows what you did:
+// the key you hit glows amber where it really sits (for the few we can point
+// at), and a line stands in where the tray would be, naming it. nothing to
+// solve — read it and type the letter you meant.
+const OFFMAP = {           // symbols we can point at, offset in sat units
+  "[": {id:'Rp', dx:7,  dy:-34},
+  "]": {id:'Rp', dx:18, dy:-34},
+  "'": {id:'Rp', dx:13, dy:2},
+  "/": {id:'Rp', dx:13, dy:34},
+  ",": {id:'Rm', dx:8,  dy:36},
+};
+// can we point at this key? a real board cell (; .) or one in the OFFMAP table
+function locatable(k){ return !!OFFMAP[k] || !!dotEls[k] || !!homeEls[k]; }
+const slipNoticeEl = document.createElement("div");
+slipNoticeEl.id = "slipnotice";
+document.body.appendChild(slipNoticeEl);
+let slipTimer = null, slipCell = null;
+function clearSlip(){
+  clearTimeout(slipTimer);
+  slipNoticeEl.classList.remove("show");
+  document.querySelectorAll(".slip").forEach(e=>e.classList.remove("slip"));
+  if(slipCell){ slipCell.remove(); slipCell = null; }   // remove any popped-in symbol
+}
+function showSlip(hitKey, expected){
+  clearSlip();
+  let g = dotEls[hitKey] || homeEls[hitKey];   // ; . or any real cell
+  if(!g && OFFMAP[hitKey]){                     // otherwise pop the symbol in
+    const m = OFFMAP[hitKey], pill = fingerEls[m.id];
+    g = document.createElement("i"); g.className = "sat";
+    g.style.setProperty("--g", pill.style.getPropertyValue("--g"));
+    g.style.setProperty("--dx", m.dx*S + "px");
+    g.style.setProperty("--dy", m.dy*S + "px");
+    pill.parentElement.appendChild(g);
+    slipCell = g;
+  }
+  if(g) g.classList.add("slip");
+  const name = hitKey === " " ? "space" : hitKey;
+  slipNoticeEl.innerHTML = quizzable(expected)
+    ? `you hit <b>${name}</b> — reach back for <b>${expected.toUpperCase()}</b>`
+    : `you hit <b>${name}</b>`;
+  slipNoticeEl.classList.add("show");
+  slipTimer = setTimeout(clearSlip, 1900);
+}
+// the Rounds toggle — turns the ? rounds off entirely. it works mid-round too:
+// switching off while a ? is open drops that round out of the strip and hands
+// typing straight back, since being stuck in one is the moment you'd reach for it
+function cancelRound(){
+  if(!challengeActive) return;
+  clearPick();
+  challengeActive = false; challengeTarget = null;
+  document.body.classList.remove("challenge", "killing");
+  clearTargets();
+  updateCursor();
+}
+// ---- the mode picker ----
+// one place to say what a round is. changing it drops whatever is half-finished
+// and starts a clean round in the new shape — no half-cycle left hanging.
+const modePick = document.getElementById("modepick");
+Object.keys(MODES).forEach(k=>{
+  const o = document.createElement("option");
+  o.value = k; o.textContent = MODES[k].label;
+  modePick.appendChild(o);
+});
+modePick.value = runMode;
+modePick.addEventListener("change", ()=>{
+  runMode = modePick.value;
+  PREF.setStr("mode", runMode);
+  blindClear();
+  restart();
+  document.body.focus();
+});
+
+// a fresh round from scratch — when the mode or the word pool changes
+function restart(){
+  cancelRound();
+  clearSlip();
+  phaseIdx = 0; phaseStep = 0; cycleKeys = [];
+  pos=0; typed=0; correct=0; mistakes=0; startTime=null; roundMisses=[];
+  wordMissed = false;
+  TEXT = makeText();
+  render();
+  updateCursor();
+  updateMetrics();
+  updateLiquid();
+  runPhase();
+  document.getElementById("curkey").textContent = "— hidden until you slip";
+}
+
+// the words are typed — whatever the mode says comes next
+function finishRound(){ nextPhase(); }
+// ---- the next round deals itself, instantly. nothing waits, nothing is
+// blocked: after the last step the keystroke that follows lands on the first
+// letter of the new words. the session is the run and a round is just its unit,
+// so speed, accuracy and score carry over — only the words and the level reset. ----
+function nextRound(){
+  phaseIdx = 0; phaseStep = 0; cycleKeys = [];
+  pos = 0;
+  roundMisses = [];
+  wordMissed = false;
+  TEXT = makeText();
+  render();
+  updateCursor();
+  // the vessel tops out, then drains — but as animation next to your typing,
+  // never as a pause in it. one frame full, then it falls to the new round's level.
+  fluidEl.style.transform = "translateY(0%)";
+  requestAnimationFrame(()=> requestAnimationFrame(updateLiquid));
+  runPhase();
+}
+
+document.body.focus();
+document.addEventListener("keydown", e=>{
+  if(e.key==="Tab") return;
+  // kill phase: the keyboard stops being a typewriter and becomes the weapon
+  if(challengeActive && phase === "kill"){
+    if(e.ctrlKey || e.metaKey || e.altKey) return;
+    if(e.key.length!==1 && e.key!==" ") return;
+    e.preventDefault();
+    strike(e.key.toLowerCase());
+    return;
+  }
+  // naming phase: the arrows walk the cursor, space commits where it stands
+  if(challengeActive && phase === "select"){
+    if(e.ctrlKey || e.metaKey || e.altKey) return;
+    const step = {ArrowLeft:-1, ArrowRight:1, ArrowUp:-ALPHA_COLS, ArrowDown:ALPHA_COLS}[e.key];
+    if(step !== undefined){ e.preventDefault(); movePick(step); return; }
+    // space or enter — whichever thumb or pinky is already there
+    if(e.key === " " || e.key === "Enter"){ e.preventDefault(); if(pick) submitAnswer(pick); return; }
+    if(e.key.length === 1) e.preventDefault();   // letters are not an answer here
+    return;
+  }
+  if(challengeActive) return;
+  // outside the typing phase the stream is not live — including the half-second
+  // between two drill steps, where a keystroke used to fall through into it
+  if(phase !== "type") return;
+  // while the word is up the keyboard is dead: reading it and typing it are two
+  // separate beats, and letting them overlap would just be copying
+  if(blindShowing){ if(e.key.length === 1 || e.key === " ") e.preventDefault(); return; }
+  // forgot it? Enter shows the word again and puts you back at its first
+  // letter. it costs nothing — being stuck with no way to look is not a drill,
+  // it's a wall, and you were always going to type the whole word again anyway.
+  if(blindMode() && e.key === "Enter"){
+    e.preventDefault();
+    blindRestartWord();
+    blindShow(units[unitIdx]);
+    return;
+  }
+  if(pos>=chars.length) return;    // the phase ends the moment the words run out
+  if(e.ctrlKey || e.metaKey || e.altKey) return; // let browser shortcuts (Ctrl+R etc) through
+  let k=e.key;
+  if(k.length!==1 && k!==" ") return; // ignore modifiers/arrows etc
+  e.preventDefault();
+  if(!startTime) startTime=performance.now();
+
+  const expected = chars[pos].ch;
+  typed++;
+  if(k===expected){
+    correct++;
+    // no flash on the key you just hit: the board leads now instead of
+    // answering. what you watch is the cursor leaving for the next one.
+    chars[pos].el.classList.remove("bad");
+    if(chars[pos].ch!==" ") chars[pos].el.className="ch done";
+    document.getElementById("curkey").textContent="— hidden until you slip";
+    // synesthetic burst on the letter just typed, in its finger color
+    burst(chars[pos].el, tint(expected===" " ? " " : expected.toLowerCase()));
+    // the physical key you pressed drops its letter into the map below — except
+    // blind, where a letter appearing on screen is the one thing that mode is for
+    // not doing
+    if(!blindMode()) dropLetter(k);
+    const finishedWord = (expected===" ");
+    const lastChar = (pos === chars.length - 1);
+    // the word that just closed: behind the space, or the one the text ends on
+    const ended = finishedWord ? wordAt(pos - 1) : (lastChar ? wordAt(pos) : "");
+    pos++;
+    if(blindMode()){
+      noteRight();          // the next note of the phrase
+      blindAdvance();       // the word's letters run out, not a space: see units[]
+    } else if(finishedWord || lastChar){
+      if(wordMissed && ended) requeueWord(ended);
+      wordMissed = false;
+    }
+    updateCursor();
+    updateMetrics();
+    updateLiquid();
+    if(pos >= chars.length) finishRound();   // vessel full — teach, then deal again
+    return;
+  }
+  // a miss says ONE thing: the ball breaks, and you hear it break. it used to
+  // say four at once — a dissonant chord, a line naming the key you hit, a red
+  // letter, and the shatter — and four simultaneous signals for one event is
+  // not feedback, it's noise to decode. the red letter stays only because the
+  // modes that show you the text need it, and blind mode never shows the text.
+  mistakes++;
+  wordMissed = true;
+  if(chars[pos].ch!==" ") chars[pos].el.classList.add("bad");
+  noteMiss(expected);          // recorded for the round's teaching phases, not shown
+  updateMetrics();
+  // the "current key" line still names the slip in the modes that show you the
+  // text — there it's the only pointer you get. blind mode gets the ball, and
+  // nothing else, or the readout in the corner is one more thing to look at
+  if(!blindMode() && k !== " " && locatable(k)) showSlip(k, expected);
+  // it breaks where it stood — before anything moves the cursor, so the pieces
+  // fly from the key you actually got wrong
+  shatterCursor();
+  if(blindMode()) blindDefer();
+});
+setInterval(updateMetrics, 500);
+// deal the first round HERE, not at the top of the script: up there the saved
+// mode isn't read yet, and blind mode deals a different shape of text (doubled,
+// no spaces) — dealt too early it would be the wrong shape for the whole round
+restart();
+</script>
+</body>
+</html>

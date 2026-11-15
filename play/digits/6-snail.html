@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>6 rolls into a snail</title>
+<style>
+:root{--ink:#1d1d1f;--muted:#8a8a8e;--bg:#ffffff;color-scheme:light dark}
+@media (prefers-color-scheme:dark){:root{--ink:#ececec;--muted:#77777c;--bg:#151517}}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,sans-serif;display:flex;justify-content:center;padding:2rem 1rem}
+main{width:100%;max-width:560px}
+.c{display:flex;gap:12px;align-items:center;margin-bottom:1rem}
+input{flex:1;min-width:0}button{font:inherit;padding:6px 14px;border:1px solid var(--muted);background:none;color:var(--ink);border-radius:6px;cursor:pointer}
+#tl{font-size:13px;color:var(--muted);min-width:170px}
+</style></head><body><main>
+<div class="c"><button id="play">Play</button><input type="range" id="t" min="0" max="1000" value="0" aria-label="Timeline"><span id="tl"></span></div>
+<svg viewBox="0 0 300 200" width="100%" role="img" aria-label="Digit 6 rolling over and curling into a snail">
+<path id="s" fill="none" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--ink)"/></svg>
+</main>
+<script>
+// The 6 is one stroke: tail flowing into a loop. Nothing is drawn as a target.
+// Morphing happens in heading-along-length space, so strokes bend and keep their length.
+const N=160,TAU=Math.PI*2,GROUND=172;
+function resample(p,n){const L=[0];for(let i=1;i<p.length;i++)L.push(L[i-1]+Math.hypot(p[i][0]-p[i-1][0],p[i][1]-p[i-1][1]));const T=L[L.length-1],o=[];let j=1;for(let k=0;k<n;k++){const d=T*k/(n-1);while(j<p.length-1&&L[j]<d)j++;const s=L[j]-L[j-1]||1,u=(d-L[j-1])/s;o.push([p[j-1][0]+(p[j][0]-p[j-1][0])*u,p[j-1][1]+(p[j][1]-p[j-1][1])*u]);}return o;}
+function arc(cx,cy,r,a0,a1){const o=[];for(let i=0;i<=72;i++){const a=(a0+(a1-a0)*i/72)*Math.PI/180;o.push([cx+r*Math.cos(a),cy+r*Math.sin(a)]);}return o;}
+function quad(a,c,b){const o=[];for(let i=0;i<=40;i++){const t=i/40,m=1-t;o.push([m*m*a[0]+2*m*t*c[0]+t*t*b[0],m*m*a[1]+2*m*t*c[1]+t*t*b[1]]);}return o;}
+const len=p=>p.reduce((a,q,i)=>i?a+Math.hypot(q[0]-p[i-1][0],q[1]-p[i-1][1]):0,0);
+const rot=(p,c,a)=>{const r=a*Math.PI/180,x=p[0]-c[0],y=p[1]-c[1];return[c[0]+x*Math.cos(r)-y*Math.sin(r),c[1]+x*Math.sin(r)+y*Math.cos(r)]};
+const cl=x=>Math.max(0,Math.min(1,x)),eIn=x=>x*x*x,eOut=x=>1-Math.pow(1-x,3);
+
+const X0=150,tail=quad([138+X0,42],[62+X0,58],[58+X0,128]),loop=arc(100+X0,128,42,180,-180);
+const six=resample(tail.concat(loop),N),J=Math.round(len(tail)/(len(tail)+len(loop))*(N-1)),R0=42;
+// headings per segment, unwrapped
+const th0=[];for(let i=0;i<N-1;i++){let a=Math.atan2(six[i+1][1]-six[i][1],six[i+1][0]-six[i][0]);if(i){while(a-th0[i-1]>Math.PI)a-=TAU;while(a-th0[i-1]<-Math.PI)a+=TAU;}th0.push(a);}
+const ds=len(six)/(N-1);
+// rebuild from headings, anchored at the junction J so both ends move freely
+function build(th,anchor){const p=new Array(N);p[J]=anchor.slice();for(let i=J;i<N-1;i++)p[i+1]=[p[i][0]+ds*Math.cos(th[i]),p[i][1]+ds*Math.sin(th[i])];for(let i=J-1;i>=0;i--)p[i]=[p[i+1][0]-ds*Math.cos(th[i]),p[i+1][1]-ds*Math.sin(th[i])];return p;}
+// c: the loop's curvature grows toward its inner end (a spiral of the same length).
+// fl: the tail presses flat against the ground; only the tip keeps its bend, which becomes the head.
+const sm=x=>x*x*(3-2*x),aJ=th0[J-1];
+function shape(c,fl){return th0.map((a,i)=>{
+ if(i<J){const keep=1-sm(cl(i/J/.55));return aJ+(a-aJ)*(1-fl*(1-keep));}
+ const s=(i-J)/(N-2-J);return a-c*3*s*s;});}
+
+// which way does it fall? torque of the stroke's mass about the loop's ground contact
+const cx=six.reduce((a,p)=>a+p[0],0)/N,DIR=cx<100+X0?-1:1; // -1: rolls left (counterclockwise)
+const PHI=90; // a quarter turn lays the tail on the ground
+
+function frame(T){
+ // tipping from rest accelerates (ease in), lands at .55, small settle, then rest
+ let f;if(T<.5)f=eIn(T/.5);else{const k=cl((T-.5)/.2);f=1+.04*Math.sin(k*Math.PI)*(1-k);}
+ const phi=DIR*PHI*f,c=Math.pow(cl(f),1.4),fl=eOut(cl((T-.47)/.18));
+ let p=build(shape(c,fl),six[J]);
+ p=p.map(q=>rot(q,six[J],phi));
+ // rolling without slipping: the contact advances by arc length r*phi; rest the lowest point on the ground
+ const maxY=Math.max(...p.map(q=>q[1])),shift=R0*phi*Math.PI/180;
+ const creep=T>.75?DIR*6*eOut((T-.75)/.25):0; // a small crawl the way the head points
+ return p.map(q=>[q[0]+shift+creep,q[1]+GROUND-maxY]);}
+const el=document.getElementById("s"),tl=document.getElementById("tl");
+function draw(T){el.setAttribute("d","M"+frame(T).map(p=>p[0].toFixed(1)+" "+p[1].toFixed(1)).join("L"));
+ tl.textContent=T<.5?"The tail's weight tips the 6":T<.75?"It lands; the tail presses flat":"Rest state: snail";}
+const sl=document.getElementById("t");sl.addEventListener("input",()=>{run=false;draw(sl.value/1000)});
+let run=false,t0=0;
+document.getElementById("play").addEventListener("click",()=>{run=true;t0=performance.now();requestAnimationFrame(step)});
+function step(now){if(!run)return;const T=Math.min(1,(now-t0)/3500);sl.value=Math.round(T*1000);draw(T);if(T<1)requestAnimationFrame(step);else run=false;}
+draw(0);
+</script></body></html>

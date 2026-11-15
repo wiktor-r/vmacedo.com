@@ -1,0 +1,79 @@
+/* family.css — the Showcase family. Every prototype linked to this file is an
+   instance of the same program: change a token here and they all follow.
+   Not in the family (by Victor's call): cycles.html (the scrollytelling one),
+   link-to-the-past.html (not working, left as-is), stash-wireframe.html.
+   Content colors (game pieces, finger tints, trails) stay in each file —
+   they mean something there. This file owns the chrome. */
+:root{
+  /* detail.design (dark scheme) tokens, read off the live site 2026-07-15 */
+  --bg:#09090b;
+  --ink:#fafafa;      /* body text */
+  --muted:#a1a1aa;    /* secondary text */
+  --accent:#fafafa;   /* interactive accent: white, like their buttons */
+  --panel:#18181b;    /* raised surfaces / cards */
+  --line:#3f3f46;     /* borders, rules */
+  --font:"Geist","Inter",-apple-system,"system-ui","Helvetica Neue",sans-serif;
+  --font-mono:"Geist Mono","Menlo","Cascadia Mono",monospace;
+  --radius:8px;       /* small components; buttons may go full pill */
+  /* ambient light: a faint top-center wash that gives every screen its depth */
+  --bg-depth:radial-gradient(ellipse 130% 90% at 50% 8%, rgba(255,255,255,.05) 0%, rgba(255,255,255,.015) 38%, transparent 66%);
+}
+body{
+  background-color:var(--bg);
+  /* The ambient wash is a per-pixel DITHERED image, not the CSS gradient — WebKit
+     doesn't dither gradients and stair-steps this near-black wash into diagonal
+     contour bands (a documented WebKit bug). bg-depth.png bakes the same wash with
+     ±1-LSB noise so it's smooth on WebKit. --bg-depth (the gradient token) is kept
+     for small panels, where banding isn't visible. Regenerate: make-bg-depth.py. */
+  background-image:url("bg-depth.png");
+  background-size:cover;
+  background-position:center top;
+  background-repeat:no-repeat;
+  background-attachment:fixed;
+  color:var(--ink);
+  font-family:var(--font);
+}
+
+/* ---- the program's layout grammar: fixed places for fixed kinds of info ----
+   status (score/phase/level/metrics) top-left · toggles top-right ·
+   keybinds + what-to-do in the bottom line · keys always drawn as .kbd chips */
+.sys-status{
+  position:fixed;top:10px;left:14px;z-index:90;
+  font:11px var(--font);letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);
+}
+.sys-status b{color:var(--ink);font-weight:600;}
+.sys-toggles{
+  position:fixed;top:10px;right:14px;z-index:90;
+  display:flex;gap:14px;align-items:center;
+  font:11px var(--font);letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);
+}
+.kbd{
+  display:inline-block;min-width:14px;padding:1px 6px;text-align:center;
+  border:1px solid var(--line);border-radius:6px;
+  background:var(--panel);color:var(--ink);
+  font-family:var(--font-mono);font-size:.95em;
+}
+
+/* one shared hint-line style: bottom edge, same voice on every screen */
+.sys-hint{
+  position:fixed;bottom:0;left:0;right:0;z-index:90;
+  padding:9px 14px;text-align:center;
+  font:11px var(--font);letter-spacing:.08em;text-transform:none;
+  color:var(--muted);
+  background:linear-gradient(transparent, rgba(0,0,0,.75) 60%);
+  pointer-events:none;
+}
+.sys-hint b,.sys-hint code{color:var(--ink);font-weight:600;font-family:var(--font);}
+/* React/Tailwind prototypes render into #root — pull their chassis into the family */
+#root>.min-h-screen{background-color:var(--bg) !important;background-image:var(--bg-depth) !important;}
+#root .bg-zinc-950{background-image:var(--bg-depth);}
+#root .font-sans{font-family:var(--font) !important;}
+#root .font-mono{font-family:var(--font-mono) !important;}
+
+/* chronos was built in warm stone grays — map those onto the zinc tokens.
+   the zinc screens (train) are already native detail.design dark. */
+#root .border-stone-600,#root .border-stone-700,#root .border-stone-800{border-color:var(--line) !important;}
+#root .bg-stone-800,#root .bg-stone-900{background-color:var(--panel) !important;}
+#root .text-stone-500,#root .text-stone-600{color:var(--muted) !important;}

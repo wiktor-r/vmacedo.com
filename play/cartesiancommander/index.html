@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cartesian Commander</title>
+<!-- Deliberately NOT on the house theme (family.css). Victor's call: the board,
+     the desk and the lamp ARE the subject here, and family.css forbids exactly
+     the depth, material and skeuomorphism this needs. Same exemption DesktopShell
+     took. What we keep from the family: the motion curves, and the rule that only
+     opacity and transform are ever animated. -->
+<style>
+  :root{
+    --ink:#e8dfd0;
+    --sans:-apple-system,"Helvetica Neue",sans-serif;
+    --ease:cubic-bezier(.32,.72,0,1);
+  }
+  html,body{height:100%;margin:0;overflow:hidden;background:#100b08;}
+  body{font-family:var(--sans);color:var(--ink);}
+  #world{position:fixed;inset:0;display:block;}
+
+  /* The prompt is a card you are holding up, in the same room as the board —
+     not a second screen pasted over the first. Put it down and the board is there. */
+  #dim{
+    position:fixed;inset:0;z-index:10;pointer-events:none;
+    background:radial-gradient(ellipse 70% 60% at 50% 46%, rgba(4,2,1,.72), rgba(4,2,1,.9));
+    opacity:0;transition:opacity .5s var(--ease);
+  }
+  #dim.on{opacity:1;}
+
+  #card{
+    position:fixed;z-index:20;left:50%;top:46%;
+    width:min(780px,86vw);padding:52px 48px 60px;
+    border-radius:12px;
+    /* Flat and light on purpose. The old card was a deep gradient with a soft
+       serif on it and Victor couldn't read it; contrast is the whole job here. */
+    background:linear-gradient(172deg, #f7f2e6 0%, #ece4d2 100%);
+    box-shadow:
+      0 54px 90px rgba(0,0,0,.7),
+      0 14px 24px rgba(0,0,0,.52),
+      inset 0 1px 0 rgba(255,255,255,.8);
+    text-align:center;
+    transform:translate(-50%,-50%);   /* square to the screen: even ~1° of tilt
+                                        measurably costs Victor reading speed */
+    transition:opacity .42s var(--ease), transform .42s var(--ease);
+  }
+  #card.away{opacity:0;transform:translate(-50%,22%) scale(.95);}
+  #card .rule{height:1px;background:rgba(48,36,22,.28);margin:0 40px 40px;}
+  #card .cap{
+    font:600 15px var(--sans);letter-spacing:.4em;text-transform:uppercase;
+    color:rgba(48,36,22,.62);margin-bottom:20px;
+  }
+  /* Sans, not the serif: the serif stack is Palatino-family and renders old-style
+     figures, so digits sat at different heights and read as noise at a glance.
+     Lining tabular numerals, near-black ink, no colour. */
+  #coord{
+    font:700 clamp(88px,13vw,168px)/1 var(--sans);
+    font-variant-numeric:lining-nums tabular-nums;
+    letter-spacing:.01em;color:#241c13;white-space:nowrap;
+  }
+  #coord .p{color:rgba(36,28,19,.42);}
+
+  #hint{
+    position:fixed;left:0;right:0;bottom:0;z-index:30;
+    padding:18px;text-align:center;opacity:.9;pointer-events:none;
+    font:400 12px var(--sans);letter-spacing:.1em;
+    color:rgba(232,223,208,.42);
+    text-shadow:0 1px 3px rgba(0,0,0,.85);
+  }
+  .cap2{
+    display:inline-block;padding:2px 9px;margin-right:6px;border-radius:5px;
+    background:rgba(255,248,235,.09);border:1px solid rgba(255,248,235,.18);
+    color:rgba(240,232,218,.86);font-size:11px;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="world"></canvas>
+<div id="dim"></div>
+<div id="card">
+  <div class="cap">go to</div>
+  <div class="rule"></div>
+  <div id="coord"></div>
+</div>
+<div id="hint"></div>
+
+<script>
+(() => {
+  const cv  = document.getElementById('world');
+  const ctx = cv.getContext('2d');
+  const D = Math.PI / 180;
+  const DPR = () => Math.min(2, devicePixelRatio || 1);
+  // Same lattice as the original CartesianCommander's 2D view: -10..10, with a
+  // heavier line every 5. Those 5-lines are the landmarks you actually estimate
+  // from, so they carry over from the old app even though the view is different.
+  const LIM = 10;
+  const MAJOR = 5;
+  const HALF = LIM + 0.62;             // board reaches a little past the last line
+  const FACE = 0.85;                   // board thickness; the WALL is z = 0.
+                                       // Chunky on purpose: the lit top face is the
+                                       // cue that says vertical panel, so it has to
+                                       // be thick enough to actually see.
+
+  // The original app's mapping: the arrows always move, a held modifier picks the
+  // axis, and X is the bare default because it is the one you reach for most.
+  // `mod` is the event flag that arms each axis — z will be metaKey when it lands.
+  // One home-row key per axis, shift flips the sign: j/k/l for x/y/z, so the
+  // third axis is already sitting there waiting. Nothing here collides with a
+  // browser or macOS shortcut, which cmd+arrow would have.
+  const AX = [
+    { id:'x', code:'KeyJ' },
+    { id:'y', code:'KeyK' },
+    // { id:'z', code:'KeyL' },   ← when 3D lands
+  ];
+  const GOLD = '#d9a441';
+
+  // ---- the world -----------------------------------------------------------
+  // The board is bolted to a WALL, not lying on a desk. That makes the axes what
+  // everyone already believes they are: x is left/right, **y is up/down**, and z
+  // — when it lands — is simply out of the wall towards you. It also all but
+  // removes the foreshortening that was fighting position estimation.
+  //
+  // Square left-to-right, and very slightly ABOVE — looking down on the board.
+  // The direction matters and it is not decorative. Looking *up* shows the slab's
+  // bottom face and keystones the board wider at the bottom, which is precisely
+  // what a board lying on a table looks like from a chair; Victor kept reading it
+  // as one. Looking down shows the TOP face and keystones it wider at the top, and
+  // no flat-on-a-table board can ever do that. A sideways offset is still banned:
+  // it keystones the sides unevenly and reads as yaw.
+  const EYE  = { x: 0,   y: 2.9, z:38 };
+  const AIM  = { x: 0,   y:-0.2, z:0 };
+  const FOV  = 38 * D;
+  let W = 0, H = 0, f = 1, basis = null;
+
+  const sub = (a,b) => ({ x:a.x-b.x, y:a.y-b.y, z:a.z-b.z });
+  const cross = (a,b) => ({ x:a.y*b.z-a.z*b.y, y:a.z*b.x-a.x*b.z, z:a.x*b.y-a.y*b.x });
+  const dot3 = (a,b) => a.x*b.x + a.y*b.y + a.z*b.z;
+  function norm(v){ const m = Math.hypot(v.x,v.y,v.z) || 1; return { x:v.x/m, y:v.y/m, z:v.z/m }; }
+
+  function buildCamera() {
+    const fwd = norm(sub(AIM, EYE));
+    const rt  = norm(cross(fwd, { x:0, y:1, z:0 }));   // world up is +y now
+    basis = { fwd, rt, up: cross(rt, fwd) };
+    f = (H / 2) / Math.tan(FOV / 2);
+  }
+  // world point -> screen. Returns null behind the eye.
+  function P(x, y, z) {
+    const d = { x:x-EYE.x, y:y-EYE.y, z:z-EYE.z };
+    const cz = dot3(d, basis.fwd);
+    if (cz <= 0.05) return null;
+    return [ W/2 + f * dot3(d, basis.rt) / cz, H/2 - f * dot3(d, basis.up) / cz, cz ];
+  }
+  const B = (x, y) => P(x, y, FACE);      // a point painted on the board's face
+
+  // ---- state --------------------------------------------------------------
+  let phase = 'prompt';                   // prompt · play · hit · miss
+  let goal = { x:0, y:0 };
+  const target = { x:0, y:0 };
+  const cur    = { x:0, y:0 };
+  let hitAt = -1e9;
+
+  // ---- static bake --------------------------------------------------------
+  // Wall, lamp, board slab and inlaid grid never change, so they are drawn once
+  // into an offscreen canvas and blitted. Only the marble, its shadow and the
+  // miss reveal are redrawn per frame.
+  const sky = document.createElement('canvas'), sctx = sky.getContext('2d');
+
+  function poly(c, pts, fill) {
+    if (pts.some(p => !p)) return;
+    c.beginPath();
+    c.moveTo(pts[0][0], pts[0][1]);
+    for (let i = 1; i < pts.length; i++) c.lineTo(pts[i][0], pts[i][1]);
+    c.closePath();
+    if (fill) { c.fillStyle = fill; c.fill(); }
+  }
+  function seg(c, a, b, style, lw) {
+    if (!a || !b) return;
+    c.strokeStyle = style; c.lineWidth = lw;
+    c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); c.stroke();
+  }
+
+  function bake() {
+    const dpr = DPR();
+    sky.width = Math.round(W * dpr); sky.height = Math.round(H * dpr);
+    sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const c = sctx;
+
+    // --- the wall. Plaster, drawn in screen space: it is near enough to
+    //     fronto-parallel that world-space texture would buy nothing. ---
+    c.fillStyle = '#2c2019'; c.fillRect(0, 0, W, H);
+    let s = 1;
+    const rand = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    for (let i = 0; i < 1600; i++) {
+      const r1 = rand(), r2 = rand(), r3 = rand(), r4 = rand();
+      c.globalAlpha = 0.02 + r4 * 0.05;
+      c.fillStyle = r3 > .5 ? '#5c4634' : '#1b120c';
+      c.beginPath();
+      c.arc(r1 * W, r2 * H, 2 + r4 * 22, 0, 7);
+      c.fill();
+    }
+    c.globalAlpha = 1;
+
+    // --- the room. Things the frame CUTS OFF, which is the point: a wall you can
+    //     see all of is a backdrop, a wall that continues past the screen is a
+    //     room. A skirting board along the bottom was tried first and did not
+    //     read — too thin, jammed against the frame edge, half under the hint. ---
+    function framedPiece(cx, cy, hw, hh) {
+      const dz = 0.3;
+      const Q = (dx, dy, z) => P(cx + dx, cy + dy, z);
+      c.save(); c.filter = 'blur(13px)';           // hung, so it shadows downward
+      poly(c, [Q(-hw, hh - .4, 0), Q(hw, hh - .4, 0),
+               Q(hw, -hh - 1.1, 0), Q(-hw, -hh - 1.1, 0)], 'rgba(0,0,0,.62)');
+      c.restore();
+      poly(c, [Q(-hw, hh, dz), Q(hw, hh, dz), Q(hw, -hh, dz), Q(-hw, -hh, dz)], '#170f09');
+      seg(c, Q(-hw, hh, dz), Q(hw, hh, dz), 'rgba(255,222,170,.3)', 1.6);
+      const m = .5, a = 1.3;
+      poly(c, [Q(-hw+m, hh-m, dz), Q(hw-m, hh-m, dz),
+               Q(hw-m, -hh+m, dz), Q(-hw+m, -hh+m, dz)], '#584829');
+      poly(c, [Q(-hw+a, hh-a, dz), Q(hw-a, hh-a, dz),
+               Q(hw-a, -hh+a, dz), Q(-hw+a, -hh+a, dz)], '#120c07');
+      const g0 = Q(0, hh-a, dz), g1 = Q(0, -hh+a, dz);   // glazing, lit from above
+      if (g0 && g1) {
+        const gg = c.createLinearGradient(0, g0[1], 0, g1[1]);
+        gg.addColorStop(0, 'rgba(255,236,200,.13)');
+        gg.addColorStop(1, 'rgba(255,236,200,0)');
+        poly(c, [Q(-hw+a, hh-a, dz), Q(hw-a, hh-a, dz),
+                 Q(hw-a, -hh+a, dz), Q(-hw+a, -hh+a, dz)], gg);
+      }
+    }
+    // one each side so neither edge biases the board, but different shapes so it
+    // does not read as wallpaper
+    framedPiece(-21.5, 2.5, 5.2, 6.4);
+    framedPiece( 22.8, 0.5, 6.0, 4.6);
+
+    // --- the lamp: one warm pool from directly above, then a vignette ---
+    // Dead centre above. Off to one side, the light ramps diagonally across the
+    // face and the board looks tilted even when it is perfectly square.
+    const lampAt = [W * .5, H * .02];
+    const lg = c.createRadialGradient(lampAt[0], lampAt[1], 10, lampAt[0], lampAt[1], Math.max(W, H) * .95);
+    lg.addColorStop(0,   'rgba(255,206,140,.30)');
+    lg.addColorStop(.34, 'rgba(255,186,116,.11)');
+    lg.addColorStop(1,   'rgba(255,170,100,0)');
+    c.fillStyle = lg; c.fillRect(0, 0, W, H);
+
+    const vg = c.createRadialGradient(W/2, H*.47, Math.min(W,H)*.26, W/2, H*.47, Math.max(W,H)*.74);
+    vg.addColorStop(0, 'rgba(0,0,0,0)');
+    vg.addColorStop(1, 'rgba(0,0,0,.46)');   // pulled back, or the edges eat the room
+    c.fillStyle = vg; c.fillRect(0, 0, W, H);
+
+    // --- the slab's shadow, thrown straight DOWN the wall by the overhead lamp ---
+    c.save();
+    c.filter = 'blur(24px)';
+    poly(c, [P(-HALF-.2, HALF-1.3, 0), P(HALF+.2, HALF-1.3, 0),
+             P(HALF+.2, -HALF-1.8, 0), P(-HALF-.2, -HALF-1.8, 0)], 'rgba(0,0,0,.82)');
+    c.restore();
+
+    // --- the slab. Viewed from a touch above, the face on show is the TOP — and
+    //     with the lamp overhead it is the brightest thing in the scene, which is
+    //     what says "vertical panel" rather than "board on a table". ---
+    poly(c, [P(-HALF, HALF, FACE), P(HALF, HALF, FACE),
+             P(HALF, HALF, 0),     P(-HALF, HALF, 0)], '#5b4229');
+
+    const t = [B(-HALF, HALF), B(HALF, HALF), B(HALF, -HALF), B(-HALF, -HALF)];
+    // Vertical, and gentle. Any left-right ramp here reads as tilt.
+    const tg = c.createLinearGradient(...(B(0, HALF)||[0,0]).slice(0,2), ...(B(0,-HALF)||[0,H]).slice(0,2));
+    tg.addColorStop(0,  '#2a1c13');
+    tg.addColorStop(.55,'#1d140c');
+    tg.addColorStop(1,  '#160f0a');
+    poly(c, t, tg);
+
+    c.save();                                          // board grain, running across
+    poly(c, t, null); c.clip();
+    for (let i = 0; i < 110; i++) {
+      const r1 = rand(), r2 = rand();
+      const gy = -HALF + r1 * HALF * 2;
+      c.globalAlpha = .04 + r2 * .09;
+      seg(c, B(-HALF, gy), B(HALF, gy + (r2 - .5) * .3), r2 > .6 ? '#5b4029' : '#150d08', .5 + r2 * 1.4);
+    }
+    c.globalAlpha = 1;
+    c.restore();
+
+    // lit from straight above: the top edge catches it, the bottom is in shadow,
+    // and the two sides match each other exactly
+    seg(c, B(-HALF, HALF),  B(HALF, HALF),  'rgba(255,222,170,.4)', 1.6);
+    seg(c, B(-HALF, -HALF), B(-HALF, HALF), 'rgba(255,214,158,.09)', 1.2);
+    seg(c, B(HALF, -HALF),  B(HALF, HALF),  'rgba(255,214,158,.09)', 1.2);
+    seg(c, B(-HALF, -HALF), B(HALF, -HALF), 'rgba(0,0,0,.5)', 1.6);
+
+    // --- inlaid grid: pale brass, thin. Nothing is written on the board — the
+    //     cells are the only ruler. ---
+    for (let i = -LIM; i <= LIM; i++) {
+      if (i === 0) continue;
+      const major = i % MAJOR === 0;
+      const a = major ? .5 : .17;
+      const lw = major ? 1.6 : 1;
+      seg(c, B(i, -LIM), B(i, LIM), `rgba(214,190,146,${a})`, lw);
+      seg(c, B(-LIM, i), B(LIM, i), `rgba(214,190,146,${a})`, lw);
+    }
+    seg(c, B(-LIM-.3, 0), B(LIM+.3, 0), 'rgba(0,0,0,.5)', 4.5);
+    seg(c, B(0, -LIM-.3), B(0, LIM+.3), 'rgba(0,0,0,.5)', 4.5);
+    seg(c, B(-LIM-.3, 0), B(LIM+.3, 0), 'rgba(236,218,180,.78)', 2.6);
+    seg(c, B(0, -LIM-.3), B(0, LIM+.3), 'rgba(236,218,180,.78)', 2.6);
+
+    // four brass screws holding the panel to the wall, in the board's margin
+    for (const sx of [-1, 1]) for (const sy of [-1, 1]) {
+      const q = B(sx * (LIM + 0.31), sy * (LIM + 0.31));
+      if (!q) continue;
+      const r = f * 0.17 / q[2];
+      c.fillStyle = 'rgba(0,0,0,.55)';
+      c.beginPath(); c.arc(q[0], q[1] + r*.35, r*1.05, 0, 7); c.fill();
+      c.fillStyle = 'rgba(198,168,116,.72)';
+      c.beginPath(); c.arc(q[0], q[1], r, 0, 7); c.fill();
+      c.fillStyle = 'rgba(255,232,186,.7)';
+      c.beginPath(); c.arc(q[0] - r*.2, q[1] - r*.3, r*.45, 0, 7); c.fill();
+      seg(c, [q[0] - r*.75, q[1]], [q[0] + r*.75, q[1]], 'rgba(40,28,16,.75)', Math.max(1, r*.34));
+    }
+
+    const o = B(0, 0);                                 // the origin, a brass pin
+    if (o) { c.fillStyle = 'rgba(226,198,150,.6)'; c.beginPath(); c.arc(o[0], o[1], 3.4, 0, 7); c.fill(); }
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function layout() {
+    W = innerWidth; H = innerHeight;
+    const dpr = DPR();
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    cv.style.width = W + 'px'; cv.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    buildCamera();
+    bake();
+  }
+
+  // ---- chrome -------------------------------------------------------------
+  const cardEl   = document.getElementById('card');
+  const dimEl    = document.getElementById('dim');
+  const coordEl  = document.getElementById('coord');
+  const hintEl   = document.getElementById('hint');
+
+  const rnd = () => Math.floor(Math.random() * (LIM * 2 + 1)) - LIM;
+  const fmt = v => (v < 0 ? '−' + Math.abs(v) : String(v));
+
+  function newRound() {
+    let g;
+    do { g = { x: rnd(), y: rnd() }; }
+    while ((g.x === 0 && g.y === 0) || (g.x === goal.x && g.y === goal.y));
+    goal = g;
+    coordEl.innerHTML =
+      `<span class="p">(</span>`
+      + AX.map(a => `<span class="n">${fmt(goal[a.id])}</span>`).join(`<span class="p">,&nbsp;</span>`)
+      + `<span class="p">)</span>`;
+    target.x = target.y = 0; cur.x = cur.y = 0;
+    phase = 'prompt';
+    cardEl.classList.remove('away');
+    dimEl.classList.add('on');
+    hintEl.innerHTML = `<span class="cap2">space</span>put the card down`;
+  }
+
+  function begin() {
+    phase = 'play';
+    cardEl.classList.add('away');
+    dimEl.classList.remove('on');
+    hintEl.innerHTML = `<span class="cap2">space</span>commit`;
+  }
+
+  function commit() {
+    if (target.x === goal.x && target.y === goal.y) {
+      hitAt = performance.now();
+      phase = 'hit';
+      hintEl.innerHTML = '';
+      setTimeout(newRound, 900);
+    } else {
+      phase = 'miss';                   // the brass mark says where; counting it is the drill
+      hintEl.innerHTML = `<span class="cap2">space</span>next`;
+    }
+  }
+
+  // ---- input --------------------------------------------------------------
+  function move(id, sign) {
+    const v = Math.max(-LIM, Math.min(LIM, target[id] + sign));
+    if (v === target[id]) return;       // at the edge — the room confirms nothing
+    target[id] = v;
+  }
+  addEventListener('keydown', e => {
+    if (e.code === 'Space') {
+      e.preventDefault();
+      if (phase === 'prompt') begin();
+      else if (phase === 'play') commit();
+      else if (phase === 'miss') newRound();
+      return;
+    }
+    const a = AX.find(a => a.code === e.code);   // e.code, not e.key: shift+j is "J"
+    if (!a) return;
+    e.preventDefault();
+    if (phase !== 'play') return;
+    move(a.id, e.shiftKey ? -1 : 1);
+  });
+
+  // ---- per-frame ----------------------------------------------------------
+  // a circle lying flat at height z, projected — an ellipse in general, so it
+  // is walked as a polygon rather than faked with ctx.ellipse
+  function discPath(bx, by, r, z) {
+    const pts = [];
+    for (let i = 0; i < 30; i++) {
+      const t = i / 30 * Math.PI * 2;
+      const p = P(bx + Math.cos(t) * r, by + Math.sin(t) * r, z);
+      if (!p) return null;
+      pts.push(p);
+    }
+    return pts;
+  }
+  function boardRing(bx, by, r, style, lw, glowPx, alpha) {
+    ctx.save();
+    ctx.globalAlpha = alpha === undefined ? 1 : alpha;
+    if (glowPx) { ctx.shadowColor = style; ctx.shadowBlur = glowPx; }
+    ctx.strokeStyle = style; ctx.lineWidth = lw;
+    ctx.beginPath();
+    for (let i = 0; i <= 28; i++) {
+      const t = i / 28 * Math.PI * 2;
+      const p = B(bx + Math.cos(t) * r, by + Math.sin(t) * r);
+      if (!p) { ctx.restore(); return; }
+      i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]);
+    }
+    ctx.closePath(); ctx.stroke();
+    ctx.restore();
+  }
+
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(64, now - last); last = now;
+    const e1 = 1 - Math.exp(-dt / 58);
+    for (const a of AX) cur[a.id] += (target[a.id] - cur[a.id]) * e1;
+    requestAnimationFrame(frame);
+
+    const dpr = DPR();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    ctx.drawImage(sky, 0, 0);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    // the answer, revealed only after a miss: a brass ring set into the wood
+    if (phase === 'miss') {
+      const g0 = B(goal.x, goal.y), p0 = B(cur.x, cur.y);
+      if (g0 && p0) {
+        ctx.save();
+        ctx.setLineDash([4, 5]); ctx.globalAlpha = .45;
+        seg(ctx, p0, g0, GOLD, 1.2);
+        ctx.restore();
+      }
+      boardRing(goal.x, goal.y, .55, GOLD, 2.2, 18, .95);
+      boardRing(goal.x, goal.y, .17, GOLD, 3, 12, .85);
+    }
+
+    // --- the piece ---
+    // A marker pressed onto a vertical board, so it stands out of the face along
+    // +z rather than resting on top of anything. Kept thin: the thicker it is,
+    // the further its lit face drifts from the square it marks.
+    const R = 0.44, THICK = 0.18;
+    const shadowAt = B(cur.x, cur.y - 0.3);       // overhead lamp: straight down
+    if (shadowAt) {
+      const rs = f * R / shadowAt[2];
+      ctx.save();
+      ctx.filter = 'blur(4px)';
+      ctx.fillStyle = 'rgba(0,0,0,.6)';
+      ctx.beginPath(); ctx.arc(shadowAt[0], shadowAt[1], rs * 1.12, 0, 7); ctx.fill();
+      ctx.restore();
+    }
+    const base = discPath(cur.x, cur.y, R, FACE);
+    const head = discPath(cur.x, cur.y, R, FACE + THICK);
+    if (base && head) {
+      ctx.beginPath();                        // the rim, in shadow
+      base.forEach((q, i) => i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]));
+      ctx.closePath();
+      ctx.fillStyle = '#6e6049'; ctx.fill();
+
+      const p = P(cur.x, cur.y, FACE + THICK);
+      const rs = f * R / p[2];
+      const g = ctx.createRadialGradient(p[0], p[1] - rs*.55, rs*.06, p[0], p[1], rs*1.15);
+      g.addColorStop(0,   '#fffdf6');
+      g.addColorStop(.42, '#f0e7d3');
+      g.addColorStop(.85, '#d3c5a6');
+      g.addColorStop(1,   '#a89a7c');
+      ctx.save();
+      ctx.shadowColor = 'rgba(255,214,150,.35)'; ctx.shadowBlur = 10;
+      ctx.beginPath();
+      head.forEach((q, i) => i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]));
+      ctx.closePath();
+      ctx.fillStyle = g; ctx.fill();
+      ctx.restore();
+
+      if (phase === 'hit') {            // landed: one ring leaves the marker
+        const t = Math.min(1, (now - hitAt) / 700);
+        boardRing(cur.x, cur.y, R + 1.9*t, '#ffe6ae', 2 - t, 20, (1 - t) * .9);
+      }
+    }
+  }
+
+  addEventListener('resize', layout);
+  layout();
+  requestAnimationFrame(frame);
+  newRound();
+})();
+</script>
+</body>
+</html>

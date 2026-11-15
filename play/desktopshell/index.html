@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Desktop Shell — the book</title>
+<style>
+/* ------------------------------------------------------------------
+   The paradigm: the desktop is a half-opened book. Windows are pages.
+
+     · choosing   — the book half-opens, pages fan sideways (old mobile
+                    Safari's card stack, turned on its side)
+     · reordering — the page is picked up toward you, carried along the
+                    strip, and set down in its new place
+     · launching  — a new page slides in from over the book and settles
+     · closing    — the page is thrown to the floor
+
+   NOT on the house theme, deliberately. family.css is a chrome system
+   for instrument screens, and it forbids exactly what this piece is
+   made of: inner glows, glare, material, skeuomorphism. It is on
+   HOUSE-THEME.md's exempt list for the same reason ColourWalk and
+   NightFlute are — here the look IS the thing, not a wrapper round it.
+
+   One rule kept from the house anyway, because it is true everywhere:
+   animate ONLY transform and opacity. Every shadow, sheen and rim below
+   is a static layer that never transitions.
+   ------------------------------------------------------------------ */
+
+*{ box-sizing:border-box; }
+
+:root{
+  /* the room */
+  --void:#07080b;
+  --floor:#0a0c11;
+  --horizon:#12151d;
+
+  /* the light: one key, upper-left, slightly warm */
+  --key:#fff6e8;
+
+  /* pages — Ghostty's palette, so this and the terminal are one scheme */
+  --page-ground:#0b0e14;
+  --page-ink:#bfbdb6;
+  --page-line:#232936;
+
+  --mono:"Geist Mono","Menlo","Cascadia Mono",monospace;
+  --sans:"Geist","Inter",-apple-system,system-ui,"Helvetica Neue",sans-serif;
+
+  --spread-x:660px;
+  --fan-x:212px;
+  --fan-y:30px;
+  --fan-z:132px;
+
+  --structural:cubic-bezier(.32,.72,0,1);
+  --alive:cubic-bezier(.22,.9,.3,1);
+}
+
+html,body{ height:100%; margin:0; }
+body{
+  background:var(--void);
+  color:#e8e6e1;
+  font-family:var(--sans);
+  overflow:hidden;
+}
+
+/* the room ----------------------------------------------------------
+   A floor inside the 3D space, one key light from upper-left, and pages
+   that cast onto the floor. Depth has somewhere to go, and a page thrown
+   to the floor has a floor to land on. */
+
+.room{
+  position:fixed; inset:0;
+  perspective:1700px;
+  perspective-origin:50% 44%;
+  overflow:hidden;
+}
+
+/* One soft pool of key light from upper-left, so the book is lit from
+   somewhere. Radial and edgeless on purpose — anything with a straight
+   boundary starts reading as a surface behind the scene rather than as
+   light falling through it. */
+.room::before{
+  content:""; position:absolute; inset:0;
+  background:
+    radial-gradient(115% 85% at 26% 6%, rgba(255,246,232,.075) 0%,
+                                        rgba(255,246,232,.026) 36%,
+                                        transparent 66%);
+  pointer-events:none;
+}
+
+/* The floor.
+
+   First attempt was a div behind the book with a gradient, and it read as
+   a two-tone picture hung behind the scene, splitting the frame in half.
+   The fault wasn't where it sat — it was that it lived OUTSIDE the 3D
+   space and nothing touched it.
+
+   This one is a child of .book with a real rotateX(90deg), so it shares
+   the scene's perspective and vanishing point and tips with the book when
+   it opens. And every page casts onto it (.cast below), which is what
+   actually makes a surface read as a surface: contact, not texture. */
+.floor{
+  position:absolute; left:50%; top:50%;
+  width:9000px; height:9000px; margin:-4500px 0 0 -4500px;
+  /* Hinged at its CENTRE, directly under the book, so half the plane runs
+     away to the vanishing point and half runs forward past the viewer and
+     off the bottom of the screen. No near edge to see, which is what made
+     the first attempt read as a picture cut in half.
+     Do NOT translate it toward the camera to achieve that: an earlier try
+     used translateZ(1600px) against a 1700px perspective, which put the
+     plane at the eye and clipped it away entirely — invisible even filled
+     with pure red. Distance from the camera is the perspective's job. */
+  transform:translateY(208px) rotateX(90deg);
+  transform-origin:50% 50%;
+  /* Two rules, both learned by getting them wrong:
+
+     1. Luminance must fall off MONOTONICALLY with distance — brightest
+        underfoot, dissolving to the void far away. Any bounded bright
+        region, however soft, reads as a flat illuminated panel standing
+        in the scene rather than as ground going away from you. A pool of
+        light here was the worst version of this piece.
+
+     2. A plane with no texture is indistinguishable from a gradient. The
+        faint bands below are drawn in the floor's OWN space, so
+        perspective compresses them as they recede — that compression is
+        the actual cue that says "this surface is going away". Kept near
+        the threshold of visibility; it should read as grain, not a grid.
+
+     Lateral falloff too, so the light dies toward the sides instead of
+     running edge to edge, which is the other half of the panel look. */
+  background:
+    repeating-linear-gradient(to bottom,
+      rgba(191,189,182,.016) 0 2px, transparent 2px 190px),
+    radial-gradient(ellipse 34% 60% at 50% 100%,
+      rgba(255,246,232,.05) 0%, rgba(255,246,232,.018) 45%, transparent 78%),
+    linear-gradient(to top, #0b0e15 0%, #08090e 22%, #06070a 48%, #06070a 100%);
+  /* the whole plane fades out before its far edge is ever reachable, so
+     the surface has no visible end to read as a boundary */
+  mask-image:linear-gradient(to top,
+    #000 0%, rgba(0,0,0,.85) 26%, rgba(0,0,0,.35) 42%, transparent 56%);
+  pointer-events:none;
+}
+
+.book{
+  position:absolute; inset:0;
+  transform-style:preserve-3d;
+  transition:transform .62s var(--structural);
+}
+.room.choosing .book{ transform:rotateX(6deg) rotateY(-3deg) scale(.86); }
+
+/* a page ------------------------------------------------------------ */
+
+/* The slot carries the transform and holds two things in 3D: the card
+   itself, and the shadow it throws on the floor. They are separate
+   because the card clips its contents and the shadow has to escape it. */
+.slot{
+  position:absolute; top:50%; left:50%;
+  width:560px; height:392px;
+  margin:-196px 0 0 -280px;
+  transform-style:preserve-3d;
+  will-change:transform;
+  transition:transform .55s var(--structural);
+  cursor:pointer;
+}
+
+/* Laid flat from the card's bottom edge, so it lies ON the floor and
+   turns with the page. This is the contact that makes the floor real. */
+.cast{
+  position:absolute; left:-18%; width:136%;
+  /* Long in world space on purpose. Lying flat and seen at this angle, a
+     300px shadow projected to 14 screen pixels — invisible. Depth has to
+     be over-built to survive foreshortening. */
+  top:100%; height:900px;
+  transform-origin:50% 0%;
+  transform:rotateX(-90deg);
+  background:radial-gradient(ellipse 46% 62% at 50% 0%,
+    rgba(0,0,0,.95) 0%, rgba(0,0,0,.7) 26%, rgba(0,0,0,.3) 50%, transparent 76%);
+  opacity:.9;
+  pointer-events:none;
+  transition:opacity .55s var(--structural);
+}
+
+.page{
+  position:absolute; inset:0;
+  border-radius:10px;
+  background:var(--page-ground);
+  overflow:hidden;
+  transform-style:preserve-3d;
+}
+
+/* Material, all baked, none of it animated:
+   · a deep cast shadow so the page sits above the floor
+   · a lit top rim and a darker bottom one, from the upper-left key
+   · a faint sheen raking across the surface */
+.page::before{
+  content:""; position:absolute; inset:0; border-radius:inherit; z-index:2;
+  pointer-events:none;
+  background:linear-gradient(148deg,
+    rgba(255,246,232,.055) 0%,
+    rgba(255,246,232,.012) 26%,
+    transparent 52%);
+}
+.page::after{
+  content:""; position:absolute; inset:0; border-radius:inherit; z-index:5;
+  pointer-events:none;
+  box-shadow:
+    0 60px 120px -28px rgba(0,0,0,.92),
+    0 18px 40px -12px rgba(0,0,0,.7),
+    inset 0 1px 0 rgba(255,246,232,.11),
+    inset 0 -1px 0 rgba(0,0,0,.55),
+    inset 0 0 0 1px rgba(191,189,182,.06);
+}
+
+/* the darkening of everything you are not looking at — only opacity moves */
+.shade{
+  position:absolute; inset:0; z-index:3;
+  background:linear-gradient(160deg, #04050a 0%, #000 100%);
+  opacity:.55;
+  pointer-events:none;
+  transition:opacity .55s var(--structural);
+}
+.slot.current .shade{ opacity:0; }
+
+/* the lifted page catches the key light along its edge */
+.lift{
+  position:absolute; inset:0; z-index:4; border-radius:inherit;
+  pointer-events:none;
+  opacity:0;
+  box-shadow:
+    inset 0 0 0 1px rgba(191,189,182,.42),
+    inset 0 1px 0 rgba(255,246,232,.3),
+    0 0 60px -6px rgba(191,189,182,.16);
+  transition:opacity .55s var(--structural);
+}
+.slot.current .lift{ opacity:1; }
+/* the lifted page's shadow tightens and darkens, the way a thing closer
+   to a surface casts harder */
+.slot.current .cast{ opacity:1; }
+
+/* held in the hand: the shadow spreads and weakens, because the page is
+   further off the floor. This is most of what sells the grab — the page
+   coming forward alone reads as a zoom, the shadow letting go reads as
+   being picked up. */
+.slot.grabbed .cast{ opacity:.4; }
+
+/* page contents ------------------------------------------------------ */
+
+.bar{
+  height:32px; display:flex; align-items:center; gap:7px; padding:0 12px;
+  border-bottom:1px solid var(--page-line);
+  background:linear-gradient(to bottom, rgba(255,255,255,.045), rgba(255,255,255,.012));
+}
+.dot{
+  width:9px; height:9px; border-radius:50%;
+  background:#2a3140;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09);
+}
+.name{
+  margin-left:8px; font:11px var(--sans); letter-spacing:.05em;
+  color:rgba(191,189,182,.62);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.body{
+  padding:16px 18px;
+  font:12px/1.68 var(--mono);
+  color:var(--page-ink);
+  white-space:pre-wrap;
+  opacity:.86;
+}
+.body .dim{ color:#4b5263; }
+.body .warm{ color:#f9af4f; }
+.body .cool{ color:#59c2ff; }
+.body .good{ color:#aad94c; }
+
+/* the three motions --------------------------------------------------- */
+
+.slot.arriving{
+  transform:translate3d(0,-150%,340px) rotateX(34deg) scale(.94) !important;
+  opacity:0;
+}
+.slot.falling{
+  transform:translate3d(-40px,150vh,-260px) rotateX(-78deg) rotateZ(-9deg) scale(.8) !important;
+  opacity:0;
+  transition:transform .72s cubic-bezier(.4,0,.85,.4), opacity .72s ease-in;
+  pointer-events:none;
+}
+
+/* chrome -------------------------------------------------------------- */
+
+.status,.corner{
+  position:fixed; top:16px; z-index:90;
+  font:10px var(--sans); letter-spacing:.14em; text-transform:uppercase;
+  color:rgba(191,189,182,.42);
+}
+.status{ left:20px; }
+.corner{ right:20px; }
+.mode.live{ color:rgba(232,230,225,.95); }
+
+.spine{
+  position:fixed; left:50%; bottom:78px; transform:translateX(-50%);
+  display:flex; gap:8px; z-index:80;
+}
+.rib{
+  width:28px; height:2px; border-radius:2px;
+  background:rgba(191,189,182,.18);
+  transition:background .3s var(--alive), transform .3s var(--alive);
+}
+.rib.on{
+  background:var(--page-ink);
+  transform:scaleY(2.5);
+  box-shadow:0 0 12px rgba(191,189,182,.5);
+}
+
+.hint{
+  position:fixed; bottom:0; left:0; right:0; z-index:90;
+  padding:14px 20px; text-align:center;
+  font:11px var(--sans); letter-spacing:.02em;
+  color:rgba(191,189,182,.45);
+  background:linear-gradient(transparent, rgba(4,5,8,.85) 65%);
+  pointer-events:none;
+}
+.hint b{ color:rgba(232,230,225,.9); font-weight:500; }
+.k{
+  display:inline-block; min-width:16px; padding:2px 7px; margin:0 1px;
+  border-radius:5px;
+  background:rgba(255,255,255,.05);
+  box-shadow:inset 0 0 0 1px rgba(191,189,182,.14),
+             inset 0 1px 0 rgba(255,246,232,.09);
+  color:rgba(232,230,225,.85);
+  font-family:var(--mono); font-size:10px;
+}
+</style>
+</head>
+<body>
+
+<div class="status"><span id="count">5 pages</span> · <span class="mode" id="mode">reading</span></div>
+<div class="corner">the book</div>
+
+<div class="room" id="room">
+  <div class="book" id="book"><div class="floor"></div></div>
+</div>
+
+<div class="spine" id="spine"></div>
+
+<div class="hint">
+  <b>hold <span class="k">⌥</span> <span class="k">tab</span></b> open the book ·
+  <span class="k">tab</span> alone if ⌥ is being eaten ·
+  <span class="k">J</span> <span class="k">L</span> walk ·
+  <b>hold <span class="k">shift</span></b> pick the page up, <span class="k">J</span> <span class="k">L</span> carry it ·
+  <span class="k">N</span> new page ·
+  <span class="k">W</span> throw it to the floor ·
+  two fingers to slide
+</div>
+
+<script>
+/* ------------------------------------------------------------------
+   State is deliberately tiny: a list of pages and an index. Every
+   posture is a pure function of (index, mode) — no animation
+   bookkeeping, nothing to get out of sync. Adding a posture later
+   means adding a branch in placeAll(), not new machinery.
+   ------------------------------------------------------------------ */
+
+const PAGES = [
+  { name:"Ghostty — logbook", body:
+`<span class="dim">$</span> paneru restart
+<span class="dim">INFO</span> service started
+<span class="dim">INFO</span> bind: <span class="warm">alt - j</span>  focus west
+<span class="dim">INFO</span> bind: <span class="warm">alt - l</span>  focus east
+<span class="dim">INFO</span> found (5, Some(5)) windows.
+
+<span class="dim">$</span> <span class="good">_</span>` },
+
+  { name:"Zen — the half-opened book", body:
+`<span class="cool">Safari's card stack</span>, turned on its side.
+
+You are not choosing from a list.
+You are looking <span class="warm">along</span> a stack of pages
+and taking the one you want.` },
+
+  { name:"Doorman", body:
+`        <span class="dim">40</span>
+
+<span class="dim">WRITE IT DOWN FIRST</span>
+
+What are you here to do?
+<span class="dim">One line per thing.</span>` },
+
+  { name:"System Settings — Accessibility", body:
+`Allow the applications below
+to control your computer.
+
+  <span class="good">✓</span> Paneru + CmdTabBlock
+  <span class="good">✓</span> paneru
+  <span class="dim">·</span> Ghostty` },
+
+  { name:"WhatsApp", body:
+`<span class="dim">Mãe</span>          <span class="dim">yesterday</span>
+<span class="dim">Family 🇺🇸</span>    <span class="dim">yesterday</span>
+<span class="dim">Beatriz</span>      <span class="dim">24/07/26</span>` },
+];
+
+const book  = document.getElementById('book');
+const spine = document.getElementById('spine');
+const modeEl= document.getElementById('mode');
+const countEl=document.getElementById('count');
+const room  = document.getElementById('room');
+
+let pages = [];
+let cur = 2;
+let choosing = false;
+let sticky = false;
+let grabbing = false;   // shift held: the current page is in the hand
+let markBeforeChoosing = 2;
+
+/* posture ----------------------------------------------------------- */
+
+function num(n){ return parseInt(getComputedStyle(document.documentElement).getPropertyValue(n)); }
+
+function transformFor(i){
+  const d = i - cur, a = Math.abs(d);
+
+  // Held in the hand. Comes toward the viewer and tilts, and its shadow
+  // lets go of the floor (see .slot.grabbed .cast). Reordering is this
+  // posture plus J/L: the page travels while the rest close the gap.
+  if(grabbing && i === cur){
+    const base = choosing ? 'rotateY(-10deg)' : '';
+    return `translate3d(0, -26px, 300px) ${base} rotateZ(-1.5deg) scale(1.02)`;
+  }
+
+  if(!choosing){
+    // Reading. One page faces you; its neighbours are turned away and
+    // pushed back, so they read as *behind* rather than beside.
+    const x  = d * num('--spread-x');
+    const z  = d === 0 ? 50 : -90;
+    const ry = d === 0 ? 0 : (d < 0 ? 11 : -11);
+    return `translate3d(${x}px, 0, ${z}px) rotateY(${ry}deg)`;
+  }
+
+  // Choosing. Every page turns to the SAME angle — that shared angle is
+  // what makes it a book rather than a carousel. They cascade down and
+  // back as they recede, which is the diagonal stack.
+  const x  = d * num('--fan-x');
+  const y  = d * num('--fan-y');
+  const z  = -a * num('--fan-z') + (d === 0 ? 90 : 0);
+  const ry = d === 0 ? -18 : -36;
+  const s  = Math.max(.72, 1 - a * .045);
+  return `translate3d(${x}px, ${y}px, ${z}px) rotateY(${ry}deg) scale(${s})`;
+}
+
+function placeAll(){
+  pages.forEach((p, i) => {
+    if(p.el.classList.contains('falling')) return;
+    p.el.style.transform = transformFor(i);
+    p.el.style.zIndex = (grabbing && i === cur) ? 200 : 100 - Math.abs(i - cur);
+    p.el.classList.toggle('current', i === cur);
+    p.el.classList.toggle('grabbed', grabbing && i === cur);
+    // Depth is also darkness: the further back, the more shade, so the
+    // stack reads without needing a single extra light.
+    p.shade.style.opacity = (choosing && i !== cur)
+      ? Math.min(.8, .32 + Math.abs(i - cur) * .13)
+      : '';
+  });
+  drawSpine();
+  countEl.textContent = pages.length + (pages.length === 1 ? ' page' : ' pages');
+  modeEl.textContent = grabbing ? 'holding' : (choosing ? 'choosing' : 'reading');
+  modeEl.classList.toggle('live', choosing || grabbing);
+}
+
+function drawSpine(){
+  spine.innerHTML = '';
+  pages.forEach((_, i) => {
+    const r = document.createElement('div');
+    r.className = 'rib' + (i === cur ? ' on' : '');
+    spine.appendChild(r);
+  });
+}
+
+/* building pages ----------------------------------------------------- */
+
+function makePage(data, arriving){
+  // slot = the thing that moves. Inside it, the card (which clips its own
+  // contents) and the shadow it throws on the floor (which must not be
+  // clipped, hence the two-element split).
+  const el = document.createElement('div');
+  el.className = 'slot' + (arriving ? ' arriving' : '');
+  el.innerHTML =
+    `<div class="page">` +
+      `<div class="bar"><span class="dot"></span><span class="dot"></span>` +
+      `<span class="dot"></span><span class="name">${data.name}</span></div>` +
+      `<div class="body">${data.body}</div>` +
+      `<div class="shade"></div><div class="lift"></div>` +
+    `</div>` +
+    `<div class="cast"></div>`;
+  const rec = { el, shade: el.querySelector('.shade') };
+  el.addEventListener('click', () => {
+    const i = pages.indexOf(rec);
+    if(i < 0) return;
+    cur = i;
+    if(choosing) commit(); else placeAll();
+  });
+  book.appendChild(el);
+  return rec;
+}
+
+PAGES.forEach(d => pages.push(makePage(d, false)));
+placeAll();
+
+/* the motions --------------------------------------------------------- */
+
+function openBook(isSticky){
+  if(choosing) return;
+  choosing = true; sticky = isSticky;
+  markBeforeChoosing = cur;
+  room.classList.add('choosing');
+  placeAll();
+}
+function commit(){
+  if(!choosing) return;
+  choosing = false; sticky = false;
+  room.classList.remove('choosing');
+  placeAll();
+}
+function cancel(){
+  if(!choosing) return;
+  cur = markBeforeChoosing;
+  commit();
+}
+function walk(step){
+  const next = cur + step;
+  if(next < 0 || next >= pages.length) return;  // the strip has ends
+  cur = next;
+  placeAll();
+}
+
+/* Reordering: carry the held page one place along, the neighbour closing
+   the gap behind it. The page keeps its grabbed posture the whole way, so
+   the move reads as carrying rather than as two pages swapping. */
+function carry(step){
+  const next = cur + step;
+  if(next < 0 || next >= pages.length) return;
+  const [held] = pages.splice(cur, 1);
+  pages.splice(next, 0, held);
+  cur = next;
+  placeAll();
+}
+
+function grab(on){
+  if(grabbing === on) return;
+  grabbing = on;
+  placeAll();
+}
+
+let launchCount = 0;
+function launch(){
+  const n = ++launchCount;
+  const rec = makePage({
+    name:`New page ${n}`,
+    body:`<span class="dim">slid in from over the book</span>\n\nand landed at the far end of\nthe strip, the way paneru's\n<span class="warm">index</span> rule puts it there.`
+  }, true);
+  pages.push(rec);
+  // One frame in the arriving posture, then released into the normal
+  // layout so the settle uses the same structural curve as everything else.
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    rec.el.classList.remove('arriving');
+    cur = pages.length - 1;
+    placeAll();
+  }));
+}
+
+function throwToFloor(){
+  if(pages.length <= 1) return;
+  const gone = pages[cur];
+  // placeAll only ever walks the strip, so anything leaving it has to drop
+  // its state classes on the way out or they go stale in the DOM.
+  gone.el.classList.remove('current', 'grabbed');
+  gone.el.classList.add('falling');
+  pages.splice(cur, 1);
+  if(cur >= pages.length) cur = pages.length - 1;
+  placeAll();
+  setTimeout(() => gone.el.remove(), 800);
+}
+
+/* input --------------------------------------------------------------- */
+
+document.addEventListener('keydown', e => {
+  const k = e.key.toLowerCase();
+
+  // Shift is the hand. Held down, the current page comes off the strip;
+  // J/L then carry it instead of moving focus.
+  if(e.key === 'Shift'){ grab(true); return; }
+
+  if(e.key === 'Tab'){
+    e.preventDefault();
+    // Held ⌥ means the book closes when you let go. Tab on its own is the
+    // fallback for when the menu bar app is swallowing ⌥+tab, and then it
+    // stays open until you commit.
+    if(!choosing) openBook(!e.altKey);
+    else walk(e.shiftKey ? -1 : 1);
+    return;
+  }
+  if(k === 'j' || e.key === 'ArrowLeft'){
+    e.preventDefault(); grabbing ? carry(-1) : walk(-1); return;
+  }
+  if(k === 'l' || e.key === 'ArrowRight'){
+    e.preventDefault(); grabbing ? carry(1) : walk(1); return;
+  }
+  if(k === 'n'){ e.preventDefault(); launch(); return; }
+  if(k === 'w'){ e.preventDefault(); throwToFloor(); return; }
+  if(e.key === 'Escape'){ e.preventDefault(); cancel(); return; }
+  if(e.key === 'Enter'){ e.preventDefault(); commit(); return; }
+});
+
+document.addEventListener('keyup', e => {
+  // Letting go of shift sets the page down wherever it now belongs.
+  if(e.key === 'Shift') grab(false);
+  if(e.key === 'Alt' && choosing && !sticky) commit();
+});
+window.addEventListener('blur', () => {
+  grab(false);
+  if(choosing && !sticky) commit();
+});
+
+/* Trackpad: a two-finger horizontal slide walks the strip. Accumulated
+   and gated, because one flick emits a long tail of small deltas. */
+let wheelAcc = 0, wheelLock = false;
+window.addEventListener('wheel', e => {
+  const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : 0;
+  if(!d) return;
+  e.preventDefault();
+  wheelAcc += d;
+  if(!wheelLock && Math.abs(wheelAcc) > 55){
+    walk(wheelAcc > 0 ? 1 : -1);
+    wheelAcc = 0; wheelLock = true;
+    setTimeout(() => { wheelLock = false; }, 190);
+  }
+}, { passive:false });
+</script>
+</body>
+</html>

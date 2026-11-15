@@ -1,198 +1,80 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Victor</title>
-<link rel="icon" type="image/svg+xml" href="logo.svg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&display=swap" rel="stylesheet">
-<style>
-/* jaydip.me-inspired: warm, linear, generous whitespace, typographic */
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Victor Aguiar-Macedo — design</title><meta name="description" content="Victor Aguiar-Macedo — design student at Unifor. Research, visual identity, signage, editorial design and interactive prototypes.">
+<meta property="og:title" content="Victor Aguiar-Macedo — design"><meta property="og:description" content="Victor Aguiar-Macedo — design student at Unifor. Research, visual identity, signage, editorial design and interactive prototypes."><meta property="og:image" content="https://vmacedo.com/img/rk-07.webp">
+<link rel="icon" href="/logo.svg"><link rel="stylesheet" href="/style.css">
+</head><body>
+<nav class="top"><div class="wrap"><a class="name" href="/">Victor Aguiar-Macedo</a>
+<ul><li><a href="/#work">Work</a></li><li class="hide"><a href="/#play">Play</a></li><li><a href="/#about">About</a></li><li><a href="/cv.html">CV</a></li></ul></div></nav>
+<main class="wrap">
+<header class="hero">
+  <div>
+    <div class="kicker">Design · Unifor · Fortaleza</div>
+    <h1 style="margin-top:18px">Hello, I'm Victor.<br>I take projects from the field to the screen.</h1>
+    <p class="serif">Talk to the people who will use it, design the system, test it, and write down why.</p>
+    <div class="facts">
+      <a class="pill ac" href="#work">See the work</a>
+      <a class="pill" href="/work/voar.html">Published article ↗</a>
+      <a class="pill" href="#play">Try the prototypes</a>
+      <a class="pill" href="/files/portfolio-carlos-victor-aguiar-de-macedo.pdf">Portfolio PDF (pt-BR)</a>
+    </div>
+  </div>
+  <img src="/img/victor.webp" alt="Portrait of Victor" width="600" height="750">
+</header>
 
-*, *::before, *::after {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+<section id="work">
+  <div class="sechead"><h2>Selected work</h2><span class="mut">2025 – 2026</span></div>
+  <div class="work">
+    <a class="wide" href="/work/voar.html"><div class="thumb"><img src="/img/voar-41.webp" alt="Affinity diagram from the Voar research" loading="lazy"></div>
+      <h3>Voar — a donation platform for an NGO, and the paper about it</h3>
+      <p>Field visit, CSD matrix, interviews, affinity mapping, benchmarking, task flows, usability testing. Published in the proceedings of a Unifor research meeting.</p>
+      <div class="tags"><span class="tag">UX research</span><span class="tag">Usability testing</span><span class="tag">Prototype</span><span class="tag">Paper</span></div></a>
+    <a href="/work/roberto-kennedy.html"><div class="thumb" style="background:#111"><img src="/img/rk-07.webp" alt="Roberto Kennedy monogram" loading="lazy"></div>
+      <h3>Roberto Kennedy — framing the light</h3><p>Visual identity for an architecture and hotel photographer, from client briefing to applications.</p>
+      <div class="tags"><span class="tag">Visual identity</span><span class="tag">Motion</span></div></a>
+    <a href="/work/iracema.html"><div class="thumb"><img src="/img/v-pecas3.webp" alt="Iracema signage family" loading="lazy"></div>
+      <h3>Praia de Iracema — a signage system for the waterfront</h3><p>A 3D survey map built for the team, a visual system, and technical drawings to NBR 9050.</p>
+      <div class="tags"><span class="tag">Field research</span><span class="tag">Wayfinding</span><span class="tag">Tool</span></div></a>
+    <a href="/work/editorial.html"><div class="thumb" style="background:#e9e1d1"><img src="/img/rev_esp-15.webp" alt="RUPTURA magazine spread" loading="lazy" style="object-fit:contain"></div>
+      <h3>Editorial and print — RUPTURA, Flatland, Vansire</h3><p>A music magazine, a 128-page book, and a two-Pantone gig folder taken to press-ready files.</p>
+      <div class="tags"><span class="tag">Editorial</span><span class="tag">Print production</span></div></a>
+    <a href="/work/prototypes.html"><div class="thumb" style="background:#111"><img src="/img/d-tensemachine.webp" alt="Tense Machine prototype" loading="lazy"></div>
+      <h3>Twenty prototypes that teach by doing</h3><p>Small apps where a skill is learned through action, not explanation — and the twenty design principles that came out of building them.</p>
+      <div class="tags"><span class="tag">Interaction design</span><span class="tag">Working code</span></div></a>
+  </div>
+</section>
 
-:root {
-    --bg: #FAFAF8;
-    --fg: #1C1917;
-    --muted: #9A9490;
-    --accent: #CC785C;
-    --border: #E8E4DF;
-}
+<section id="play">
+  <div class="sechead"><h2>Play</h2><span class="mut">These run in your browser. A keyboard helps.</span></div>
+  <div class="play">
+    <a href="/play/vimnav/"><img src="/img/d-vimnav.webp" alt="" loading="lazy"><div><h3>VimNav</h3><p>Vim's motions over a grid. Each key's symbol sits where the move goes.</p><div class="go">Play →</div></div></a>
+    <a href="/play/tetrisrotation/"><img src="/img/d-tetrisrotation.webp" alt="" loading="lazy"><div><h3>Tetris Rotation</h3><p>Three rotations, three colours. The colours are content, not decoration.</p><div class="go">Play →</div></div></a>
+    <a href="/play/keyview/"><img src="/img/d-keyview.webp" alt="" loading="lazy"><div><h3>Keyview</h3><p>Typing practice in three fixed acts per round.</p><div class="go">Play →</div></div></a>
+    <a href="/play/munselltools/"><img src="/img/d-munselltools.webp" alt="" loading="lazy"><div><h3>MunsellTools</h3><p>Hue is a gear, value a plumb bob, chroma a pump. Colour as tools.</p><div class="go">Play →</div></div></a>
+    <a href="/play/cartesiancommander/"><img src="/img/d-cartesiancommander.webp" alt="" loading="lazy"><div><h3>Cartesian Commander</h3><p>Coordinates with no marker: position is where two ridges cross.</p><div class="go">Play →</div></div></a>
+    <a href="/play/desktopshell/"><img src="/img/d-desktopshell.webp" alt="" loading="lazy"><div><h3>DesktopShell</h3><p>A desktop as a half-open book, with windows as pages.</p><div class="go">Play →</div></div></a>
+  </div>
+</section>
 
-html {
-    background: var(--bg);
-}
-
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
-    font-size: 16px;
-    line-height: 1.7;
-    color: var(--fg);
-    background: var(--bg);
-    font-weight: 400;
-    -webkit-font-smoothing: antialiased;
-}
-
-/* narrow reading column, pushed down for breathing room */
-.container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 128px 28px 96px;
-}
-
-/* Name */
-nav {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 40px;
-}
-
-.logo {
-    width: 60px;
-    height: auto;
-    display: block;
-}
-
-nav .name {
-    font-family: "Fraunces", Georgia, serif;
-    font-weight: 500;
-    font-size: 30px;
-    letter-spacing: -0.015em;
-    color: var(--fg);
-}
-
-/* Intro */
-.intro {
-    font-size: 21px;
-    line-height: 1.65;
-    font-weight: 400;
-    margin-bottom: 26px;
-    letter-spacing: -0.005em;
-}
-
-.intro em {
-    font-family: "Fraunces", Georgia, serif;
-    font-style: italic;
-    font-weight: 400;
-}
-
-.blog-line {
-    font-size: 21px;
-    line-height: 1.65;
-    font-weight: 400;
-    color: var(--muted);
-    margin-bottom: 48px;
-    letter-spacing: -0.005em;
-}
-
-a {
-    color: var(--fg);
-    text-decoration: none;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 1px;
-    transition: color 0.18s, border-color 0.18s;
-}
-
-a:hover {
-    color: var(--accent);
-    border-color: var(--accent);
-}
-
-.blog-line a {
-    color: var(--fg);
-}
-
-/* Contact icon row */
-.links {
-    display: flex;
-    align-items: center;
-    gap: 22px;
-    padding-top: 32px;
-    border-top: 1px solid var(--border);
-}
-
-.links a {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--muted);
-    border-bottom: none;
-    padding-bottom: 0;
-    font-size: 14px;
-    letter-spacing: 0.01em;
-    transition: color 0.18s;
-}
-
-.links a:hover {
-    color: var(--fg);
-}
-
-.links svg {
-    width: 17px;
-    height: 17px;
-    flex: none;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .container {
-        padding: 80px 24px 72px;
-    }
-    nav .name {
-        font-size: 26px;
-    }
-    .intro,
-    .blog-line {
-        font-size: 18px;
-    }
-}
-</style>
-</head>
-<body>
-<div class="container">
-
-    <nav>
-        <img class="logo" src="logo.svg" alt="Victor">
-        <span class="name">Victor</span>
-    </nav>
-
-    <main>
-        <p class="intro">
-            hello. i'm victor and i build software for <em>human flourishing</em>.
-            right now this takes the form of <em>drill apps</em> &mdash; i strive to
-            make them the best teaching resources for their categories on the internet.
-            thanks for stopping by.
-        </p>
-        <p class="blog-line">
-            i also log some personal learning at <a href="https://ordinary.vision">ordinary.vision</a>,
-            and shorter thoughts on a <a href="microblog.html">microblog</a>.
-        </p>
-
-        <div class="links">
-            <a href="mailto:cavictoor@gmail.com">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <rect x="3" y="5" width="18" height="14" rx="2"/>
-                    <path d="m3 7 9 6 9-6"/>
-                </svg>
-                email
-            </a>
-            <a href="https://ordinary.vision">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <circle cx="12" cy="12" r="9"/>
-                    <path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>
-                </svg>
-                ordinary.vision
-            </a>
-        </div>
-    </main>
-
-</div>
-</body>
-</html>
+<section id="about">
+  <div class="sechead"><h2>About</h2><span class="mut">Carlos Victor Aguiar de Macedo</span></div>
+  <div class="two about">
+    <div>
+      <p class="lede">I'm a fourth-semester Design student at the University of Fortaleza (Unifor), after a year of Computer Science.</p>
+      <p style="margin-top:18px">The work I like most sits between research and the screen: finding out what people actually do, turning that into a system, and checking it with the people it's for. In class that has meant an NGO's donation app, a brand for a photographer, and a signage system for a beach. On my own it means small learning apps — I build what I design, so the prototype is the real thing.</p>
+      <p>I write things down: decision logs, technical drawings, a set of twenty design principles, and one published paper so far. I speak Portuguese and English fluently and hold Brazilian and Portuguese (EU) citizenship.</p>
+    </div>
+    <div>
+      <ul class="list">
+        <li><span>Research</span><span>CSD matrix · interviews · affinity mapping · benchmarking · usability tests</span></li>
+        <li><span>Design</span><span>Visual identity · wayfinding · editorial · print production</span></li>
+        <li><span>Interface</span><span>Task flows · wireframes · low/mid-fi prototypes · working HTML/JS</span></li>
+        <li><span>Tools</span><span>Figma · InDesign · Illustrator · Blender · HTML/CSS/JS</span></li>
+        <li><span>Published</span><span><a href="/work/voar.html">Voar paper, 2026 · ISSN 2965-9396</a></span></li>
+      </ul>
+      <div class="facts"><a class="pill ac" href="mailto:victormac@edu.unifor.br">Email me</a><a class="pill" href="/cv.html">CV</a><a class="pill" href="/files/curriculo-carlos-victor-aguiar-de-macedo.pdf">Currículo (PDF)</a></div>
+    </div>
+  </div>
+</section>
+</main>
+<footer><div class="wrap"><span>Victor Aguiar-Macedo · Fortaleza, Brazil</span><span><a href="mailto:victormac@edu.unifor.br">victormac@edu.unifor.br</a> · <a href="https://ordinary.vision">ordinary.vision</a> · <a href="/microblog.html">microblog</a></span></div></footer>
+</body></html>

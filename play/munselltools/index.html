@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Munsell Match</title>
+<style>
+  /* eBay Playbook (Evo), dark set: page is background-primary, ink is
+     foreground-primary, type is Market Sans with eBay's own web fallback. */
+  html, body { margin:0; height:100%; background:#000000; color:#f7f7f7;
+    font:14px/1.5 "Market Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    overflow:hidden; }
+  /* the cursor is hidden only where the tool works — see setCursor() */
+  canvas { display:block; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<script>
+"use strict";
+
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+
+/* ---------- colour: OkLCh is the working space (L=value, C=chroma, H=hue) ---------- */
+
+function lchToLinear(L, C, H) {
+  const h = H * Math.PI / 180, a = C * Math.cos(h), b = C * Math.sin(h);
+  const l_ = L + 0.3963377774*a + 0.2158037573*b;
+  const m_ = L - 0.1055613458*a - 0.0638541728*b;
+  const s_ = L - 0.0894841775*a - 1.2914855480*b;
+  const l = l_*l_*l_, m = m_*m_*m_, s = s_*s_*s_;
+  return [
+     4.0767416621*l - 3.3077115913*m + 0.2309699292*s,
+    -1.2684380046*l + 2.6097574011*m - 0.3413193965*s,
+    -0.0041960863*l - 0.7034186147*m + 1.7076147010*s
+  ];
+}
+function inGamut(rgb) {
+  for (const v of rgb) if (v < -0.0005 || v > 1.0005) return false;
+  return true;
+}
+function gamma(v) {
+  v = Math.min(1, Math.max(0, v));
+  return v <= 0.0031308 ? 12.92*v : 1.055*Math.pow(v, 1/2.4) - 0.055;
+}
+// clipped = this L,C,H asks for a colour the screen cannot make, so chroma was
+// pulled in until it could. Rounds are dealt so this never happens in play.
+function lchToCss(L, C, H) {
+  let clipped = false;
+  if (!inGamut(lchToLinear(L, C, H))) {
+    clipped = true;
+    let lo = 0, hi = C;
+    for (let i = 0; i < 18; i++) {
+      const mid = (lo + hi) / 2;
+      if (inGamut(lchToLinear(L, mid, H))) lo = mid; else hi = mid;
+    }
+    C = lo;
+  }
+  const rgb = lchToLinear(L, C, H).map(v => Math.round(gamma(v) * 255));
+  return { css: `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`, clipped };
+}
+
+/* ---------- the tools ----------
+   Each body is built as flat polygons in tool space: x right, y up, about one
+   unit tall, with its dripping tip near (0,−0.5).
+
+   They are machined grey — no colour anywhere on them — so the only thing
+   telling them apart is shape and motion, and no two share a silhouette: hue
+   is a round cog that turns, value is a tall ladder a bob climbs, chroma is a
+   wide lamp that burns. Circle, column, flare.                             */
+
+let tool = 0;
+
+function pol(o, L, pts) { o.push({ p: pts, L }); }
+function rct(o, L, x0, y0, x1, y1) { pol(o, L, [[x0,y0],[x1,y0],[x1,y1],[x0,y1]]); }
+function disc(cx, cy, r, n, rot) {
+  const p = [];
+  for (let i = 0; i < n; i++) {
+    const a = (rot||0) + i*2*Math.PI/n;
+    p.push([cx + r*Math.cos(a), cy + r*Math.sin(a)]);
+  }
+  return p;
+}
+
+// The business end says which way the tool is running, and it says it in a
+// still frame: a narrow tip drips out, a flared mouth drinks in. Same rule on
+// all three tools, so it is learned once and then read at a glance.
+function spout(o, dir, top, w) {
+  const y = -0.5;
+  if (dir > 0) { pol(o, 0.34, [[-w,top],[w,top],[w*0.32,y],[-w*0.32,y]]); return; }
+  pol(o, 0.30, [[-w*0.5,top],[w*0.5,top],[0.40,y],[-0.40,y]]);          // the funnel
+  pol(o, 0.10, [[-0.04,top+0.02],[0.04,top+0.02],[0.28,y],[-0.28,y]]);  // its open mouth
+}
+
+// HUE — a cog: a ratchet wheel with bolt holes, so you can see it turning. The
+// teeth are sawtooth, and they lean the way the wheel is driven — one still
+// frame tells you which way it runs.
+function cogBody(t, busy, dir) {
+  const o = [], n = 9, spin = t * (busy ? 3.2 : 0.7) * dir, ro = 0.33, rt = 0.44;
+  const rim = [], s = 2*Math.PI/n, lean = dir > 0 ? 0.09 : 0.41;
+  for (let i = 0; i < n; i++) {
+    const a = spin + i*s;
+    const P = (r, k) => [r*Math.cos(a + k), r*Math.sin(a + k)];
+    rim.push(P(ro, 0), P(rt, s*lean), P(ro, s*0.5));
+  }
+  pol(o, 0.62, rim);
+  for (let i = 0; i < 5; i++) pol(o, 0.30, disc(0.20*Math.cos(spin + i*2*Math.PI/5),
+                                                0.20*Math.sin(spin + i*2*Math.PI/5), 0.052, 6));
+  pol(o, 0.44, disc(0, 0, 0.115, 10));
+  pol(o, 0.86, disc(0, 0, 0.045, 8));
+  spout(o, dir, -ro + 0.02, 0.06);
+  return { o, tip: [0, -0.52] };
+}
+
+// VALUE — a ladder, and a bob that climbs it. Dripping walks the bob up the
+// rungs, sucking walks it back down: the tool does what the variable does. In
+// reverse the bob hangs off the bottom rung, below the rails it was climbing.
+function ladderBody(t, busy, dir) {
+  const o = [], x = 0.115, y0 = -0.34, y1 = 0.5;
+  rct(o, 0.70, -x-0.038, y0, -x+0.038, y1);
+  rct(o, 0.70,  x-0.038, y0,  x+0.038, y1);
+  for (let i = 0; i < 6; i++) {
+    const yy = y0 + 0.07 + i*(y1 - y0 - 0.14)/5;
+    rct(o, 0.46, -x, yy-0.018, x, yy+0.018);
+  }
+  let ph = (t * (busy ? 0.85 : 0.26) * dir) % 1;
+  if (ph < 0) ph += 1;
+  const lo = dir > 0 ? y0 + 0.09 : y0 - 0.05;              // reversed, it hangs off the end
+  const by = lo + ph*(y1 - 0.09 - lo);
+  rct(o, 0.90, -x-0.10, by-0.062, x+0.10, by+0.062);       // the bob
+  spout(o, dir, y0 + 0.01, 0.075);
+  return { o, tip: [0, -0.52] };
+}
+
+// CHROMA — a lamp: a wide flared shade with a bulb hanging in its mouth. It
+// burns and throws rays out to the sides as it drips colour in; running
+// backwards it is dark, with no rays at all. The rays splay sideways so the
+// spout can still hang straight down and say which way the tool runs.
+function lampBody(t, busy, dir) {
+  const o = [], lit = dir > 0;
+  const ph = Math.sin(t * (busy ? 5.0 : 1.2)) * 0.5 + 0.5;
+  rct(o, 0.50, -0.030, 0.30, 0.030, 0.52);                 // the flex it hangs from
+  pol(o, 0.66, [[-0.15,0.32],[0.15,0.32],[0.46,-0.04],[-0.46,-0.04]]);   // the shade
+  if (lit) {                                               // the light it throws
+    const len = 0.13 + ph*0.22;
+    for (const a of [3.66, 4.19, 5.24, 5.76]) {            // a fan below, clear of the spout
+      const c = Math.cos(a), s = Math.sin(a), px = -s, py = c;
+      const bx = 0.13*c, by = -0.02 + 0.13*s, ex = (0.13+len)*c, ey = -0.02 + (0.13+len)*s;
+      // brighter than the shade, so they read as light and not as shadow
+      pol(o, 0.80 + ph*0.15,
+          [[bx - px*0.055, by - py*0.055], [bx + px*0.055, by + py*0.055], [ex, ey]]);
+    }
+  }
+  // burning when it drips, cold and black when it drinks back in
+  pol(o, lit ? 0.72 + ph*0.24 : 0.14, disc(0, -0.02, 0.135, 12));
+  spout(o, dir, -0.14, 0.075);
+  return { o, tip: [0, -0.52] };
+}
+
+const BODIES = [cogBody, ladderBody, lampBody];
+
+/* ---------- the game: make your scene match the target one ----------
+   Same objects both sides, one of them the wrong colour. A move is one drop,
+   and the target is a whole number of drops away, so par is exactly the
+   distance — every extra drop is one you didn't need. Z takes a drop back.
+
+   The round never ends itself. You say when you have matched it, with space,
+   and only then does it tell you — calling it is the skill, and a game that
+   announces the win the instant you stumble into it never asks for that.
+
+   No numbers while you play: the dots at the top are the only status. Reading
+   the difference off a readout would be a different skill from seeing it. The
+   numbers all come out at once on the end screen, after the call is made.  */
+
+const GH = 24, HST = 15;                  // hue: 24 rungs of 15° round the circle
+const LN = 13, LST = 0.062, LMIN = 0.16;  // value: 14 rungs
+const CN = 7,  CST = 0.032;               // chroma: grey, then 7 rungs out
+const gCol = o => lchToCss(LMIN + o.l*LST, o.c*CST, o.h*HST);
+const dHue = (a, b) => { const d = Math.abs(a-b) % GH; return Math.min(d, GH-d); };
+const gDist = (a, b) => dHue(a.h, b.h) + Math.abs(a.l - b.l) + Math.abs(a.c - b.c);
+
+/* the objects. Silhouettes only — no two alike, all of them nameable from
+   across the room, because telling which thing you are looking at must never
+   be the hard part. The hard part is the colour.                           */
+
+function lens(w, h, k) {
+  const p = [], n = 14;
+  for (let i = 0; i <= n; i++) { const u = i/n; p.push([-w + 2*w*u,  h*Math.pow(Math.sin(Math.PI*u), k)]); }
+  for (let i = n; i >= 0; i--) { const u = i/n; p.push([-w + 2*w*u, -h*Math.pow(Math.sin(Math.PI*u), k)]); }
+  return p;
+}
+function arcp(cx, cy, r, a0, a1, n) {
+  const p = [];
+  for (let i = 0; i <= n; i++) { const a = a0 + (a1-a0)*i/n; p.push([cx + r*Math.cos(a), cy + r*Math.sin(a)]); }
+  return p;
+}
+function ringp(cx, cy, ro, ri, a0, a1, n) {
+  return arcp(cx, cy, ro, a0, a1, n).concat(arcp(cx, cy, ri, a1, a0, n));
+}
+function rotp(pts, a) {
+  const c = Math.cos(a), s = Math.sin(a);
+  return pts.map(q => [q[0]*c - q[1]*s, q[0]*s + q[1]*c]);
+}
+function boxp(x0, y0, x1, y1) { return [[x0,y0],[x1,y0],[x1,y1],[x0,y1]]; }
+function starp(n, ro, ri) {
+  const p = [];
+  for (let i = 0; i < n*2; i++) {
+    const a = -Math.PI/2 + i*Math.PI/n, r = i % 2 ? ri : ro;
+    p.push([r*Math.cos(a), r*Math.sin(a)]);
+  }
+  return p;
+}
+
+const SHAPES = [
+  [ rotp(lens(0.44, 0.21, 0.9), -0.62), rotp(boxp(-0.50,-0.022,-0.30,0.022), -0.62) ],      // leaf
+  [ starp(5, 0.50, 0.21) ],                                                                 // star
+  [ [[-0.38,-0.44],[0.38,-0.44],[0.38,0.06],[0,0.46],[-0.38,0.06]], boxp(-0.11,-0.44,0.11,-0.06) ], // house
+  [ boxp(-0.34,-0.36,0.20,0.32), ringp(0.20,-0.02,0.28,0.16,-1.25,1.25,10) ],               // mug
+  [ lens(0.34, 0.22, 1.0), [[-0.30,0],[-0.50,0.22],[-0.50,-0.22]],
+    arcp(0.14, 0.05, 0.045, 0, 6.2, 8) ],                                                   // fish
+  [ boxp(-0.055,-0.48,0.055,0.16), ringp(0,0.30,0.20,0.095,0,6.28,14),
+    boxp(0.055,-0.42,0.24,-0.32), boxp(0.055,-0.22,0.20,-0.13) ],                           // key
+  [ arcp(0,-0.08,0.31,Math.PI,0,10).concat([[0.36,-0.30],[-0.36,-0.30]]),
+    boxp(-0.42,-0.40,0.42,-0.28), arcp(0,-0.47,0.07,0,6.2,8) ],                             // bell
+  [ [[-0.17,-0.46],[0.17,-0.46],[0.17,0.02],[0.085,0.17],[0.085,0.36],
+     [-0.085,0.36],[-0.085,0.17],[-0.17,0.02]], boxp(-0.115,0.36,0.115,0.48) ],             // bottle
+  [ boxp(-0.075,-0.48,0.075,-0.10), [[0,0.48],[0.34,0.02],[-0.34,0.02]],
+    [[0,0.16],[0.40,-0.28],[-0.40,-0.28]] ],                                                // tree
+  [ [[-0.17,0.48],[0.11,0.48],[0.11,-0.14],[0.32,-0.20],[0.46,-0.31],
+     [0.46,-0.44],[-0.17,-0.44]] ]                                                          // boot
+];
+
+const G = { level:1, objs:[], target:[], start:[], moves:0, par:0, slack:0, odd:0,
+            over:null, deny:0, hover:-1, panes:[], cells:[], tcells:[], hit:[] };
+const gdrops = [];
+const history = [];                       // every landed step, newest last — Z walks it back
+
+const rnd = n => Math.floor(Math.random()*n);
+function okColour(o) { return !gCol(o).clipped; }
+
+function newRound(level) {
+  // Exactly one object in the scene is off, at every level. The others are
+  // there to be ruled out — finding which one is the round. Difficulty is the
+  // size of the crowd, how many variables that one is off in, and the slack.
+  const n      = clamp(3 + Math.floor((level-1)/2), 3, 8);
+  // steps stay small on purpose: a six-step difference is easy to see and just
+  // long to walk back. Further off is not harder, only longer.
+  const maxSt  = clamp(2 + Math.floor(level/4), 2, 4);
+  const varsN  = clamp(1 + Math.floor((level-1)/3), 1, 3);
+  G.slack = Math.max(0, 8 - level);
+
+  const pool = SHAPES.map((s, i) => i);
+  for (let i = pool.length - 1; i > 0; i--) { const j = rnd(i+1); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+
+  G.objs = [];
+  for (let i = 0; i < n; i++) {
+    let o;
+    do { o = { shape: pool[i], h: rnd(GH), l: 2 + rnd(LN-3), c: 1 + rnd(CN) }; } while (!okColour(o));
+    G.objs.push(o);
+  }
+
+  G.target = G.objs.map(o => ({ ...o }));
+  {
+    const i = rnd(n), src = G.objs[i];
+    G.odd = i;                                         // the one the round is about
+    // hue is invisible on something nearly grey, so a near-grey object is never
+    // given a hue difference — that would be an unseeable move to find
+    const vars = [src.c >= 2 ? 0 : null, 1, 2].filter(v => v !== null);
+    for (let k = vars.length - 1; k > 0; k--) { const j = rnd(k+1); [vars[k], vars[j]] = [vars[j], vars[k]]; }
+    const chosen = vars.slice(0, 1 + rnd(varsN));
+    // the budget of steps is shared out, not handed to each variable: three
+    // variables off by one is subtler than one off by three, and that is the
+    // direction difficulty should go
+    const per = Math.max(1, Math.round(maxSt/chosen.length));
+    for (const v of chosen) {
+      for (let tries = 0; tries < 24; tries++) {
+        const d = (1 + rnd(per)) * (Math.random() < 0.5 ? -1 : 1);
+        const c = { ...G.target[i] };
+        if (v === 0) c.h = (c.h + d + GH) % GH;
+        else if (v === 1) c.l = c.l + d;
+        else c.c = c.c + d;
+        if (c.l < 1 || c.l > LN || c.c < 0 || c.c > CN || !okColour(c)) continue;
+        G.target[i] = c;
+        break;
+      }
+    }
+  }
+
+  G.par = G.objs.reduce((s, o, i) => s + gDist(o, G.target[i]), 0);
+  if (G.par === 0) return newRound(level);              // nothing to find, deal again
+  G.start = G.objs.map(o => ({ ...o }));
+  G.level = level; G.moves = 0; G.over = null; G.deny = 0; G.hover = -1;
+  gdrops.length = 0; history.length = 0;
+}
+function retryRound() {
+  G.objs = G.start.map(o => ({ ...o }));
+  G.moves = 0; G.over = null; G.deny = 0;
+  gdrops.length = 0; history.length = 0;
+}
+const budget = () => G.par + G.slack;
+const matched = () => G.objs.every((o, i) => gDist(o, G.target[i]) === 0);
+
+function gStep(o, v, s) {
+  if (v === 0) o.h = (o.h + s + GH) % GH;
+  else if (v === 1) o.l = clamp(o.l + s, 0, LN);
+  else o.c = clamp(o.c + s, 0, CN);
+}
+function gLaunch(i) {
+  if (G.over) return;
+  if (G.moves >= budget()) { G.deny = 1; return; }   // out of drops: the dots say so
+  G.moves++;
+  gHold = 0.4;
+  const o = G.objs[i], s = shift ? -1 : 1, c = G.cells[i];
+  const to = [c.x, c.y];
+  const d = { i, v: tool, s, suck: s < 0, u: 0, rate: 1/0.34, arc: 0.34,
+              from: gTip.slice(), to };
+  // a sucked drop leaves the object carrying the colour it took: the change
+  // lands at once and the drop flies up into the tool wearing the old colour
+  if (d.suck) { d.col = gCol(o).css; d.landed = true; gApply(d); d.from = to; d.to = gTip.slice(); }
+  else { const a = { ...o }; gStep(a, tool, s); d.col = gCol(a).css; }
+  gdrops.push(d);
+}
+function gApply(d) {
+  gStep(G.objs[d.i], d.v, d.s);
+  history.push({ i: d.i, v: d.v, s: d.s });
+  G.flash = { i: d.i, t: 1 };
+}
+
+// space — you call it. Nothing else ends a round: not matching every object,
+// not spending the whole budget. A drop still in the air is part of your
+// answer, so committing waits for it to land.
+function commit() {
+  if (G.over || gdrops.length) return;
+  G.over = matched() ? 'win' : 'miss';
+}
+
+// Z — take the last drop back and get the move with it. A drop still in the
+// air was already paid for, so that comes back first.
+function undo() {
+  if (G.over) return;                      // the call is made; the round is closed
+  for (let i = gdrops.length - 1; i >= 0; i--) {
+    if (!gdrops[i].landed) { gdrops.splice(i, 1); G.moves--; return; }
+  }
+  const h = history.pop();
+  if (!h) return;
+  gStep(G.objs[h.i], h.v, -h.s);
+  G.moves--;
+  G.flash = { i: h.i, t: 1 };
+}
+
+/* layout: the same grid twice, yours on the left, the target on the right */
+
+// bias pushes the grid toward the divider (+1 left pane, −1 right pane), so a
+// small round puts the pair next to each other instead of a screen apart. A
+// full grid has no slack left to move and stays put.
+function gCells(pane, n, bias) {
+  const cols = Math.ceil(Math.sqrt(n)), rows = Math.ceil(n/cols);
+  const c = Math.min(pane.w/cols, pane.h/rows, 340), out = [];
+  const slackX = pane.w - cols*c;
+  const ox = pane.x + slackX*(1 + bias)/2, oy = pane.y + (pane.h - rows*c)/2;
+  for (let i = 0; i < n; i++) {
+    const r = Math.floor(i/cols), cN = (r === rows-1) ? n - r*cols : cols;
+    out.push({ x: ox + (cols - cN)*c/2 + (i - r*cols + 0.5)*c,   // last row rides centred
+               y: oy + (r + 0.5)*c, s: c*0.80 });
+  }
+  return out;
+}
+// shape space has y up; the canvas has y down, so it flips on the way out
+function placed(shape, cell) {
+  return SHAPES[shape].map(p => p.map(q => [cell.x + q[0]*cell.s, cell.y - q[1]*cell.s]));
+}
+function layoutGame() {
+  const top = 76, bot = 116, gap = 20;      // the rack stands in the bottom strip
+  const pw = (W - gap*3)/2, phh = Math.max(120, Hh - top - bot);
+  G.panes = [{ x:gap, y:top, w:pw, h:phh }, { x:gap*2 + pw, y:top, w:pw, h:phh }];
+  G.cells  = gCells(G.panes[0], G.objs.length,  1);
+  G.tcells = gCells(G.panes[1], G.objs.length, -1);
+  G.hit = G.objs.map((o, i) => placed(o.shape, G.cells[i]));
+}
+function gPick(x, y) {
+  for (let i = 0; i < G.hit.length; i++) {
+    for (const poly of G.hit[i]) {
+      let inside = false;
+      for (let a = 0, b = poly.length - 1; a < poly.length; b = a++) {
+        if ((poly[a][1] > y) !== (poly[b][1] > y) &&
+            x < (poly[b][0] - poly[a][0]) * (y - poly[a][1]) / (poly[b][1] - poly[a][1]) + poly[a][0])
+          inside = !inside;
+      }
+      if (inside) return i;
+    }
+  }
+  return -1;
+}
+
+/* draw */
+
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+let W = 0, Hh = 0;
+
+/* ---------- theme: eBay's Evo tokens, taken from @ebay/skin's dark set -----
+   page = background-primary (black), cards = background-elevated, ink =
+   foreground-primary, and the two signal colours are Evo's own success and
+   attention. Radius 8 is border-radius-50.
+
+   Two rules the theme is not allowed to break, both for the same reason —
+   anything you can see while judging a colour changes the colour you see:
+
+   1. BOTH cards are the same grey. A colour on one background compared to a
+      colour on another background is not a comparison at all.
+   2. Everything on screen during play is ACHROMATIC. The mark on the live
+      card, the hover ring, the dots — all neutral. Evo's blue would sit a
+      saturated hue next to the very hues being judged. The signal colours
+      are allowed only on the end screen, when the judging is over.        */
+
+const T = {
+  page:  '#000000',              // neutral-900, background-primary
+  card:  '#191919',              // neutral-800, background-elevated
+  ink:   '#f7f7f7',              // neutral-200, foreground-primary
+  ink2:  '#8f8f8f',              // neutral-500, foreground-secondary
+  line:  '#363636',              // neutral-700, border-subtle
+  line2: '#707070',              // neutral-600, border-medium
+  red:   '#ff5c5c',              // red-400,  foreground-attention  (end screen only)
+  green: '#4ce160',              // kiwi-400, foreground-success    (end screen only)
+  scrim: 'rgba(0,0,0,0.64)',     // scrim-background
+  font:  '"Market Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
+  R: 8
+};
+// the tool bodies are modelled light-on-dark, which is the theme they are in
+const toolInk = L => lchToCss(L, 0, 0).css;
+
+function roundRect(x, y, w, h, r) {
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(x, y, w, h, r); else ctx.rect(x, y, w, h);
+}
+
+function resize() {
+  const dpr = window.devicePixelRatio || 1;
+  W = window.innerWidth; Hh = window.innerHeight;
+  cv.width = W*dpr; cv.height = Hh*dpr;
+  cv.style.width = W + 'px'; cv.style.height = Hh + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+window.addEventListener('resize', resize);
+
+function fillPoly(poly, css, out) {
+  ctx.beginPath();
+  ctx.moveTo(poly[0][0], poly[0][1]);
+  for (let i = 1; i < poly.length; i++) ctx.lineTo(poly[i][0], poly[i][1]);
+  ctx.closePath();
+  ctx.fillStyle = css; ctx.fill();
+  ctx.strokeStyle = out; ctx.lineWidth = 1; ctx.stroke();
+}
+// Only the left card can be painted, and every cue for that sits OUTSIDE the
+// card and carries no hue: a bright 2px frame, a white label chip, and the
+// tool cursor, which does not exist off the card (see setCursor). The grey
+// inside the two cards is identical, so the colours are compared on equal
+// ground.
+function drawPane(pane, list, cells, label, live) {
+  roundRect(pane.x, pane.y, pane.w, pane.h, T.R);
+  ctx.fillStyle = T.card; ctx.fill();
+  roundRect(pane.x + 0.5, pane.y + 0.5, pane.w - 1, pane.h - 1, T.R);
+  ctx.strokeStyle = live ? T.ink : T.line; ctx.lineWidth = live ? 2 : 1; ctx.stroke();
+
+  ctx.font = '600 10px ' + T.font; ctx.textAlign = 'left';
+  const lw = ctx.measureText(label).width;
+  if (live) {                                          // a filled chip, eBay-style
+    roundRect(pane.x, pane.y - 24, lw + 18, 18, 9);
+    ctx.fillStyle = T.ink; ctx.fill();
+    ctx.fillStyle = T.page; ctx.fillText(label, pane.x + 9, pane.y - 11);
+  } else {
+    ctx.fillStyle = T.ink2; ctx.fillText(label, pane.x + 1, pane.y - 11);
+  }
+
+  for (let i = 0; i < list.length; i++) {
+    const css = gCol(list[i]).css;
+    for (const poly of placed(list[i].shape, cells[i])) fillPoly(poly, css, 'rgba(0,0,0,0.45)');
+    // the ring is a selection affordance, so it belongs only where selecting
+    // is possible: the target is never marked, not even on its twin
+    if (live && (i === G.hover || (G.flash && G.flash.i === i && G.flash.t > 0.01))) {
+      ctx.globalAlpha = i === G.hover ? 0.9 : G.flash.t;
+      ctx.strokeStyle = T.ink; ctx.lineWidth = 2;
+      for (const poly of placed(list[i].shape, cells[i])) {
+        ctx.beginPath();
+        ctx.moveTo(poly[0][0], poly[0][1]);
+        for (let k = 1; k < poly.length; k++) ctx.lineTo(poly[k][0], poly[k][1]);
+        ctx.closePath(); ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+  }
+}
+
+// the whole status line: one dot per move in the budget, filled while it is
+// still yours to spend. Nothing else is on screen to read — and none of it is
+// coloured, since a coloured mark anywhere is a colour you are judging against.
+function drawDots() {
+  const total = budget(), left = total - G.moves, gap = 18, r = 5;
+  const x0 = W/2 - (total-1)*gap/2, y = 42;
+  for (let i = 0; i < total; i++) {
+    const x = x0 + i*gap, big = G.deny > 0 ? G.deny*2 : 0;
+    ctx.beginPath(); ctx.arc(x, y, r + big, 0, 7);
+    if (i < left) { ctx.fillStyle = T.ink; ctx.fill(); }
+    else {                                   // spent; it flares when you ask for one you haven't got
+      ctx.strokeStyle = G.deny > 0 ? 'rgba(247,247,247,' + (0.3 + G.deny*0.7).toFixed(2) + ')' : T.line;
+      ctx.lineWidth = 1.5; ctx.stroke();
+    }
+    if (i === left - 1 && left === 1) {       // your last one, said without colour
+      ctx.beginPath(); ctx.arc(x, y, r + big + 4, 0, 7);
+      ctx.strokeStyle = T.line2; ctx.lineWidth = 1; ctx.stroke();
+    }
+  }
+}
+
+/* the rack: the three tools stand in a row along the bottom, tips down, and
+   the one you're holding rises out of the row — Apple's markup palette. The
+   tool is not carried around any more; only its point is.                   */
+
+const RACK_S = 74, RACK_W = 104, RACK_LIFT = 15;
+function rackSlot(i) {
+  const base = Hh - 24;                       // where the tips rest
+  return { x: 16 + RACK_W*(i + 0.5), base,
+           box: { x: 16 + RACK_W*i, y: base - RACK_S - RACK_LIFT, w: RACK_W, h: RACK_S + RACK_LIFT + 10 } };
+}
+function drawRack(t) {
+  for (let i = 0; i < 3; i++) {
+    const on = i === tool, s = rackSlot(i);
+    // held: it lifts, it runs, and it wears whichever end shift has it using.
+    // racked: parked, forward-facing, and dimmed back
+    const body = BODIES[i](on ? t : 0.55, on && gHold > 0, on && shift ? -1 : 1);
+    const ax = s.x, ay = s.base - (on ? RACK_LIFT : 0) - 0.52*RACK_S;
+    ctx.globalAlpha = on ? 1 : 0.42;
+    for (const pl of body.o)
+      fillPoly(pl.p.map(q => [ax + q[0]*RACK_S, ay - q[1]*RACK_S]),
+               toolInk(pl.L), 'rgba(240,244,255,0.30)');
+    ctx.globalAlpha = 1;
+  }
+}
+
+// the cursor is the tool's point and nothing else: the spout itself, tip
+// exactly on the mouse, flared into a funnel when shift has it running
+// backwards. Everything else about the tool lives down in the rack.
+const NIB_S = 62;
+function drawNib() {
+  const o = [];
+  spout(o, shift ? -1 : 1, -0.10, 0.075);
+  // brighter than the racked tools — this one has to be findable over any
+  // colour an object might be. The funnel's mouth stays black, so it reads as
+  // an opening rather than a wedge.
+  o.forEach((pl, k) =>
+    fillPoly(pl.p.map(q => [mx + q[0]*NIB_S, my - (q[1] + 0.5)*NIB_S]),
+             lchToCss(k === 0 ? 0.70 : 0.06, 0, 0).css, 'rgba(0,0,0,0.85)'));
+}
+
+/* the end screen — the only place a number appears, and the only place a hue
+   appears that isn't part of the exercise. It shows the object the round was
+   about, twice: where you left it and where the target was, in rungs, which
+   is the same unit as a drop. A component that doesn't match is in Evo's
+   attention red, so a wrong call shows exactly which variable you misread.
+
+   The rest of the crowd is not listed. They were there to be ruled out, and
+   once the round is called they have nothing left to say — unless you left
+   one of them wrong, which is the one case they earn a row. */
+
+function endRows() {
+  const rows = [G.odd];
+  G.objs.forEach((o, i) => { if (i !== G.odd && gDist(o, G.target[i]) !== 0) rows.push(i); });
+  return rows;
+}
+
+const p2 = v => (v < 10 ? '0' : '') + v;
+function drawCoords(o, x, y, ref) {
+  const parts = [['H', o.h, ref.h], ['V', o.l, ref.l], ['C', o.c, ref.c]];
+  ctx.textAlign = 'left';
+  parts.forEach(([k, v, r], i) => {
+    const off = v !== r;
+    ctx.font = (off ? '700 ' : '') + '12px ' + T.font;
+    ctx.fillStyle = off ? T.red : T.ink2;
+    ctx.fillText(k + p2(v), x + i*36, y + 4);
+  });
+}
+function drawEnd() {
+  const rows = endRows(), rowH = 44, headH = 62, footH = 44;
+  const w = 420, h = headH + rows.length*rowH + footH;
+  const x = Math.round(W/2 - w/2), y = Math.round(Hh/2 - h/2);
+  ctx.fillStyle = T.scrim; ctx.fillRect(0, 0, W, Hh);
+  roundRect(x, y, w, h, 16);                          // border-radius-100
+  ctx.fillStyle = T.card; ctx.fill();
+  roundRect(x + 0.5, y + 0.5, w - 1, h - 1, 16);
+  ctx.strokeStyle = T.line; ctx.lineWidth = 1; ctx.stroke();
+
+  const win = G.over === 'win';
+  ctx.textAlign = 'left'; ctx.font = '700 18px ' + T.font;
+  ctx.fillStyle = win ? T.green : T.red;
+  ctx.fillText(win ? 'Matched' : 'Not matched', x + 24, y + 34);
+  ctx.font = '12px ' + T.font; ctx.fillStyle = T.ink2; ctx.textAlign = 'right';
+  ctx.fillText(G.moves + (G.moves === 1 ? ' move' : ' moves') + '  ·  par ' + G.par
+               + (win && G.moves === G.par ? '  ·  nothing wasted' : ''), x + w - 24, y + 33);
+
+  const cx1 = x + 50, nx1 = x + 78, cx2 = x + 248, nx2 = x + 276;
+  ctx.font = '600 10px ' + T.font; ctx.fillStyle = T.ink2; ctx.textAlign = 'left';
+  ctx.fillText('YOURS', cx1 - 26, y + headH - 14);
+  ctx.fillText('TARGET', cx2 - 26, y + headH - 14);
+  ctx.strokeStyle = T.line; ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(x + 24, y + headH - 7.5); ctx.lineTo(x + w - 24, y + headH - 7.5); ctx.stroke();
+
+  rows.forEach((idx, r) => {
+    const cy = y + headH + r*rowH + rowH/2, mine = G.objs[idx], want = G.target[idx];
+    for (const poly of placed(mine.shape, { x: cx1, y: cy, s: 28 }))
+      fillPoly(poly, gCol(mine).css, 'rgba(0,0,0,0.45)');
+    for (const poly of placed(want.shape, { x: cx2, y: cy, s: 28 }))
+      fillPoly(poly, gCol(want).css, 'rgba(0,0,0,0.45)');
+    drawCoords(mine, nx1, cy, want);         // each side marks the components that disagree,
+    drawCoords(want, nx2, cy, mine);         // so a miss reads as a pair, not as one bad number
+  });
+
+  ctx.font = '12px ' + T.font; ctx.fillStyle = T.ink2; ctx.textAlign = 'center';
+  ctx.fillText(win ? 'space — next round   ·   r — this round again'
+                   : 'r — this round again   ·   space — move on',
+               x + w/2, y + h - 17);
+  ctx.textAlign = 'left';
+}
+
+let gTip = [0, 0];
+function drawGame(t) {
+  ctx.fillStyle = T.page; ctx.fillRect(0, 0, W, Hh);
+  drawDots();
+  drawPane(G.panes[0], G.objs,   G.cells,  'YOURS', true);
+  drawPane(G.panes[1], G.target, G.tcells, 'TARGET', false);
+  drawRack(t);
+
+  gTip = [mx, my];
+  if (onBench() && !G.over) drawNib();
+
+  // drops last, over the tool, so you see one leave the spout
+  for (const d of gdrops) {
+    const u = d.u, x = d.from[0] + (d.to[0]-d.from[0])*u, y = d.from[1] + (d.to[1]-d.from[1])*u
+              - Math.hypot(d.to[0]-d.from[0], d.to[1]-d.from[1]) * d.arc * 4 * u * (1-u);
+    ctx.beginPath();
+    ctx.arc(x, y, 9 * (d.suck ? 1 - u*0.55 : 1), 0, 7);
+    ctx.fillStyle = d.col; ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 1; ctx.stroke();
+  }
+
+  if (G.over) drawEnd();
+}
+
+function stepGame(dt) {
+  if (gHold > 0) gHold -= dt;
+  if (G.deny > 0) G.deny = Math.max(0, G.deny - dt*2.2);
+  for (let i = gdrops.length - 1; i >= 0; i--) {
+    const d = gdrops[i];
+    if (d.suck) d.to = gTip.slice();
+    d.u += d.rate * dt;
+    if (d.u >= 1) {
+      if (!d.landed) gApply(d);
+      gdrops.splice(i, 1);
+    }
+  }
+  if (G.flash) G.flash.t = Math.max(0, G.flash.t - dt*3);
+}
+
+/* ---------- input ---------- */
+
+let mx = 0, my = 0, shift = false, gHold = 0;
+
+function setTool(i) { tool = i; }
+
+// the left pane is the bench. The tool only exists over it: inside, the system
+// cursor is hidden and the tool's point takes its place; outside, the arrow
+// comes back and there is no tool at all. Nothing to read — you feel it.
+function onBench() {
+  const p = G.panes[0];
+  return !!p && mx >= p.x && mx <= p.x + p.w && my >= p.y && my <= p.y + p.h;
+}
+function setCursor() {
+  const want = (onBench() && !G.over) ? 'none' : 'default';
+  if (cv.style.cursor !== want) cv.style.cursor = want;
+}
+
+cv.addEventListener('contextmenu', e => e.preventDefault());
+cv.addEventListener('mousedown', e => {
+  if (e.button !== 0) return;
+  mx = e.clientX; my = e.clientY;
+  for (let i = 0; i < 3; i++) {                       // picking one out of the rack
+    const b = rackSlot(i).box;
+    if (mx >= b.x && mx <= b.x + b.w && my >= b.y && my <= b.y + b.h) { setTool(i); return; }
+  }
+  if (G.hover >= 0) gLaunch(G.hover);                 // the end screen is dismissed by key only
+});
+window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+
+function nextRound() { newRound(G.over === 'win' ? G.level + 1 : G.level); }
+
+// Every key this app acts on is swallowed with preventDefault. An unhandled
+// keydown falls through to the OS, and macOS answers a keystroke that means
+// nothing with the system beep. Anything with a modifier is left alone so
+// cmd-R still reloads.
+window.addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.key === 'Shift') { shift = true; return; }
+  const eat = () => e.preventDefault();
+  if (e.key === '1') return eat(), setTool(0);
+  if (e.key === '2') return eat(), setTool(1);
+  if (e.key === '3') return eat(), setTool(2);
+  if (e.key === 'z' || e.key === 'Z') return eat(), undo();
+  if (e.key === 'r' || e.key === 'R') return eat(), retryRound();
+  if (e.code === 'Space') return eat(), G.over ? nextRound() : commit();
+});
+window.addEventListener('keyup', e => { if (e.key === 'Shift') shift = false; });
+
+/* ---------- loop ---------- */
+
+let prev = 0;
+function frame(ms) {
+  const t = ms/1000, dt = Math.min(0.05, prev ? t - prev : 0.016);
+  prev = t;
+  layoutGame();
+  G.hover = G.over ? -1 : gPick(mx, my);
+  setCursor();
+  stepGame(dt);
+  drawGame(t);
+  requestAnimationFrame(frame);
+}
+
+setTool(0);
+resize();
+newRound(1);
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

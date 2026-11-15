@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VimNav</title>
+  <link rel="stylesheet" href="../family.css">
+  <style>
+    :root {
+      --text: var(--ink);
+      --dim: var(--muted);
+      --inert-x: #4a4640;
+      --target-x: #ff7676;
+      --deleted: #2a2825;
+      --cursor: #f4d4b5;
+      --unlock: var(--accent);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      color: var(--text);
+      font-family: var(--font);
+      user-select: none;
+      overflow: hidden;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+    }
+
+    .info-bar {
+      position: fixed;
+      top: 10px;
+      left: 14px;
+      display: flex;
+      gap: 18px;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--dim);
+      flex-wrap: wrap;
+      align-items: baseline;
+      z-index: 90;
+    }
+    .info-bar strong {
+      color: var(--text);
+      font-weight: 600;
+      font-size: 13px;
+      margin-left: 6px;
+      letter-spacing: 0.04em;
+      text-transform: none;
+    }
+    .info-bar .reset-note {
+      opacity: .45;
+    }
+    .info-bar .key-chip {
+      display: inline-block;
+      padding: 2px 7px;
+      margin: 0 2px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      font-family: var(--font);
+      font-size: 11px;
+      color: var(--text);
+    }
+    /* Scale-coded chips — borrowed from AffordingTextEditing:
+       purple = word granularity (Ctrl-equivalent), amber = line edges (Home/End) */
+    .info-bar .key-chip[data-scale="word"] {
+      color: #b06ce9;
+      border-color: #5a3a6b;
+    }
+    .info-bar .key-chip[data-scale="line"] {
+      color: #ffd970;
+      border-color: #6b5a3a;
+    }
+    .info-bar .key-chip.fresh {
+      border-color: var(--unlock);
+      color: var(--unlock);
+      animation: chipPulse 2s ease-out;
+    }
+
+    @keyframes chipPulse {
+      0%   { box-shadow: 0 0 0 0 var(--unlock); }
+      50%  { box-shadow: 0 0 14px 2px var(--unlock); }
+      100% { box-shadow: 0 0 0 0 transparent; }
+    }
+
+    .grid-wrap {
+      position: relative;
+      border-radius: 6px;
+    }
+    #trail-canvas {
+      position: absolute;
+      top: 0; left: 0;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    /* Motion glyphs — the letters themselves live around the grid, each
+       standing where it takes you; distance from the grid encodes the
+       motion's reach (h near · b further · 0 furthest). Ethereal at rest,
+       a glyph brightens and PERFORMS its motion on a valid press.
+       Scale-coded: char = cursor cream, word = purple, line = amber. */
+    .mglyph {
+      position: absolute;
+      pointer-events: none; user-select: none; z-index: 4;
+      font-family: var(--font-mono); font-weight: 600;
+      color: var(--g);
+      opacity: .10; filter: blur(1px);
+      text-shadow: 0 0 16px var(--g), 0 0 46px var(--g);
+      transition: opacity .35s ease, filter .35s ease;
+    }
+    .mglyph b { display: block; font-weight: 600; }
+    .mglyph.lit { opacity: .7; filter: blur(0); }
+    @keyframes gNudgeL { 40% { transform: translateX(-20px); } }
+    @keyframes gNudgeR { 40% { transform: translateX(20px); } }
+    @keyframes gNudgeU { 40% { transform: translateY(-20px); } }
+    @keyframes gNudgeD { 40% { transform: translateY(20px); } }
+    @keyframes gLeapL  { 40% { transform: translateX(-48px); } }
+    @keyframes gLeapR  { 40% { transform: translateX(48px); } }
+    @keyframes gSnapL  { 30% { transform: translateX(-30px) scaleX(1.2); } }
+    @keyframes gSnapR  { 30% { transform: translateX(30px) scaleX(1.2); } }
+
+    #text-grid {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      line-height: 1.7;
+      margin: 0;
+      padding: 20px 28px;
+      background: rgba(22, 19, 13, 0.6);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--inert-x);
+      min-width: 320px;
+      text-align: left;
+      transition: border-color 180ms, box-shadow 180ms;
+    }
+
+    #text-grid.error-flash {
+      border-color: var(--target-x);
+      box-shadow: 0 0 18px rgba(255, 118, 118, 0.4);
+    }
+
+    #text-grid .cursor {
+      background: var(--cursor);
+      color: #1f1d1b;
+    }
+    #text-grid .target {
+      background: rgba(255, 118, 118, 0.32);
+      color: #fff0f0;
+      font-weight: 700;
+      animation: targetPulse 1.2s ease-in-out infinite;
+    }
+    #text-grid .cursor-on-target {
+      background: var(--target-x);
+      color: #1f1d1b;
+      font-weight: 700;
+    }
+    #text-grid .deleted {
+      color: var(--deleted);
+    }
+    /* Word-phase prose: brighter than the inert-x default so the words are
+       actually legible and the red target block clearly sits *among* words. */
+    #text-grid.word-mode {
+      color: var(--dim);
+    }
+
+    @keyframes targetPulse {
+      0%, 100% { background: rgba(255, 118, 118, 0.22); }
+      50%      { background: rgba(255, 118, 118, 0.55); }
+    }
+
+    .error-msg {
+      position: fixed;
+      bottom: 60px;
+      left: 0; right: 0;
+      text-align: center;
+      font-size: 12px;
+      color: var(--target-x);
+      letter-spacing: 0.06em;
+      opacity: 0;
+      transition: opacity 180ms;
+      pointer-events: none;
+    }
+    .error-msg.visible { opacity: 1; }
+    .error-msg code {
+      font-family: var(--font-mono);
+      color: var(--target-x);
+      background: rgba(255, 118, 118, 0.12);
+      padding: 1px 6px;
+      border-radius: 3px;
+      margin: 0 2px;
+    }
+
+    .unlock-toast {
+      position: fixed;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.9);
+      padding: 16px 32px;
+      background: rgba(255, 217, 112, 0.08);
+      border: 1px solid var(--unlock);
+      border-radius: var(--radius);
+      color: var(--unlock);
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 300ms, transform 400ms cubic-bezier(.2, .9, .2, 1.1);
+      z-index: 50;
+    }
+    .unlock-toast.visible {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .unlock-toast .toast-key {
+      display: inline-block;
+      font-family: var(--font);
+      padding: 0 6px;
+      margin: 0 4px;
+      background: var(--unlock);
+      color: #1f1d1b;
+      border-radius: 4px;
+    }
+
+    .hint {
+      position: fixed;
+      bottom: 0;
+      left: 0; right: 0;
+      padding: 9px 14px;
+      text-align: center;
+      font-size: 11px;
+      color: var(--dim);
+      letter-spacing: 0.08em;
+      background: linear-gradient(transparent, rgba(0,0,0,.75) 60%);
+    }
+    /* Brief attention pulse on phase change so you don't miss the hint. */
+    .hint.pulse-attention { animation: hintAttention 1.8s ease-out; }
+    @keyframes hintAttention {
+      0%   { color: var(--unlock); text-shadow: 0 0 14px var(--unlock); font-size: 15px; }
+      100% { color: var(--dim);    text-shadow: none;                   font-size: 12px; }
+    }
+    .hint code {
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 1px 6px;
+      border-radius: var(--radius);
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="info-bar">
+    <span>phase <strong id="phase-num">1</strong></span>
+    <span>unlocked <span id="unlocked-keys"></span></span>
+    <span>kills <strong id="progress">0 / 20</strong></span>
+    <span class="reset-note">⇧R reset</span>
+  </div>
+
+  <div class="grid-wrap" id="grid-wrap">
+    <pre id="text-grid"></pre>
+    <canvas id="trail-canvas"></canvas>
+    <div id="glyphs"></div>
+  </div>
+
+  <div class="error-msg" id="error-msg"></div>
+  <div class="unlock-toast" id="unlock-toast"></div>
+  <div class="hint" id="hint"></div>
+
+  <script>
+    // ============================================================
+    //  PATH HELPERS
+    // ============================================================
+    function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+    // Targets scattered up AND down the column, 1–4 rows apart, never twice on
+    // the same row (a consumed x is erased, so it can't be a target again).
+    // Distance variety is what makes the phase a drill instead of key-mashing:
+    // you have to read where the x is and pick a direction, not just repeat j.
+    function scatterColumnPath(rows) {
+      const remaining = Array.from({length: rows}, (_, r) => r);
+      const path = [];
+      let cur = remaining.splice(Math.floor(Math.random() * remaining.length), 1)[0];
+      path.push([cur, 0]);
+      while (remaining.length) {
+        const near = remaining.filter(r => Math.abs(r - cur) <= 4);
+        const next = pick(near.length ? near : remaining);
+        remaining.splice(remaining.indexOf(next), 1);
+        path.push([next, 0]);
+        cur = next;
+      }
+      return path;
+    }
+
+    // The whole diagonal is drawn, but only every 2nd–4th cell is a target, so
+    // a kill costs a run of the motif (j l j l) rather than one press.
+    function diagonalRound(direction, n) {
+      let full;
+      switch (direction) {
+        case 'jl': full = Array.from({length: n}, (_, i) => [i, i]); break;
+        case 'kl': full = Array.from({length: n}, (_, i) => [n - 1 - i, i]); break;
+        case 'jh': full = Array.from({length: n}, (_, i) => [i, n - 1 - i]); break;
+        case 'kh': full = Array.from({length: n}, (_, i) => [n - 1 - i, n - 1 - i]); break;
+      }
+      const path = [full[0]];
+      let i = 0;
+      while (i < full.length - 1) {
+        i = Math.min(full.length - 1, i + 2 + Math.floor(Math.random() * 3));
+        path.push(full[i]);
+      }
+      return { lines: gridFromPath(full, n, n), path };
+    }
+    function snakePath(rows, cols) {
+      const path = [];
+      for (let r = 0; r < rows; r++) {
+        if (r % 2 === 0) {
+          for (let c = 0; c < cols; c++) path.push([r, c]);
+        } else {
+          for (let c = cols - 1; c >= 0; c--) path.push([r, c]);
+        }
+      }
+      return path;
+    }
+    function gridFromPath(path, rows, cols) {
+      const lines = Array.from({length: rows}, () => ' '.repeat(cols));
+      for (const [r, c] of path) {
+        lines[r] = lines[r].substring(0, c) + 'x' + lines[r].substring(c + 1);
+      }
+      return lines;
+    }
+
+    // Real-text substrate for the word/line phases. The x-grid is a
+    // precision-positioning surface; word motions need actual words to jump
+    // between, and a target matched to the motion's grain (a whole word).
+    const PROSE = [
+      "the quick brown fox runs",
+      "over a lazy spotted dog",
+      "and then it leaps a gate"
+    ];
+    function wordStartCols(line) {
+      const cols = [];
+      for (let c = 0; c < line.length; c++) {
+        if (line[c] !== ' ' && (c === 0 || line[c - 1] === ' ')) cols.push(c);
+      }
+      return cols;
+    }
+    function allWordStarts(lines) {
+      const path = [];
+      lines.forEach((line, r) => {
+        for (const c of wordStartCols(line)) path.push([r, c]);
+      });
+      return path;
+    }
+    // Word-phase targets: one word at a time at a "random" spot, so it reads
+    // as "go to the highlighted word, then a new one appears" — the same
+    // mental model as the hjkl phases, just word-grained.
+    // Strictly forward, never wrapping past the end of the buffer: in the w
+    // phase b isn't unlocked yet, so a backward target would have no fast route
+    // and w would stop being the answer. Runs short and regenerates.
+    function forwardWordPath(lines) {           // forward hops — the w phase
+      const starts = allWordStarts(lines);
+      const path = [];
+      let i = Math.floor(Math.random() * 3);
+      path.push(starts[i]);
+      while (i < starts.length - 1) {
+        i = Math.min(starts.length - 1, i + 1 + Math.floor(Math.random() * 3));
+        path.push(starts[i]);
+      }
+      return path;
+    }
+    function randomWordPath(lines, n) {         // any direction — the b phase
+      const starts = allWordStarts(lines);
+      const path = []; let prev = -1;
+      for (let k = 0; k < n; k++) {
+        let idx;
+        do { idx = Math.floor(Math.random() * starts.length); }
+        while (idx === prev && starts.length > 1);
+        path.push(starts[idx]); prev = idx;
+      }
+      return path;
+    }
+    // Line-edge phases have to drag the cursor OFF the edge between targets,
+    // or the motion they teach is never the answer: two line starts in a row
+    // means the cursor is already in column 0 and plain j does it. So the
+    // path alternates — out into the line, then back to the edge.
+    function lineStartsPath(lines, n) {              // col 0 of a line — for 0
+      const outThere = allWordStarts(lines).filter(([, c]) => c > 6);
+      const path = [];
+      while (path.length < n) {
+        path.push(pick(outThere));                                     // w gets you here
+        path.push([Math.floor(Math.random() * lines.length), 0]);      // 0 snaps back
+      }
+      return path;
+    }
+    // The endless phase: a line edge, then a word, then another edge — so every
+    // motion learned stays in rotation and the shortest route keeps changing.
+    function mixedTargetPath(lines, n) {
+      const words = allWordStarts(lines);
+      const path = [];
+      while (path.length < n) {
+        const row = Math.floor(Math.random() * lines.length);
+        path.push(Math.random() < 0.5
+          ? [row, 0]                                   // 0 snaps here
+          : [row, Math.max(0, lines[row].length - 1)]  // $ snaps here
+        );
+        path.push(pick(words));                        // w / b leap here
+      }
+      return path;
+    }
+
+    // A target must never spawn under the cursor: with nothing to move toward,
+    // every key is correctly refused and the game is stuck. Consecutive
+    // duplicates are the only way that happens, so they never survive.
+    function dedupeAdjacent(path) {
+      return path.filter((p, i) => i === 0 || p[0] !== path[i - 1][0] || p[1] !== path[i - 1][1]);
+    }
+
+    // ============================================================
+    //  PHASES
+    // ============================================================
+    const PHASES = [
+      {
+        keys: ['j', 'k'],
+        unlocksKey: 'l',
+        unlockGoal: 20,
+        autoKill: true,
+        build: () => {
+          const path = scatterColumnPath(10);
+          return { lines: gridFromPath(path, 10, 1), path };
+        },
+        hint: 'land on the red <code>x</code> · <code>j</code> down · <code>k</code> up'
+      },
+      {
+        keys: ['j', 'k', 'l'],
+        unlocksKey: 'h',
+        unlockGoal: 30,
+        autoKill: true,
+        rounds: [
+          { label: 'jl', hint: '<code>j</code> + <code>l</code> · down-right diagonal',
+            build: () => diagonalRound('jl', 10) },
+          { label: 'kl', hint: '<code>k</code> + <code>l</code> · up-right diagonal',
+            build: () => diagonalRound('kl', 10) }
+        ]
+      },
+      {
+        keys: ['h', 'j', 'k', 'l'],
+        unlocksKey: 'w',
+        unlockGoal: 40,
+        autoKill: true,
+        rounds: [
+          { label: 'jh', hint: '<code>j</code> + <code>h</code> · down-left diagonal',
+            build: () => diagonalRound('jh', 10) },
+          { label: 'kh', hint: '<code>k</code> + <code>h</code> · up-left diagonal',
+            build: () => diagonalRound('kh', 10) },
+          { label: 'kl', hint: '<code>k</code> + <code>l</code> · up-right diagonal',
+            build: () => diagonalRound('kl', 10) },
+          { label: 'jl', hint: '<code>j</code> + <code>l</code> · down-right diagonal',
+            build: () => diagonalRound('jl', 10) }
+        ]
+      },
+      {
+        keys: ['h', 'j', 'k', 'l', 'w'],
+        unlocksKey: 'b',
+        unlockGoal: 40,
+        autoKill: true,
+        wordTarget: true,
+        build: () => ({ lines: PROSE.slice(), path: forwardWordPath(PROSE) }),
+        hint: 'land on the red letter — <code>w</code> jumps forward a word'
+      },
+      {
+        keys: ['h', 'j', 'k', 'l', 'w', 'b'],
+        unlocksKey: '0',
+        unlockGoal: 40,
+        autoKill: true,
+        wordTarget: true,
+        build: () => ({ lines: PROSE.slice(), path: randomWordPath(PROSE, 14) }),
+        hint: 'land on the red letter — <code>b</code> jumps back a word'
+      },
+      {
+        keys: ['h', 'j', 'k', 'l', 'w', 'b', '0'],
+        unlocksKey: '$',
+        unlockGoal: 40,
+        autoKill: true,
+        wordTarget: true,
+        build: () => ({ lines: PROSE.slice(), path: lineStartsPath(PROSE, 14) }),
+        hint: 'out to the word with <code>w</code>, back to the line start with <code>0</code>'
+      },
+      {
+        keys: ['h', 'j', 'k', 'l', 'w', 'b', '0', '$'],
+        unlocksKey: null,
+        unlockGoal: Infinity,
+        autoKill: true,
+        wordTarget: true,
+        build: () => ({ lines: PROSE.slice(), path: mixedTargetPath(PROSE, 14) }),
+        hint: '<code>$</code> line end · <code>0</code> line start · every motion is live'
+      }
+    ];
+
+    // ============================================================
+    //  STATE
+    // ============================================================
+    const state = {
+      phaseIdx: 0,
+      roundIdx: 0,
+      lines: [],
+      path: [],
+      pathIdx: 0,
+      cursor: { row: 0, col: 0 },
+      desiredCol: 0,
+      progress: 0,         // kills within current phase (drives unlock)
+      roundProgress: 0,    // kills within the current drill (drives drill rotation)
+      totalKills: 0,       // kills across the whole session
+      lockUntil: 0,        // input is ignored until this timestamp (phase/round change)
+      distMap: null        // cached keystroke-distance map to the live target
+    };
+
+    // ============================================================
+    //  SAVE — reaching phase 7 is ~190 kills; a refresh shouldn't cost that
+    // ============================================================
+    const SAVE_KEY = 'vimnav.v1';
+    function save() {
+      try {
+        localStorage.setItem(SAVE_KEY, JSON.stringify({
+          phase: state.phaseIdx, progress: state.progress, total: state.totalKills
+        }));
+      } catch (e) { /* private mode — play on, just don't persist */ }
+    }
+    function loadSave() {
+      try {
+        const s = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
+        if (!s || typeof s.phase !== 'number') return;
+        state.phaseIdx  = Math.max(0, Math.min(PHASES.length - 1, s.phase));
+        state.progress  = Math.max(0, s.progress || 0);
+        state.totalKills = Math.max(0, s.total || 0);
+      } catch (e) { /* corrupt save — start fresh */ }
+    }
+
+    // ============================================================
+    //  AUDIO — melodic kill + error thud
+    // ============================================================
+    let audioCtx = null;
+    function ensureAudio() {
+      if (!audioCtx) {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return null;
+        audioCtx = new Ctx();
+      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    // --- KILL: melodic arpeggio in A minor pentatonic.
+    // Combo number picks the scale degree, so consecutive kills walk up
+    // the scale. Consecutive kills walk up the pentatonic, then wrap.
+    const PENTATONIC = [440, 523.25, 587.33, 659.25, 783.99];  // A4 C5 D5 E5 G5
+    function playKill() {
+      const ctx = ensureAudio();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+
+      const idx = (Math.max(0, state.totalKills - 1)) % PENTATONIC.length;
+      const fundamental = PENTATONIC[idx];
+
+      const tone = (freq, delay, dur, vol, type='triangle') => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type = type;
+        osc.frequency.value = freq;
+        const t0 = now + delay;
+        gain.gain.setValueAtTime(0, t0);
+        gain.gain.linearRampToValueAtTime(vol, t0 + 0.004);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+        osc.start(t0);
+        osc.stop(t0 + dur + 0.02);
+      };
+
+      // root + perfect fifth, slight delay
+      tone(fundamental,        0.00, 0.20, 0.16);
+      tone(fundamental * 1.5,  0.04, 0.16, 0.10);
+    }
+
+    // --- ERROR: low square thud (unchanged)
+    function playError() {
+      const ctx = ensureAudio();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const dur = 0.09;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(140, now);
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(0.08, now + 0.005);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+      osc.start(now);
+      osc.stop(now + dur + 0.02);
+    }
+
+    // ============================================================
+    //  DOM HOOKS
+    // ============================================================
+    const textGridEl = document.getElementById('text-grid');
+    const phaseNumEl = document.getElementById('phase-num');
+    const unlockedEl = document.getElementById('unlocked-keys');
+    const progressEl = document.getElementById('progress');
+    const toastEl    = document.getElementById('unlock-toast');
+    const hintEl     = document.getElementById('hint');
+    const errorMsgEl = document.getElementById('error-msg');
+    const trailCanvas = document.getElementById('trail-canvas');
+    const tctx = trailCanvas.getContext('2d');
+
+    // ============================================================
+    //  MOTION TRAILS — each motion scale animates differently, so
+    //  the eye parses them as distinct moves:
+    //    char (h j k l) → expanding ring   (a "tap" — one step)
+    //    word (w b)     → purple comet      (a leap)
+    //    line (0 $)     → amber dash         (a snap to the edge)
+    // ============================================================
+    function syncCanvas() {
+      const w = textGridEl.offsetWidth, h = textGridEl.offsetHeight;
+      if (trailCanvas.width !== w || trailCanvas.height !== h) {
+        trailCanvas.width = w;
+        trailCanvas.height = h;
+      }
+    }
+
+    function cellCenter(row, col) {
+      const span = textGridEl.querySelector(`span[data-r="${row}"][data-c="${col}"]`);
+      if (!span) return null;
+      const sr = span.getBoundingClientRect();
+      const cr = trailCanvas.getBoundingClientRect();
+      return { x: sr.left - cr.left + sr.width / 2, y: sr.top - cr.top + sr.height / 2 };
+    }
+
+    function motionTrailStyle(key) {
+      switch (key) {
+        case 'w': case 'b': return { rgb: '176,108,233', shape: 'comet', width: 5, life: 340 };
+        case '0': case '$': return { rgb: '255,217,112', shape: 'dash',  width: 7, life: 230 };
+        default:            return { rgb: '244,212,181', shape: 'ring',  width: 3, life: 220 };
+      }
+    }
+
+    let trails = [];
+    let trailRAF = null;
+    let lastTrailTs = 0;
+
+    function addTrail(from, to, key) {
+      if (!from || !to) return;
+      const s = motionTrailStyle(key);
+      trails.push({ from, to, rgb: s.rgb, shape: s.shape, width: s.width, life: s.life, age: 0 });
+      if (!trailRAF) { lastTrailTs = 0; trailRAF = requestAnimationFrame(stepTrails); }
+    }
+
+    function stepTrails(ts) {
+      const dt = lastTrailTs ? ts - lastTrailTs : 16;
+      lastTrailTs = ts;
+      tctx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
+      trails = trails.filter(t => t.age < t.life);
+      for (const t of trails) {
+        const k = 1 - t.age / t.life;   // 1 → 0 over the trail's life
+        if (t.shape === 'ring') {
+          const radius = 4 + 16 * (1 - k);
+          tctx.strokeStyle = `rgba(${t.rgb},${k})`;
+          tctx.lineWidth = 2;
+          tctx.beginPath();
+          tctx.arc(t.to.x, t.to.y, radius, 0, 2 * Math.PI);
+          tctx.stroke();
+        } else {
+          const grad = tctx.createLinearGradient(t.from.x, t.from.y, t.to.x, t.to.y);
+          grad.addColorStop(0, `rgba(${t.rgb},0)`);
+          grad.addColorStop(1, `rgba(${t.rgb},${k * 0.9})`);
+          tctx.strokeStyle = grad;
+          tctx.lineWidth = t.width;
+          tctx.lineCap = 'round';
+          tctx.beginPath();
+          tctx.moveTo(t.from.x, t.from.y);
+          tctx.lineTo(t.to.x, t.to.y);
+          tctx.stroke();
+          tctx.fillStyle = `rgba(${t.rgb},${k})`;
+          tctx.beginPath();
+          tctx.arc(t.to.x, t.to.y, t.width * 0.8 * k + 2, 0, 2 * Math.PI);
+          tctx.fill();
+        }
+        t.age += dt;
+      }
+      if (trails.length) {
+        trailRAF = requestAnimationFrame(stepTrails);
+      } else {
+        trailRAF = null;
+      }
+    }
+
+    // ============================================================
+    //  RENDER
+    // ============================================================
+    function targetCell() {
+      if (state.pathIdx >= state.path.length) return null;
+      const [r, c] = state.path[state.pathIdx];
+      return { row: r, col: c };
+    }
+
+    // Target is a single cell — the cursor's atomic unit. cursor on target
+    // means an exact row/col match.
+    function cursorOnTarget() {
+      const tgt = targetCell();
+      if (!tgt) return false;
+      return state.cursor.row === tgt.row && state.cursor.col === tgt.col;
+    }
+
+    function renderText() {
+      const tgt = targetCell();
+      const phase = PHASES[state.phaseIdx];
+
+      const html = state.lines.map((line, row) => {
+        let out = '';
+        const len = Math.max(1, line.length);
+        for (let col = 0; col < len; col++) {
+          const ch = col < line.length ? line[col] : ' ';
+          const isCursor = state.cursor.row === row && state.cursor.col === col;
+          const isTarget = tgt && row === tgt.row && col === tgt.col;
+          const isEmpty  = ch === ' ';
+
+          let cls = '';
+          if (isCursor && isTarget) cls = 'cursor-on-target';
+          else if (isCursor)        cls = 'cursor';
+          else if (isTarget)        cls = 'target';
+          else if (isEmpty)         cls = 'deleted';
+
+          const esc = ch === ' ' ? ' ' : ch;
+          // Every cell is a span tagged with its grid coords, so the trail
+          // layer can look up exact pixel positions for any motion.
+          out += `<span class="${cls}" data-r="${row}" data-c="${col}">${esc}</span>`;
+        }
+        return out;
+      }).join('\n');
+      textGridEl.innerHTML = html;
+      textGridEl.classList.toggle('word-mode', !!phase.wordTarget);
+      syncCanvas();
+    }
+
+    function currentBuilder() {
+      const phase = PHASES[state.phaseIdx];
+      if (phase.rounds) return phase.rounds[state.roundIdx].build;
+      return phase.build;
+    }
+
+    function keyScale(k) {
+      if (k === 'w' || k === 'b') return 'word';
+      if (k === '0' || k === '$') return 'line';
+      return 'char';
+    }
+
+    function renderInfoBar(freshKey) {
+      phaseNumEl.textContent = state.phaseIdx + 1;
+      const phase = PHASES[state.phaseIdx];
+      const chips = phase.keys.map(k => {
+        const isFresh = k === freshKey;
+        const scale = keyScale(k);
+        return `<span class="key-chip${isFresh ? ' fresh' : ''}" data-scale="${scale}">${k}</span>`;
+      }).join('');
+      unlockedEl.innerHTML = chips;
+      const goal = phase.unlockGoal === Infinity ? '∞' : phase.unlockGoal;
+      progressEl.textContent = `${state.progress} / ${goal}`;
+
+      if (phase.rounds) {
+        const r = phase.rounds[state.roundIdx];
+        hintEl.innerHTML = `<code>${r.label}</code> &nbsp;·&nbsp; ${r.hint}`;
+      } else {
+        hintEl.innerHTML = phase.hint;
+      }
+    }
+
+    let toastTimer = null;
+    function showToast(html, ms) {
+      toastEl.innerHTML = html;
+      toastEl.classList.add('visible');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toastEl.classList.remove('visible'), ms);
+    }
+    function showUnlockToast(key) {
+      showToast(`new motion · <span class="toast-key">${key}</span> unlocked`, 1800);
+    }
+    // Phase 2 and 3 rotate through drills mid-phase. That used to happen in
+    // silence: the footer swapped from jl to kl and the old combo just stopped
+    // working, which reads exactly like the game breaking.
+    function showDrillToast(label) {
+      showToast(`next drill · <span class="toast-key">${label}</span>`, 1200);
+    }
+
+    function pulseHint() {
+      hintEl.classList.remove('pulse-attention');
+      void hintEl.offsetWidth;
+      hintEl.classList.add('pulse-attention');
+      setTimeout(() => hintEl.classList.remove('pulse-attention'), 1800);
+    }
+
+    // Freeze input briefly so a phase/drill change can't be mashed through —
+    // and so keys pressed during the changeover aren't scored as misses.
+    function lockInput(ms) {
+      state.lockUntil = performance.now() + ms;
+    }
+
+    let errorFlashTimer = null;
+    let errorMsgTimer = null;
+    function showError(html) {
+      errorMsgEl.innerHTML = html;
+      errorMsgEl.classList.add('visible');
+      clearTimeout(errorMsgTimer);
+      errorMsgTimer = setTimeout(() => errorMsgEl.classList.remove('visible'), 1200);
+    }
+
+    // Motion glyphs: one letter per unlocked motion, standing where it
+    // takes you. Distance from the grid encodes reach; anim = its motion.
+    const glyphWrap = document.getElementById('glyphs');
+    const GLYPHS = {
+      'h': { color:'#f4d4b5', size:40, pos:{left:-66,  mid:1}, anim:'gNudgeL' },
+      'l': { color:'#f4d4b5', size:40, pos:{right:-66, mid:1}, anim:'gNudgeR' },
+      'k': { color:'#f4d4b5', size:40, pos:{top:-64},          anim:'gNudgeU' },
+      'j': { color:'#f4d4b5', size:40, pos:{bottom:-64},       anim:'gNudgeD' },
+      'b': { color:'#b06ce9', size:46, pos:{left:-128, mid:1}, anim:'gLeapL' },
+      'w': { color:'#b06ce9', size:46, pos:{right:-128,mid:1}, anim:'gLeapR' },
+      '0': { color:'#ffd970', size:46, pos:{left:-192, mid:1}, anim:'gSnapL' },
+      '$': { color:'#ffd970', size:46, pos:{right:-192,mid:1}, anim:'gSnapR' }
+    };
+    const glyphEls = {};
+    function renderGlyphs() {
+      glyphWrap.innerHTML = '';
+      Object.keys(glyphEls).forEach(k => delete glyphEls[k]);
+      for (const key of PHASES[state.phaseIdx].keys) {
+        const g = GLYPHS[key];
+        if (!g) continue;
+        const el = document.createElement('div');
+        el.className = 'mglyph';
+        el.style.setProperty('--g', g.color);
+        el.style.fontSize = g.size + 'px';
+        if ('left' in g.pos)   el.style.left = g.pos.left + 'px';
+        if ('right' in g.pos)  el.style.right = g.pos.right + 'px';
+        if ('top' in g.pos)  { el.style.top = g.pos.top + 'px';   el.style.left = 'calc(50% - .35em)'; }
+        if ('bottom' in g.pos){ el.style.bottom = g.pos.bottom + 'px'; el.style.left = 'calc(50% - .35em)'; }
+        if (g.pos.mid)         el.style.top = 'calc(50% - .55em)';
+        el.innerHTML = '<b>' + key + '</b>';
+        glyphWrap.appendChild(el);
+        glyphEls[key] = el;
+      }
+    }
+    function glyphFx(key) {
+      const el = glyphEls[key];
+      if (!el) return;
+      const inner = el.firstChild;
+      el.classList.add('lit');
+      inner.style.animation = 'none';
+      void inner.offsetWidth;
+      inner.style.animation = GLYPHS[key].anim + ' .5s cubic-bezier(.22,.9,.3,1)';
+      clearTimeout(el._t);
+      el._t = setTimeout(() => el.classList.remove('lit'), 480);
+    }
+
+
+    // ============================================================
+    //  REGEN / PHASE ADVANCE
+    // ============================================================
+    function regenerateText() {
+      const phase = PHASES[state.phaseIdx];
+      let built = currentBuilder()();
+      let path = dedupeAdjacent(built.path);
+      for (let tries = 0; path.length < 2 && tries < 8; tries++) {   // need a cursor cell and a target
+        built = currentBuilder()();
+        path = dedupeAdjacent(built.path);
+      }
+      state.lines = built.lines.slice();
+      state.path  = path.map(p => p.slice());
+      state.pathIdx = 0;
+      state.distMap = null;
+      const [r, c] = state.path[0];
+      state.cursor = { row: r, col: c };
+      state.desiredCol = c;
+
+      if (phase.autoKill && state.path.length > 1) {
+        // x-grid phases erase the consumed target; word phases leave the prose
+        // intact (reaching a word doesn't delete it).
+        if (!phase.wordTarget) {
+          const line = state.lines[r];
+          state.lines[r] = line.substring(0, c) + ' ' + line.substring(c + 1);
+        }
+        state.pathIdx = 1;
+      }
+      // Belt and braces: never open on a target the cursor is already standing on.
+      while (state.pathIdx < state.path.length && cursorOnTarget()) state.pathIdx++;
+    }
+
+    function maybeAdvancePhase() {
+      const phase = PHASES[state.phaseIdx];
+      if (state.progress >= phase.unlockGoal && phase.unlocksKey) {
+        const justUnlocked = phase.unlocksKey;
+        state.phaseIdx++;
+        state.progress = 0;
+        state.roundProgress = 0;
+        state.roundIdx = 0;
+        regenerateText();
+        renderGlyphs();
+        renderInfoBar(justUnlocked);
+        renderText();        // draw the new level immediately (don't wait for a keypress)
+        showUnlockToast(justUnlocked);
+        pulseHint();         // pulse the hint so the new instruction registers
+        lockInput(1100);     // hold the keys so the unlock is actually seen
+        save();
+        return true;
+      }
+      return false;
+    }
+
+    // ============================================================
+    //  MOVEMENT
+    // ============================================================
+    function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+    function lineMaxCol(row) {
+      return Math.max(0, state.lines[row].length - 1);
+    }
+
+    function simulate(key, cursor, desiredCol) {
+      const c = { row: cursor.row, col: cursor.col };
+      let d = desiredCol;
+      switch (key) {
+        case 'h':
+          c.col = clamp(c.col - 1, 0, lineMaxCol(c.row));
+          d = c.col;
+          break;
+        case 'l':
+          c.col = clamp(c.col + 1, 0, lineMaxCol(c.row));
+          d = c.col;
+          break;
+        case 'k':
+          c.row = clamp(c.row - 1, 0, state.lines.length - 1);
+          c.col = clamp(d, 0, lineMaxCol(c.row));
+          break;
+        case 'j':
+          c.row = clamp(c.row + 1, 0, state.lines.length - 1);
+          c.col = clamp(d, 0, lineMaxCol(c.row));
+          break;
+        case '0':
+          c.col = 0; d = 0;
+          break;
+        case '$':
+          c.col = lineMaxCol(c.row); d = c.col;
+          break;
+        case 'w': {
+          const line = state.lines[c.row];
+          let col = c.col;
+          while (col < line.length && line[col] !== ' ') col++;
+          while (col < line.length && line[col] === ' ') col++;
+          if (col >= line.length) {
+            if (c.row < state.lines.length - 1) {
+              c.row++;
+              const next = state.lines[c.row];
+              col = 0;
+              while (col < next.length && next[col] === ' ') col++;
+              if (col >= next.length) col = Math.max(0, next.length - 1);
+            } else { col = lineMaxCol(c.row); }
+          }
+          c.col = col; d = col;
+          break;
+        }
+        case 'b': {
+          const line = state.lines[c.row];
+          let col = c.col - 1;
+          while (col >= 0 && line[col] === ' ') col--;
+          while (col > 0 && line[col - 1] !== ' ') col--;
+          if (col < 0) {
+            if (c.row > 0) {
+              c.row--;
+              const prev = state.lines[c.row];
+              col = prev.length - 1;
+              while (col >= 0 && prev[col] === ' ') col--;
+              while (col > 0 && prev[col - 1] !== ' ') col--;
+              if (col < 0) col = 0;
+            } else { col = 0; }
+          }
+          c.col = col; d = col;
+          break;
+        }
+        default: return null;
+      }
+      return { cursor: c, desiredCol: d };
+    }
+
+    function applyMove(key) {
+      const result = simulate(key, state.cursor, state.desiredCol);
+      if (result) {
+        state.cursor = result.cursor;
+        state.desiredCol = result.desiredCol;
+      }
+    }
+
+    // ============================================================
+    //  ROUTE DISTANCE — how many keystrokes from here to the target
+    //
+    //  A move counts as progress when it shortens the remaining KEYSTROKE
+    //  count, measured over the motions actually unlocked. Two things fall
+    //  out of that, and both were broken before:
+    //
+    //   · No dead ends. The old rule (Manhattan distance must strictly drop)
+    //     had positions where every single key was rejected — e.g. phase 7
+    //     with the cursor on one line's last column and the target on
+    //     another line's last column: j lands on the shorter middle line, so
+    //     the column distance grows exactly as much as the row distance
+    //     shrinks, and $ from a line end is a no-op. Every key refused, game
+    //     frozen. A BFS distance can always be decreased by *something* as
+    //     long as the target is reachable, so that class of freeze is gone.
+    //
+    //   · The taught motion is the only way through. Walking toward a line
+    //     end with l doesn't shorten the keystroke count — it's still one $
+    //     away — so l is refused and $ is the move. Before this, every word
+    //     and line phase could be cleared with hjkl alone.
+    // ============================================================
+    function sKey(row, col, desired) { return row + ',' + col + ',' + desired; }
+
+    function buildDistMap() {
+      const tgt = targetCell();
+      if (!tgt) return null;
+      const keys = PHASES[state.phaseIdx].keys;
+      const rows = state.lines.length;
+      const wide = Math.max(1, ...state.lines.map(l => l.length));
+
+      // Reverse edges of the motion graph, over (row, col, desiredCol).
+      const preds = new Map();
+      const goals = [];
+      for (let r = 0; r < rows; r++) {
+        const maxCol = lineMaxCol(r);
+        for (let c = 0; c <= maxCol; c++) {
+          for (let d = 0; d < wide; d++) {
+            const from = sKey(r, c, d);
+            if (r === tgt.row && c === tgt.col) goals.push(from);
+            for (const k of keys) {
+              const res = simulate(k, { row: r, col: c }, d);
+              if (!res) continue;
+              const to = sKey(res.cursor.row, res.cursor.col, res.desiredCol);
+              if (to === from) continue;          // no-op move, not an edge
+              let list = preds.get(to);
+              if (!list) preds.set(to, list = []);
+              list.push(from);
+            }
+          }
+        }
+      }
+
+      const dist = new Map();
+      for (const g of goals) dist.set(g, 0);
+      for (let i = 0; i < goals.length; i++) {
+        const here = goals[i], d = dist.get(here);
+        for (const p of (preds.get(here) || [])) {
+          if (!dist.has(p)) { dist.set(p, d + 1); goals.push(p); }
+        }
+      }
+      return dist;
+    }
+
+    function distTo(cursor, desiredCol) {
+      if (!state.distMap) state.distMap = buildDistMap();
+      if (!state.distMap) return null;
+      const d = state.distMap.get(sKey(cursor.row, cursor.col, desiredCol));
+      return d === undefined ? null : d;
+    }
+
+    // 'hit' = lands on the target · 'closer' = shortens the route · 'slow' =
+    // legal move that doesn't · 'blocked' = nothing there to move onto ·
+    // 'away' = wrong direction entirely.
+    function moveVerdict(key, phase) {
+      if (!phase.keys.includes(key)) return 'locked';
+      const tgt = targetCell();
+      if (!tgt || cursorOnTarget()) return 'away';
+      const result = simulate(key, state.cursor, state.desiredCol);
+      if (!result) return 'away';
+      if (result.cursor.row === state.cursor.row && result.cursor.col === state.cursor.col) {
+        return 'blocked';
+      }
+      const before = distTo(state.cursor, state.desiredCol);
+      const after  = distTo(result.cursor, result.desiredCol);
+      if (before === null) return 'closer';   // unreachable target: never trap the player
+      if (after === null) return 'away';
+      if (after === 0) return 'hit';
+      if (after < before) return 'closer';
+      return after > before ? 'away' : 'slow';
+    }
+
+    // ============================================================
+    //  KILL
+    // ============================================================
+    function killTarget() {
+      const phase = PHASES[state.phaseIdx];
+      // x-grid phases erase the x; word phases leave the prose intact.
+      if (!phase.wordTarget) {
+        const [r, c] = state.path[state.pathIdx];
+        const line = state.lines[r];
+        state.lines[r] = line.substring(0, c) + ' ' + line.substring(c + 1);
+      }
+      state.pathIdx++;
+      state.progress++;
+      state.roundProgress++;
+      state.totalKills++;
+      state.distMap = null;   // target moved — the route map is stale
+
+      playKill();
+      save();
+
+      if (maybeAdvancePhase()) return;
+
+      if (state.pathIdx >= state.path.length) {
+        lockInput(320);       // cover the changeover so keys aren't counted as misses
+        setTimeout(() => {
+          const p = PHASES[state.phaseIdx];
+          // Stay on a drill for a stretch — a grid runs out every few kills and
+          // rotating that often is more interruption than practice.
+          const rotate = !!p.rounds && p.rounds.length > 1 && state.roundProgress >= 8;
+          if (rotate) {
+            state.roundIdx = (state.roundIdx + 1) % p.rounds.length;
+            state.roundProgress = 0;
+          }
+          regenerateText();
+          renderInfoBar();
+          renderText();
+          if (rotate) {
+            showDrillToast(p.rounds[state.roundIdx].label);
+            pulseHint();
+            lockInput(700);
+          }
+        }, 280);
+        return;
+      }
+      renderInfoBar();
+      renderText();   // draw the NEW target immediately — without this the red
+                      // marker stays stale on the just-killed cell and the next
+                      // target is invisible until the player happens to move.
+    }
+
+    // ============================================================
+    //  KEY HANDLER
+    // ============================================================
+    const ALL_MOTIONS = ['h', 'j', 'k', 'l', 'w', 'b', '0', '$'];
+    const ARROWS = {
+      ArrowLeft: 'h', ArrowDown: 'j', ArrowUp: 'k', ArrowRight: 'l'
+    };
+
+    function handleKey(e) {
+      if (e.ctrlKey || e.altKey || e.metaKey) return;
+
+      const key = e.key;
+      const lower = key.toLowerCase();
+      const effective = (key === '$') ? '$' : lower;
+      const phase = PHASES[state.phaseIdx];
+
+      // Wipe the save and start over.
+      if (key === 'R') {
+        e.preventDefault();
+        try { localStorage.removeItem(SAVE_KEY); } catch (err) {}
+        location.reload();
+        return;
+      }
+
+      // Mid-changeover: swallow input rather than score it as a miss.
+      if (performance.now() < state.lockUntil) {
+        if (ARROWS[key] || ALL_MOTIONS.includes(effective)) e.preventDefault();
+        return;
+      }
+
+      // Arrows are a beginner's reflex — say why they do nothing instead of
+      // looking broken.
+      if (ARROWS[key]) {
+        e.preventDefault();
+        showError(`arrows are off — <code>${ARROWS[key]}</code> moves that way`);
+        playError();
+        return;
+      }
+
+      // A real motion, just not unlocked in this phase yet.
+      if (!phase.keys.includes(effective)) {
+        if (ALL_MOTIONS.includes(effective)) {
+          e.preventDefault();
+          showError(`<code>${effective}</code> isn't unlocked yet`);
+          playError();
+        }
+        return;   // anything else isn't part of the game — ignore it
+      }
+      e.preventDefault();
+      ensureAudio();
+
+      const verdict = moveVerdict(effective, phase);
+
+      if (verdict !== 'hit' && verdict !== 'closer') {
+        // Miss — thud, a red border flash, and a line saying what was wrong.
+        playError();
+        showError(
+          verdict === 'blocked' ? `<code>${effective}</code> can't go any further that way` :
+          verdict === 'slow'    ? `<code>${effective}</code> works, but there's a shorter way` :
+                                  `<code>${effective}</code> moves away from the target`);
+        textGridEl.classList.add('error-flash');
+        clearTimeout(errorFlashTimer);
+        errorFlashTimer = setTimeout(() => textGridEl.classList.remove('error-flash'), 400);
+        return;
+      }
+
+      glyphFx(effective);
+
+      // Capture cursor pixel position BEFORE the move, for the trail
+      const fromXY = cellCenter(state.cursor.row, state.cursor.col);
+
+      applyMove(effective);
+      renderText();
+
+      // Distinct animation per motion scale: ring / comet / dash
+      const toXY = cellCenter(state.cursor.row, state.cursor.col);
+      addTrail(fromXY, toXY, effective);
+
+      // Auto-kill on arrival (anywhere within the target word, for word phases)
+      if (phase.autoKill) {
+        if (cursorOnTarget()) {
+          killTarget();
+        }
+      }
+    }
+
+    document.addEventListener('keydown', handleKey);
+
+    // ============================================================
+    //  INIT
+    // ============================================================
+    loadSave();
+    regenerateText();
+    renderGlyphs();
+    renderInfoBar();
+    renderText();
+  </script>
+
+</body>
+</html>

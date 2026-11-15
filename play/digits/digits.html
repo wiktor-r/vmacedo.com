@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Digits to pictograms</title>
+<style>
+:root{--ink:#1d1d1f;--muted:#8a8a8e;--bg:#ffffff;--line:#e4e4e7;color-scheme:light dark}
+@media (prefers-color-scheme:dark){:root{--ink:#ececec;--muted:#77777c;--bg:#151517;--line:#2a2a2e}}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,sans-serif;display:flex;justify-content:center;padding:2rem 1rem}
+main{width:100%;max-width:960px}
+.c{display:flex;gap:12px;align-items:center;margin-bottom:1.25rem}
+input{flex:1;min-width:0}button{font:inherit;padding:6px 14px;border:1px solid var(--muted);background:none;color:var(--ink);border-radius:6px;cursor:pointer}
+#tl{font-size:13px;color:var(--muted);min-width:150px}
+#grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+@media (max-width:640px){#grid{grid-template-columns:repeat(2,1fr)}#tl{min-width:0}}
+figure{margin:0;border:1px solid var(--line);border-radius:10px;padding:6px 6px 8px}
+figcaption{font-size:13px;color:var(--muted);text-align:center}
+figcaption b{color:var(--ink);font-weight:600}
+svg{display:block;width:100%;height:auto;overflow:visible}
+</style></head><body><main>
+<div class="c"><button id="play">Play</button><input type="range" id="t" min="0" max="1000" value="0" aria-label="Timeline"><span id="tl"></span></div>
+<div id="grid"></div>
+</main>
+<script>
+const N=64,NS="http://www.w3.org/2000/svg";
+function resample(p,n){const L=[0];for(let i=1;i<p.length;i++)L.push(L[i-1]+Math.hypot(p[i][0]-p[i-1][0],p[i][1]-p[i-1][1]));const T=L[L.length-1],o=[];let j=1;for(let k=0;k<n;k++){const d=T*k/(n-1);while(j<p.length-1&&L[j]<d)j++;const s=L[j]-L[j-1]||1,u=(d-L[j-1])/s;o.push([p[j-1][0]+(p[j][0]-p[j-1][0])*u,p[j-1][1]+(p[j][1]-p[j-1][1])*u]);}return o;}
+function arc(cx,cy,r,a0,a1,ry=r){const o=[];for(let i=0;i<=72;i++){const a=(a0+(a1-a0)*i/72)*Math.PI/180;o.push([cx+r*Math.cos(a),cy+ry*Math.sin(a)]);}return o;}
+function quad(a,c,b){const o=[];for(let i=0;i<=40;i++){const t=i/40,m=1-t;o.push([m*m*a[0]+2*m*t*c[0]+t*t*b[0],m*m*a[1]+2*m*t*c[1]+t*t*b[1]]);}return o;}
+const cat=(...a)=>a.flat(),S=x=>resample(x,N);
+const rot=(p,c,a)=>{const r=a*Math.PI/180,x=p[0]-c[0],y=p[1]-c[1];return[c[0]+x*Math.cos(r)-y*Math.sin(r),c[1]+x*Math.sin(r)+y*Math.cos(r)]};
+const R=(s,c,a)=>s.map(p=>rot(p,c,a)),Sc=(s,c,kx,ky=kx)=>s.map(p=>[c[0]+(p[0]-c[0])*kx,c[1]+(p[1]-c[1])*ky]),Tr=(s,dx,dy)=>s.map(p=>[p[0]+dx,p[1]+dy]);
+const eIn=x=>x*x*x,eQ=x=>x*x,eOut=x=>1-Math.pow(1-x,3),eB=x=>{const c=1.4;return 1+(c+1)*Math.pow(x-1,3)+c*Math.pow(x-1,2)};
+const cl=x=>Math.max(0,Math.min(1,x)),TAU=Math.PI*2;
+const lerp=(a,b,u)=>a.map((p,i)=>[p[0]+(b[i][0]-p[0])*u,p[1]+(b[i][1]-p[1])*u]);
+
+// Each digit: strokes in the digit and in the pictogram share order and count.
+// v(st,u): the digit's verb (u eased 0..1). r(st,k): rest motion, zero at k=0. fill: closed region, if any.
+const D=[
+{n:0,name:"ball",verb:"bounces",ease:eIn,
+ digit:[S(arc(100,100,40,-90,270,62))],
+ pict:[S(arc(100,122,46,-90,270))],
+ v:(st,u)=>st.map(s=>Tr(Sc(s,[100,100],1-.04*u,1+.06*u),0,8*u)),
+ r:(st,k)=>st.map(s=>Tr(s,0,-16*Math.abs(Math.sin(k*TAU))*(1-k))),
+ fill:st=>st[0]},
+{n:1,name:"flag",verb:"unfurls",ease:eIn,
+ // stroke order: stem, serif
+ digit:[S([[108,32],[108,170]]),S([[108,32],[80,58]])],
+ pict:[S([[108,28],[108,172]]),S(cat(quad([108,30],[78,20],[44,34]),quad([44,34],[40,50],[46,64]),quad([46,64],[78,54],[108,66])))],
+ v:(st,u)=>[st[0],R(st[1],[108,32],40*u)],
+ r:(st,k)=>[st[0],st[1].map(p=>{const w=(108-p[0])/64;return[p[0],p[1]+3.5*w*Math.sin(k*TAU*2-(108-p[0])/12)]})],
+ fill:st=>st[1]},
+{n:2,name:"swan",verb:"bows its neck",ease:eIn,
+ // stroke order: hook+diagonal, base
+ digit:[S(cat(arc(100,72,40,-165,10),[[52,166]])),S([[52,166],[152,166]])],
+ pict:[S(cat([[32,74],[50,62]],quad([50,62],[68,50],[74,70]),quad([74,70],[80,110],[56,138]))),S(cat(quad([56,138],[72,182],[150,158]),quad([150,158],[168,146],[174,116]),quad([174,116],[132,142],[88,136])))],
+ v:(st,u)=>[R(st[0],[52,166],-12*u),st[1]],
+ r:(st,k)=>{const b=2.5*Math.sin(k*TAU);return[Tr(R(st[0],[56,138],3*Math.sin(k*TAU)),0,b),Tr(st[1],0,b)]},
+ fill:st=>st[1]},
+{n:3,name:"pufferfish",verb:"inflates",ease:eQ,
+ // stroke order: upper bowl, lower bowl
+ digit:[S(arc(98,70,30,-150,90)),S(arc(98,135,35,-90,150))],
+ pict:[S(cat(arc(96,104,52,-172,-18),[[174,80],[158,104]])),S(cat([[158,104],[174,128]],arc(96,104,52,18,172)))],
+ v:(st,u)=>st.map((s,i)=>Sc(s,[98,100],1+[.32,.08][i]*u)),
+ r:(st,k)=>st.map(s=>Sc(s,[96,104],1+.03*Math.sin(k*TAU*1.5))),
+ fill:st=>st[0].concat(st[1])},
+{n:4,name:"sailboat",verb:"heels",ease:eIn,
+ // stroke order: upper stem→mast, diagonal→sail, crossbar→boom, stem tail→hull (flatter, raft-like)
+ digit:[S([[125,40],[125,125]]),S([[125,40],[45,125]]),S([[45,125],[150,125]]),S([[125,125],[125,170]])],
+ pict:[S([[110,28],[110,126]]),S(quad([110,28],[58,62],[44,122])),S([[44,124],[132,124]]),S([[170,136],[158,148],[52,148],[40,138]])].map(s=>R(s,[100,145],-10)),
+ v:(st,u)=>st.map(s=>R(s,[125,170],-18*u)),
+ r:(st,k)=>st.map(s=>R(s,[100,145],4*Math.sin(k*TAU)*(1-k*.5))),
+ fill:st=>st[1].concat([st[0][N-1]])},
+{n:5,name:"fish hook",verb:"swings",ease:eIn,
+ // stroke order: top bar→line, stem→shank, bowl→bend+barb
+ digit:[S([[140,40],[72,40]]),S([[72,40],[68,96]]),S(arc(98,126,40,-140,140))],
+ pict:[S([[100,6],[100,40]]),S([[100,40],[100,112]]),S(cat(arc(74,112,26,0,180),[[48,84],[60,98]]))],
+ v:(st,u)=>st.map(s=>R(s,[72,40],18*u)), // bowl hangs right of the pivot, so it swings plumb
+ r:(st,k)=>st.map(s=>R(s,[100,6],7*Math.sin(k*TAU*1.5)*(1-k))),
+ fill:null},
+{n:6,name:"snail",verb:"rolls into its shell",ease:eIn,
+ // stroke order: tail→body+feeler, loop→spiral shell
+ digit:[S(quad([138,42],[62,58],[58,128])),S(arc(100,128,42,180,-180))],
+ pict:[S([[172,90],[164,126],[150,152],[50,158],[36,150]]),S(Array.from({length:91},(_,i)=>{const t=i/90,a=(180-630*t)*Math.PI/180,r=46-38*t;return[96+r*Math.cos(a),108+r*Math.sin(a)]}))],
+ v:(st,u)=>st.map(s=>R(s,[100,170],14*u)),
+ r:(st,k)=>st.map(s=>Tr(s,8*eOut(k),0)),
+ fill:null},
+{n:7,name:"axe",verb:"chops",ease:eIn,
+ // stroke order: top bar→head, diagonal→handle
+ digit:[S([[46,40],[154,40]]),S([[154,40],[86,170]])],
+ pict:[S(cat([[150,46],[114,42],[94,12]],quad([94,12],[68,58],[94,104]),[[114,74],[150,70]])),S([[150,52],[150,172]])].map(s=>Tr(R(s,[150,172],-50),18,-4)),
+ v:(st,u)=>st.map(s=>R(s,[86,170],-16*u)),
+ r:(st,k)=>st.map(s=>R(s,[168,168],2.5*Math.sin(k*TAU*3)*(1-k)*(1-k))),
+ fill:st=>st[0]},
+{n:8,name:"snowman",verb:"settles",ease:eIn,
+ // stroke order: upper loop→head with arms from its ends, lower loop→body
+ digit:[S(arc(100,68,30,90,450)),S(arc(100,133,36,-90,270))],
+ pict:[S(cat([[48,84],[80,100]],arc(100,70,24,120,420),[[120,100],[152,84]])),S(arc(100,130,42,-90,270).map(p=>[p[0],Math.min(p[1],166)]))],
+ v:(st,u)=>st.map(s=>Sc(s,[100,170],1+.06*u,1-.1*u)),
+ r:(st,k)=>st.map(s=>Sc(s,[100,166],1-.02*Math.sin(k*TAU*1.5)*(1-k),1+.03*Math.sin(k*TAU*1.5)*(1-k))),
+ fill:null},
+{n:9,name:"balloon",verb:"floats up",ease:eQ,
+ // stroke order: loop→balloon, tail→string
+ digit:[S(arc(100,70,34,25,-335)),S(quad([131,84],[134,130],[124,170]))],
+ pict:[S(arc(100,56,34,90,-270,42)),S(Array.from({length:41},(_,i)=>{const t=i/40;return[100+5*Math.sin(t*3*Math.PI),98+t*76]}))],
+ v:(st,u)=>st.map(s=>Tr(s,0,-12*u)),
+ r:(st,k)=>st.map(s=>Tr(R(s,[100,98],3*Math.sin(k*TAU)),0,-4*Math.sin(k*TAU))),
+ fill:st=>st[0]},
+];
+
+const d=pts=>"M"+pts.map(p=>p[0].toFixed(1)+" "+p[1].toFixed(1)).join("L");
+const grid=document.getElementById("grid");
+D.forEach(x=>{
+ const f=document.createElement("figure"),svg=document.createElementNS(NS,"svg");
+ svg.setAttribute("viewBox","0 0 200 200");svg.setAttribute("role","img");svg.setAttribute("aria-label",`Digit ${x.n} becoming a ${x.name}`);
+ x.fillEl=document.createElementNS(NS,"path");x.fillEl.setAttribute("stroke","none");x.fillEl.style.fill="var(--ink)";svg.appendChild(x.fillEl);
+ x.P=x.digit.map(()=>{const p=document.createElementNS(NS,"path");p.setAttribute("fill","none");p.setAttribute("stroke-width","6");p.setAttribute("stroke-linecap","round");p.setAttribute("stroke-linejoin","round");p.style.stroke="var(--ink)";svg.appendChild(p);return p;});
+ const c=document.createElement("figcaption");c.innerHTML=`<b>${x.n}</b> ${x.name} ${x.verb}`;
+ f.append(svg,c);grid.appendChild(f);
+});
+function frame(x,T){let st;
+ if(T<.35)st=x.v(x.digit,x.ease(T/.35));
+ else{const a=x.v(x.digit,1),u=eB(cl((T-.35)/.35));st=a.map((s,i)=>lerp(s,x.pict[i],u));}
+ if(T>.7)st=x.r(st,(T-.7)/.3);
+ return st;}
+const tl=document.getElementById("tl");
+function draw(T){D.forEach(x=>{const st=frame(x,T);st.forEach((s,i)=>x.P[i].setAttribute("d",d(s)));
+  if(x.fill){x.fillEl.setAttribute("d",d(x.fill(st))+"Z");x.fillEl.style.fillOpacity=(0.12*cl((T-.45)/.3)).toFixed(3);}});
+ tl.textContent=T<.35?"Each digit acts on its imbalance":T<.7?"Strokes become objects":"Rest state";}
+const sl=document.getElementById("t");sl.addEventListener("input",()=>{run=false;draw(sl.value/1000)});
+let run=false,t0=0;
+document.getElementById("play").addEventListener("click",()=>{run=true;t0=performance.now();requestAnimationFrame(step)});
+function step(now){if(!run)return;const T=Math.min(1,(now-t0)/4500);sl.value=Math.round(T*1000);draw(T);if(T<1)requestAnimationFrame(step);else run=false;}
+draw(0);
+</script></body></html>
