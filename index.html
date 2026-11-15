@@ -6,7 +6,7 @@
 <style>
 @font-face{font-family:'EB Garamond';font-style:normal;font-weight:400 800;font-display:swap;src:url(/fonts/EBGaramond-normal-latin.woff2) format('woff2')}
 @font-face{font-family:'EB Garamond';font-style:italic;font-weight:400 800;font-display:swap;src:url(/fonts/EBGaramond-italic-latin.woff2) format('woff2')}
-:root{--paper:#f4f1ea;--ink:#1a1916;--soft:#4b463e;--mut:#857e72;--wrap:1240px}
+:root{--gut:clamp(48px,6vw,120px);--paper:#f4f1ea;--ink:#1a1916;--soft:#4b463e;--mut:#857e72;--wrap:1240px}
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;scroll-padding-top:104px}
 body{background:var(--paper);color:var(--ink);font:400 19px/1.6 "EB Garamond",Georgia,serif;-webkit-font-smoothing:antialiased}
@@ -16,12 +16,13 @@ a{color:inherit} img{display:block;max-width:100%;height:auto}
 header.top{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;justify-content:space-between;align-items:baseline;padding:30px 48px 44px;background:linear-gradient(var(--paper) 62%,rgba(244,241,234,0))}
 header.top a{text-decoration:none;font-size:14px;letter-spacing:.2em;text-transform:uppercase}
 header.top nav{display:flex;gap:30px;color:var(--soft)}
-.wrap{max-width:var(--wrap);margin:0 auto;padding-inline:48px}
-@media (min-width:1101px){.wrap{max-width:min(var(--wrap),calc(100vw - 420px));padding-inline:0}}
+.wrap{width:min(1600px,100% - 2*var(--gut));margin-inline:auto;padding-inline:0}
+header.top,footer{padding-inline:max(var(--gut),(100% - 1600px)/2)!important}
+
 .shadow{box-shadow:0 1px 2px rgba(40,30,15,.08),0 26px 50px -18px rgba(40,30,15,.32)}
 /* intro */
-.hello{min-height:min(84svh,820px);align-content:center;display:grid;grid-template-columns:1fr 340px;gap:clamp(40px,7vw,120px);align-items:center;padding-top:110px;padding-bottom:40px}
-.hello h1{font-weight:400;font-size:clamp(46px,5.3vw,84px);line-height:1.03;letter-spacing:-.02em}
+.hello{min-height:min(84svh,820px);align-content:center;display:grid;grid-template-columns:1fr 400px;gap:clamp(40px,7vw,120px);align-items:center;padding-top:110px;padding-bottom:40px}
+.hello h1{font-weight:400;font-size:clamp(46px,5.2vw,96px);line-height:1.03;letter-spacing:-.02em}
 .hello h1 i,.k i{color:var(--soft)}
 .hello p{font-style:italic;font-size:clamp(21px,1.8vw,27px);line-height:1.42;color:var(--soft);margin-top:28px;max-width:26em}
 .hello .print-photo img{aspect-ratio:4/5;object-fit:cover;width:100%}
@@ -51,11 +52,11 @@ header.top nav{display:flex;gap:30px;color:var(--soft)}
 @media (max-width:820px){.desk{margin:6px 4px 18px}}
 
 /* projects */
-.work{position:relative;display:grid;grid-template-columns:1fr 1.25fr;gap:clamp(40px,6vw,96px);align-items:center;padding-block:clamp(56px,8vh,104px)}
-.work.flip{grid-template-columns:1.4fr 1fr}.work.flip .media{order:-1}
+.work{position:relative;display:grid;grid-template-columns:1fr 1.45fr;gap:clamp(40px,6vw,96px);align-items:center;padding-block:clamp(56px,8vh,104px)}
+.work.flip{grid-template-columns:1.45fr 1fr}.work.flip .media{order:-1}
 .work:not(.flip) .media{order:1}
 .k{font-size:14.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--mut)}
-.work h2{font-weight:400;font-size:clamp(32px,3.4vw,50px);line-height:1.1;letter-spacing:-.012em;margin-top:14px}
+.work h2{font-weight:400;font-size:clamp(32px,3.2vw,60px);line-height:1.1;letter-spacing:-.012em;margin-top:14px}
 .work p{font-size:21px;line-height:1.5;color:var(--soft);margin-top:16px;max-width:30em}
 a.go{display:inline-block;margin-top:20px;font-size:20px;text-decoration:none;border-bottom:1.5px solid var(--ink);padding-bottom:1px}a.go::after{content:" →"}
 a.go:hover{border-bottom-width:3px}
@@ -107,7 +108,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 @media (max-width:1100px){.idx{display:none}}
 @media (max-width:820px){
  header.top{padding:16px 22px;background:var(--paper);box-shadow:0 1px 0 rgba(26,25,22,.08)}header.top a{font-size:12px;letter-spacing:.16em;white-space:nowrap}header.top nav a.wide{display:none}
- .wrap{padding:0 22px}
+ :root{--gut:22px}
  .hello{grid-template-columns:1fr;min-height:0;padding-top:100px;gap:32px}.hello .print-photo{width:min(46%,210px);padding:9px;margin:4px 10px 24px auto}
  .work,.work.flip{grid-template-columns:1fr;min-height:0;padding-block:72px 0;gap:24px}.work .media,.work.flip .media,.work:not(.flip) .media{order:-1}
 .work p{font-size:18px}.paper{padding:4% 6% 10%}
@@ -142,7 +143,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
  <ul class="grid"><li class="rv"><a href="/play/vimnav/"><img class="shadow" src="/img/kv-vimnav.webp" width="1600" height="1000" alt="Learn Vim's movement keys — screenshot on a laptop" loading="lazy" decoding="async"><div class="t"><span>VimNav</span><span aria-hidden="true">Play →</span></div></a></li><li class="rv"><a href="/play/tetrisrotation/"><img class="shadow" src="/img/kv-tetrisrotation.webp" width="1600" height="1000" alt="See how each Tetris piece turns — screenshot on a laptop" loading="lazy" decoding="async"><div class="t"><span>Tetris Rotation</span><span aria-hidden="true">Play →</span></div></a></li><li class="rv"><a href="/play/keyview/"><img class="shadow" src="/img/kv-keyview.webp" width="1600" height="1000" alt="A keyboard map that shows where each key goes — screenshot on a laptop" loading="lazy" decoding="async"><div class="t"><span>Keyview</span><span aria-hidden="true">Play →</span></div></a></li><li class="rv"><a href="/play/munselltools/"><img class="shadow" src="/img/kv-munselltools.webp" width="1600" height="1000" alt="Train colour judgement with the Munsell system — screenshot on a laptop" loading="lazy" decoding="async"><div class="t"><span>MunsellTools</span><span aria-hidden="true">Play →</span></div></a></li><li class="rv"><a href="/play/cartesiancommander/"><img class="shadow" src="/img/kv-cartesiancommander.webp" width="1600" height="1000" alt="Find points on a coordinate grid — screenshot on a laptop" loading="lazy" decoding="async"><div class="t"><span>Cartesian Commander</span><span aria-hidden="true">Play →</span></div></a></li><li class="rv"><a href="/play/desktopshell/"><img class="shadow" src="/img/kv-desktopshell.webp" width="1600" height="1000" alt="A minimal desktop you drive from the keyboard — screenshot on a laptop" loading="lazy" decoding="async"><div class="t"><span>DesktopShell</span><span aria-hidden="true">Play →</span></div></a></li></ul>
 </section>
 </main>
-<ul class="idx" aria-label="Sections"><li><a href="#intro">Intro</a></li><li><a href="#work">Work</a></li><li><a href="#voar">Voar</a></li><li><a href="#kennedy">Kennedy</a></li><li><a href="#iracema">Iracema</a></li><li><a href="#play">Play</a></li></ul>
+
 <footer id="contact"><p class="line">Let's make something people can actually use.</p><a class="mail" href="mailto:victormac@edu.unifor.br">victormac@edu.unifor.br</a>
 <nav class="links"><a href="/cv.html">CV</a><a href="/files/curriculo-carlos-victor-aguiar-de-macedo.pdf">Currículo (PDF)</a><a href="/files/portfolio-carlos-victor-aguiar-de-macedo.pdf">Portfolio (PDF)</a><a href="https://ordinary.vision">ordinary.vision</a><a href="/microblog.html">microblog</a></nav><div class="name">Victor Aguiar-Macedo</div></footer>
 <script>
