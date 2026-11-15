@@ -106,3 +106,6 @@ figcaption::before{content:"Fig. " counter(fig) " — ";color:var(--ink)}
  .g2,.g3,.split,.play{grid-template-columns:1fr}.meta{grid-template-columns:1fr 1fr}
  .frame{border:0}
 }
+
+@media (max-width:520px){nav.top{height:64px}nav.top .name{font-size:18px;white-space:nowrap}nav.top .r{gap:14px;font-size:16px}nav.top .r a:not(.btn):not([href="/cv.html"]){display:none}
+.btn{padding:10px 14px;font-size:15px}.hero{padding-top:48px;padding-bottom:44px}.st{padding-top:48px;padding-bottom:20px}.st .mut{display:none}}
