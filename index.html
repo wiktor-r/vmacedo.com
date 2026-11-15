@@ -67,6 +67,7 @@ p,li{text-wrap:pretty}
 @media (min-width:821px){.hello>div:first-child{padding-right:clamp(48px,6vw,110px)}}
 .stack{position:relative;isolation:isolate}
 .stack>.print-photo:not(.back){position:relative;z-index:3}
+.stack .print-photo.back img{aspect-ratio:auto;width:100%;filter:none}
 .stack .print-photo.back{position:absolute;padding:9px;box-shadow:0 1px 1px rgba(40,30,15,.10),0 10px 24px -8px rgba(40,30,15,.30)}
 .stack .ph{background:linear-gradient(135deg,#d9d3c6,#c9c1b2);display:flex;align-items:center;justify-content:center}
 .stack .ph span{font-style:italic;font-size:14px;letter-spacing:.06em;color:rgba(60,52,40,.45)}
@@ -74,9 +75,15 @@ p,li{text-wrap:pretty}
 .stack .print-photo.b2{width:52%;right:-26%;top:-12%;transform:rotate(8deg);z-index:2}
 .stack .print-photo.b3{width:42%;left:-20%;bottom:-14%;transform:rotate(5deg);z-index:4}
 @media (max-width:820px){
- .stack{width:min(42%,180px);margin:18px 0 10px 46px}.stack>.print-photo:not(.back){width:100%!important;margin:0!important}
- .stack .print-photo.back{padding:6px}.stack .ph span{font-size:11px}
- .stack .print-photo.b1{width:80%;left:-40%;top:14%}.stack .print-photo.b2{width:58%;right:-48%;top:-6%}.stack .print-photo.b3{width:50%;left:auto;right:-58%;bottom:-6%}
+ .hello{grid-template-columns:1fr 40%!important;gap:22px!important;align-items:center;padding-bottom:36px}
+ .hello h1{font-size:clamp(24px,7vw,31px)}
+ .hello>div:first-child{position:relative;z-index:5}
+ .stack .print-photo.b2{right:-8%}
+ body{overflow-x:clip}
+ .hello>div:last-child{order:0!important}
+ .stack{width:100%;margin:10px 0 18px}.stack>.print-photo:not(.back){width:100%!important;margin:0!important;padding:6px}
+ .stack .print-photo.back{padding:5px}
+ .stack .print-photo.b1{width:50%;left:-9%;top:30%}.stack .print-photo.b2{width:52%;right:-14%;top:-10%}.stack .print-photo.b3{width:44%;left:-12%;bottom:-14%}
 }
 
 /* projects */
@@ -144,7 +151,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 @media (max-width:820px){
  header.top{padding:16px 22px;background:var(--paper);box-shadow:0 1px 0 rgba(26,25,22,.08)}header.top a{font-size:12px;letter-spacing:.16em;white-space:nowrap}header.top nav a.wide{display:none}
  .wrap{padding:0 22px}
- .hello{grid-template-columns:1fr;min-height:0;padding-top:100px;gap:32px}.hello .print-photo{width:min(42%,180px);padding:8px;margin:4px 0 0 4px}.hello>div:last-child{order:-1}.hello{gap:26px;padding-bottom:40px}
+ .hello{grid-template-columns:1fr;min-height:0;padding-top:100px;gap:32px}
  .work,.work.flip{grid-template-columns:1fr;min-height:0;padding-block:72px 0;gap:24px}.work .media,.work.flip .media,.work:not(.flip) .media{order:-1}
 .work p{font-size:18px}.paper{padding:4% 6% 10%}
  .play{padding-block:64px 0;margin-top:56px}
@@ -158,7 +165,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 <main>
 <section class="wrap hello" id="intro" aria-label="Introduction">
  <div class="rv"><h1>Hello, I'm Victor.<br>I take projects from <i>the&nbsp;field</i> to <i>the&nbsp;screen</i>.</h1></div>
- <div class="rv portrait"><div class="stack"><div class="print-photo back b1" aria-hidden="true"><div class="ph" style="aspect-ratio:3/2"><span>photo</span></div></div><div class="print-photo back b2" aria-hidden="true"><div class="ph" style="aspect-ratio:4/5"><span>photo</span></div></div><div class="print-photo"><img src="/img/victor.webp" width="604" height="800" alt="Portrait of Victor" decoding="async"></div><div class="print-photo back b3" aria-hidden="true"><div class="ph" style="aspect-ratio:1/1"><span>photo</span></div></div></div></div>
+ <div class="rv portrait"><div class="stack"><div class="print-photo back b1"><img src="/img/stack-sketch.webp" width="900" height="600" alt="Pencil sketch of the RK monogram" loading="lazy" decoding="async"></div><div class="print-photo back b2"><img src="/img/stack-palette.webp" width="720" height="900" alt="Colour palette and type from the Praia de Iracema sign system" loading="lazy" decoding="async"></div><div class="print-photo"><img src="/img/victor.webp" width="604" height="800" alt="Portrait of Victor" decoding="async"></div><div class="print-photo back b3"><img src="/img/stack-print.webp" width="700" height="700" alt="Detail of the two-colour Vansire concert folder" loading="lazy" decoding="async"></div></div></div>
 </section>
 <section class="wrap sec" id="work" aria-labelledby="h-work"><div class="k rv">Work</div><h2 class="rv" id="h-work">Selected&nbsp;work</h2></section>
 <section class="wrap work" id="voar" aria-labelledby="h-voar">
