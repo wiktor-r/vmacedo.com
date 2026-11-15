@@ -58,7 +58,7 @@ footer .line{font-size:clamp(36px,4.6vw,70px);line-height:1.06;letter-spacing:-.
 footer .mail{display:inline-block;margin-top:36px;font-style:italic;font-size:clamp(22px,2.4vw,34px);color:#f3efe6;text-underline-offset:8px}
 footer .links{display:flex;flex-wrap:wrap;gap:12px 34px;margin-top:64px;padding-top:22px;border-top:1px solid rgba(243,239,230,.18);color:rgba(243,239,230,.7);font-size:18px}
 footer .links a{text-decoration:none}
-footer .name{font-size:clamp(56px,12vw,200px);line-height:.8;letter-spacing:-.03em;white-space:nowrap;margin-top:70px;color:rgba(243,239,230,.08);transform:translateY(.12em)}
+footer .name{font-size:min(200px,calc((100vw - 96px) / 7.6));line-height:1.05;letter-spacing:-.03em;white-space:nowrap;margin-top:70px;padding-bottom:clamp(24px,4vh,48px);color:rgba(243,239,230,.08)}
 footer{margin-top:10vh}
 
 /* ---- depth ---- */
@@ -87,6 +87,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
  .play{padding-block:64px 0;margin-top:56px}
  .sec{padding-top:56px;margin-top:8px}.work,.work.flip{padding-block:48px 0}.grid{grid-template-columns:1fr 1fr;gap:28px 14px;margin-top:28px}.grid .t{font-size:15px}.grid .t span:last-child{display:none}
  footer{padding:12vh 22px 0}
+ footer .name{font-size:calc((100vw - 44px) / 7.6)}
 }
 </style></head><body>
 <a class="skip" href="#work">Skip to the work</a>
