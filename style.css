@@ -156,3 +156,18 @@ figcaption::before{content:"Fig. " counter(fig) ". ";font-style:italic}
 .playgrid a:hover .go{color:var(--ink)}
 @media (max-width:820px){.selwork{grid-template-columns:1fr;gap:48px}.selwork .lead .mat{aspect-ratio:16/11;padding:7%}.playgrid{grid-template-columns:1fr 1fr}}
 @media (max-width:520px){.playgrid{grid-template-columns:1fr}}
+
+/* strong footer */
+.big-foot{background:#151412;color:#f4f1ea;margin-top:140px;padding:110px 0 0;overflow:hidden}
+.big-foot a{color:#f4f1ea}
+.bf-line{font-size:clamp(34px,4.6vw,64px);line-height:1.08;letter-spacing:-.012em;max-width:16em}
+.bf-mail{display:inline-block;margin-top:40px;font-style:italic;font-size:clamp(24px,2.8vw,38px);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:8px;text-decoration-color:rgba(244,241,234,.45)}
+.bf-mail:hover{text-decoration-color:#f4f1ea}
+.bf-links{display:flex;flex-wrap:wrap;gap:10px 34px;margin-top:64px;padding-top:22px;border-top:1px solid rgba(244,241,234,.22);font-size:18px}
+.bf-links a{text-decoration:none;color:rgba(244,241,234,.75)}.bf-links a:hover{color:#f4f1ea}
+.bf-name{font-size:clamp(56px,11.5vw,170px);line-height:.82;letter-spacing:-.03em;margin-top:70px;white-space:nowrap;color:rgba(244,241,234,.1);transform:translateY(.12em)}
+@media (max-width:820px){.big-foot{padding-top:72px;margin-top:96px}.bf-name{font-size:15vw}}
+
+.big-foot{border-top:0;font-size:18px;color:#f4f1ea;padding-bottom:0}
+.big-foot .wrap{display:block}
+.bf-name{font-size:clamp(48px,9.4vw,138px);white-space:nowrap;overflow:hidden}
