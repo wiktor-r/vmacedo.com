@@ -127,3 +127,6 @@ figcaption::before{content:"Fig. " counter(fig) ".  ";font-style:italic;color:va
 }
 
 .portrait figcaption::before{content:none}
+
+@media (max-width:520px){.run .home{font-size:11.5px;letter-spacing:.12em;white-space:nowrap}.run nav{gap:12px;font-size:15px}.run nav a[href="/#about"],.run nav a[href="/#contents"]{display:none}
+.hello .links{flex-direction:column;gap:8px}.hello .links a+a::before{content:none}}
