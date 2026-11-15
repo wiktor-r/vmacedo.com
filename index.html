@@ -20,7 +20,7 @@ header.top nav{display:flex;gap:30px;color:var(--soft)}
 @media (min-width:1101px){.wrap{max-width:min(var(--wrap),calc(100vw - 420px));padding-inline:0}}
 .shadow{box-shadow:0 1px 2px rgba(40,30,15,.08),0 26px 50px -18px rgba(40,30,15,.32)}
 /* intro */
-.hello{min-height:84svh;display:grid;grid-template-columns:1fr 340px;gap:clamp(40px,7vw,120px);align-items:center;padding-top:110px;padding-bottom:40px}
+.hello{min-height:min(84svh,820px);align-content:center;display:grid;grid-template-columns:1fr 340px;gap:clamp(40px,7vw,120px);align-items:center;padding-top:110px;padding-bottom:40px}
 .hello h1{font-weight:400;font-size:clamp(46px,5.3vw,84px);line-height:1.03;letter-spacing:-.02em}
 .hello h1 i,.k i{color:var(--soft)}
 .hello p{font-style:italic;font-size:clamp(21px,1.8vw,27px);line-height:1.42;color:var(--soft);margin-top:28px;max-width:26em}
@@ -78,13 +78,13 @@ a.go:hover{border-bottom-width:3px}
 .js .rv{opacity:0;transform:translateY(28px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.7,.2,1)}
 .js .rv.in{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.js .rv{opacity:1;transform:none;transition:none}.grid a img{transition:none}}
-footer{position:relative;z-index:25;background:var(--ink);color:#f3efe6;padding:18vh 48px 0;overflow:hidden}
+footer{position:relative;z-index:25;background:var(--ink);color:#f3efe6;padding:clamp(80px,18vh,200px) 48px 0;overflow:hidden}
 footer .line{font-size:clamp(36px,4.6vw,70px);line-height:1.06;letter-spacing:-.015em;max-width:15em}
 footer .mail{display:inline-block;margin-top:36px;font-style:italic;font-size:clamp(22px,2.4vw,34px);color:#f3efe6;text-underline-offset:8px}
 footer .links{display:flex;flex-wrap:wrap;gap:12px 34px;margin-top:64px;padding-top:22px;border-top:1px solid rgba(243,239,230,.18);color:rgba(243,239,230,.7);font-size:18px}
 footer .links a{text-decoration:none}
 footer .name{font-size:min(200px,calc((100vw - 96px) / 8.3));line-height:.8;letter-spacing:-.03em;white-space:nowrap;margin-top:70px;color:rgba(243,239,230,.08);transform:translateY(.12em)}
-footer{margin-top:10vh}
+footer{margin-top:clamp(48px,10vh,120px)}
 
 
 /* curtain: at the end the page holds still and the footer slides up over it */
@@ -118,7 +118,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 .work p{font-size:18px}.paper{padding:4% 6% 10%}
  .play{padding-block:64px 0;margin-top:56px}
  .sec{padding-top:56px;margin-top:8px}.work,.work.flip{padding-block:48px 0}.grid{grid-template-columns:1fr 1fr;gap:28px 14px;margin-top:28px}.grid .t{font-size:15px}.grid .t span:last-child{display:none}
- footer{padding:12vh 22px 0}
+ footer{padding:clamp(64px,12vh,140px) 22px 0}
  footer .name{font-size:calc((100vw - 44px) / 8.3)}
 }
 </style></head><body>
