@@ -87,12 +87,7 @@ footer .name{font-size:min(200px,calc((100vw - 96px) / 8.3));line-height:.8;lett
 footer{margin-top:clamp(48px,10vh,120px)}
 
 
-/* curtain: at the end the page holds still and the footer slides up over it */
-main{position:sticky;top:var(--hold,0px);z-index:0}
-.pause{height:min(60vh,520px)}
-@media (prefers-reduced-motion:reduce){.pause{display:none}}
 footer{position:relative;z-index:25;box-shadow:0 -40px 80px -20px rgba(26,25,22,.28)}
-@media (prefers-reduced-motion:reduce){main{position:static}}
 /* ---- depth ---- */
 html{background-color:var(--paper)}
 html.at-end{background-color:var(--ink)}
@@ -147,18 +142,12 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
  <ul class="grid"><li class="rv"><a href="/play/vimnav/"><img class="shadow" src="/img/kv-vimnav.webp" width="1600" height="1000" alt="Learn Vim's movement keys — screenshot on a laptop" loading="lazy" decoding="async"><div class="t"><span>VimNav</span><span aria-hidden="true">Play →</span></div></a></li><li class="rv"><a href="/play/tetrisrotation/"><img class="shadow" src="/img/kv-tetrisrotation.webp" width="1600" height="1000" alt="See how each Tetris piece turns — screenshot on a laptop" loading="lazy" decoding="async"><div class="t"><span>Tetris Rotation</span><span aria-hidden="true">Play →</span></div></a></li><li class="rv"><a href="/play/keyview/"><img class="shadow" src="/img/kv-keyview.webp" width="1600" height="1000" alt="A keyboard map that shows where each key goes — screenshot on a laptop" loading="lazy" decoding="async"><div class="t"><span>Keyview</span><span aria-hidden="true">Play →</span></div></a></li><li class="rv"><a href="/play/munselltools/"><img class="shadow" src="/img/kv-munselltools.webp" width="1600" height="1000" alt="Train colour judgement with the Munsell system — screenshot on a laptop" loading="lazy" decoding="async"><div class="t"><span>MunsellTools</span><span aria-hidden="true">Play →</span></div></a></li><li class="rv"><a href="/play/cartesiancommander/"><img class="shadow" src="/img/kv-cartesiancommander.webp" width="1600" height="1000" alt="Find points on a coordinate grid — screenshot on a laptop" loading="lazy" decoding="async"><div class="t"><span>Cartesian Commander</span><span aria-hidden="true">Play →</span></div></a></li><li class="rv"><a href="/play/desktopshell/"><img class="shadow" src="/img/kv-desktopshell.webp" width="1600" height="1000" alt="A minimal desktop you drive from the keyboard — screenshot on a laptop" loading="lazy" decoding="async"><div class="t"><span>DesktopShell</span><span aria-hidden="true">Play →</span></div></a></li></ul>
 </section>
 </main>
-<div class="pause" aria-hidden="true"></div>
 <ul class="idx" aria-label="Sections"><li><a href="#intro">Intro</a></li><li><a href="#work">Work</a></li><li><a href="#voar">Voar</a></li><li><a href="#kennedy">Kennedy</a></li><li><a href="#iracema">Iracema</a></li><li><a href="#play">Play</a></li></ul>
 <footer id="contact"><p class="line">Let's make something people can actually use.</p><a class="mail" href="mailto:victormac@edu.unifor.br">victormac@edu.unifor.br</a>
 <nav class="links"><a href="/cv.html">CV</a><a href="/files/curriculo-carlos-victor-aguiar-de-macedo.pdf">Currículo (PDF)</a><a href="/files/portfolio-carlos-victor-aguiar-de-macedo.pdf">Portfolio (PDF)</a><a href="https://ordinary.vision">ordinary.vision</a><a href="/microblog.html">microblog</a></nav><div class="name">Victor Aguiar-Macedo</div></footer>
 <script>
 document.documentElement.classList.add('js');
-const mainEl=document.querySelector('main'); const hold=()=>document.documentElement.style.setProperty('--hold', Math.min(0, innerHeight-mainEl.offsetHeight)+'px');
-new ResizeObserver(hold).observe(mainEl); addEventListener('resize',hold); hold();
 
-document.addEventListener('click',e=>{const a=e.target.closest('a[href^="#"]'); if(!a) return; const t=document.querySelector(a.getAttribute('href'));
-  if(!t||!mainEl.contains(t)) return; e.preventDefault(); let y=0,n=t; while(n&&n!==mainEl){y+=n.offsetTop;n=n.offsetParent}
-  scrollTo({top:Math.max(0,y-90),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}); history.replaceState(null,'',a.getAttribute('href')); t.setAttribute('tabindex','-1'); t.focus({preventScroll:true});});
 
 const endFlag=()=>document.documentElement.classList.toggle('at-end', scrollY > (document.documentElement.scrollHeight-innerHeight)/2);
 addEventListener('scroll',endFlag,{passive:true}); addEventListener('resize',endFlag); endFlag();
