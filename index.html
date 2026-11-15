@@ -25,6 +25,9 @@ header.top nav{display:flex;gap:30px;color:var(--soft)}
 .hello h1 i,.k i{color:var(--soft)}
 .hello p{font-style:italic;font-size:clamp(21px,1.8vw,27px);line-height:1.42;color:var(--soft);margin-top:28px;max-width:26em}
 .hello img{aspect-ratio:4/5;object-fit:cover;width:100%}
+
+.hello img.soft{-webkit-mask-image:linear-gradient(to right,transparent,#000 12%,#000 88%,transparent),linear-gradient(to bottom,transparent,#000 10%,#000 86%,transparent);
+ -webkit-mask-composite:source-in;mask-image:linear-gradient(to right,transparent,#000 12%,#000 88%,transparent),linear-gradient(to bottom,transparent,#000 10%,#000 86%,transparent);mask-composite:intersect}
 /* projects */
 .work{position:relative;display:grid;grid-template-columns:1fr 1.25fr;gap:clamp(40px,6vw,96px);align-items:center;padding-block:clamp(56px,8vh,104px)}
 .work.flip{grid-template-columns:1.4fr 1fr}.work.flip .media{order:-1}
@@ -102,7 +105,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 <main>
 <section class="wrap hello" id="intro" aria-label="Introduction">
  <div class="rv"><h1>Hello, I'm Victor.<br>I take projects from <i>the field</i> to <i>the screen</i>.</h1><p>Talk to the people who will use it, design the system, test it, and write down why.</p></div>
- <div class="rv portrait"><img class="shadow" src="/img/victor.webp" width="604" height="800" alt="Portrait of Victor" decoding="async"></div>
+ <div class="rv portrait"><img class="soft" src="/img/victor.webp" width="604" height="800" alt="Portrait of Victor" decoding="async"></div>
 </section>
 <section class="wrap sec" id="work" aria-labelledby="h-work"><div class="k rv">Work</div><h2 class="rv" id="h-work">Selected work</h2></section>
 <section class="wrap work" id="voar" aria-labelledby="h-voar">
