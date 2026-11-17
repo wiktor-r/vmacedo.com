@@ -1,0 +1,4 @@
+Contact: mailto:victormac@edu.unifor.br
+Expires: 2027-11-17T00:00:00Z
+Preferred-Languages: en, pt
+Canonical: https://vmacedo.com/.well-known/security.txt

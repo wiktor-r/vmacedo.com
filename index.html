@@ -1,12 +1,13 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Victor Aguiar-Macedo — design</title>
+<title>Victor Aguiar-Macedo — design portfolio</title>
 <meta name="description" content="Victor Aguiar-Macedo — design student at Unifor, Fortaleza. Research, visual identity, wayfinding and prototypes.">
-<meta property="og:title" content="Victor Aguiar-Macedo"><meta property="og:description" content="I take projects from the field to the screen."><meta property="og:image" content="https://vmacedo.com/img/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
-<link rel="icon" href="/logo.svg"><link rel="preload" href="/fonts/EBGaramond-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
+<meta property="og:title" content="Victor Aguiar-Macedo"><meta property="og:description" content="I take projects from the field to the screen."><meta property="og:image" content="https://vmacedo.com/img/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:url" content="https://vmacedo.com/"><meta property="og:type" content="website"><meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://vmacedo.com/"><link rel="icon" href="/logo.svg"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://vmacedo.com/#website","url":"https://vmacedo.com/","name":"Victor Aguiar-Macedo","inLanguage":"en","publisher":{"@id":"https://vmacedo.com/#victor"}},{"@type":"Person","@id":"https://vmacedo.com/#victor","name":"Victor Aguiar-Macedo","alternateName":"Carlos Victor Aguiar de Macedo","url":"https://vmacedo.com/","image":"https://vmacedo.com/img/victor.webp","jobTitle":"Design student","email":"mailto:victormac@edu.unifor.br","affiliation":{"@type":"CollegeOrUniversity","name":"Universidade de Fortaleza (Unifor)"},"address":{"@type":"PostalAddress","addressLocality":"Fortaleza","addressCountry":"BR"},"sameAs":["https://ordinary.vision"]}]}</script><link rel="preload" href="/fonts/EBGaramond-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>
 @font-face{font-family:'EB Garamond';font-style:normal;font-weight:400 800;font-display:swap;src:url(/fonts/EBGaramond-normal-latin.woff2) format('woff2')}
 @font-face{font-family:'EB Garamond';font-style:italic;font-weight:400 800;font-display:swap;src:url(/fonts/EBGaramond-italic-latin.woff2) format('woff2')}
-:root{--paper:#f4f1ea;--ink:#1a1916;--soft:#4b463e;--mut:#857e72;--wrap:1240px}
+:root{--paper:#f4f1ea;--ink:#1a1916;--soft:#4b463e;--mut:#736c60;--wrap:1240px}
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;scroll-padding-top:104px}
 body{background:var(--paper);color:var(--ink);font:400 19px/1.6 "EB Garamond",Georgia,serif;-webkit-font-smoothing:antialiased}
@@ -130,6 +131,7 @@ footer .mail{display:inline-block;margin-top:36px;font-style:italic;font-size:cl
 footer .links{display:flex;flex-wrap:wrap;gap:12px 34px;margin-top:64px;padding-top:22px;border-top:1px solid rgba(243,239,230,.18);color:rgba(243,239,230,.7);font-size:18px}
 footer .links a{text-decoration:none}
 footer .name{font-size:min(200px,calc((100vw - 96px) / 8.3));line-height:.8;letter-spacing:-.03em;white-space:nowrap;margin-top:70px;color:rgba(243,239,230,.08);transform:translateY(.12em)}
+footer .name::before{content:attr(data-name)}
 footer{margin-top:clamp(40px,7vh,88px)}
 
 
@@ -172,7 +174,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
   border-left:1px solid rgba(243,239,230,.10);border-right:1px solid rgba(243,239,230,.10);box-sizing:border-box}
 }
 .idx{z-index:30}
-html.at-end .idx a{color:rgba(243,239,230,.45)}html.at-end .idx a[aria-current]{color:#f3efe6}
+html.at-end .idx a{color:rgba(243,239,230,.55)}html.at-end .idx a[aria-current]{color:#f3efe6}
 html.at-end .idx a::after{background:currentColor}
 /* background depth: grain + lighter page/deeper margins + window light */
 
@@ -202,7 +204,7 @@ body::before{background:url(/img/grain-light.webp) 0 0/128px,
 <section class="wrap sec" id="work" aria-labelledby="h-work"><h2 class="rv" id="h-work">Selected&nbsp;work</h2></section>
 <section class="wrap work" id="voar" aria-labelledby="h-voar">
  <div class="rv"><div class="k">UX research</div><h2 id="h-voar">Why does an NGO lose the donors who aren't companies?</h2><p>For Associação Voar, an NGO in Fortaleza: field visit, interviews, usability testing — published as a&nbsp;paper.</p><a class="go" href="/work/voar.html" aria-label="Read the article about Voar">Read the article</a></div>
- <div class="media paper rv"><img class="shadow" src="/img/ecoe-01.webp" width="760" height="1073" alt="First page of the published Voar paper" loading="lazy" decoding="async"><img class="shadow" src="/img/ecoe-02.webp" width="760" height="1073" alt="Second page of the published Voar paper" loading="lazy" decoding="async"></div>
+ <div class="media paper rv"><img class="shadow" src="/img/ecoe-01-560w.webp" srcset="/img/ecoe-01-560w.webp 560w, /img/ecoe-01.webp 760w" sizes="(max-width:820px) 46vw, 270px" width="760" height="1073" alt="First page of the published Voar paper" loading="lazy" decoding="async"><img class="shadow" src="/img/ecoe-02-560w.webp" srcset="/img/ecoe-02-560w.webp 560w, /img/ecoe-02.webp 760w" sizes="(max-width:820px) 46vw, 270px" width="760" height="1073" alt="Second page of the published Voar paper" loading="lazy" decoding="async"></div>
 </section>
 <section class="wrap work flip" id="kennedy" aria-labelledby="h-rk">
  <div class="rv"><div class="k">Visual identity</div><h2 id="h-rk">How do you draw a photographer whose job is framing?</h2><p>For Roberto Kennedy, a photographer: a monogram where two columns frame a single point of&nbsp;light.</p><a class="go" href="/work/roberto-kennedy.html" aria-label="Read the article about the Roberto Kennedy identity">Read the article</a></div>
@@ -210,12 +212,12 @@ body::before{background:url(/img/grain-light.webp) 0 0/128px,
 </section>
 <section class="wrap work" id="iracema" aria-labelledby="h-ira">
  <div class="rv"><div class="k">Wayfinding</div><h2 id="h-ira">What does a beach need to tell the people walking on it?</h2><p>For Praia de Iracema, Fortaleza's waterfront: a shared 3D survey and a sign family drawn from the&nbsp;shore.</p><a class="go" href="/work/iracema.html" aria-label="Read the article about Praia de Iracema wayfinding">Read the article</a></div>
- <div class="media desk ira rv"><img class="s1" src="/img/ir_pr-01.webp" width="1600" height="1132" alt="A3 board: location map of the proposed signs along the Praia de Iracema waterfront" loading="lazy" decoding="async"><img class="s2" src="/img/ir_pr-02.webp" width="1600" height="1132" alt="A3 technical board for the directional totem: front view with dimensions, palette and type" loading="lazy" decoding="async"></div>
+ <div class="media desk ira rv"><img class="s1" src="/img/ir_pr-01-800w.webp" srcset="/img/ir_pr-01-800w.webp 800w, /img/ir_pr-01.webp 1600w" sizes="(max-width:820px) 75vw, 400px" width="1600" height="1132" alt="A3 board: location map of the proposed signs along the Praia de Iracema waterfront" loading="lazy" decoding="async"><img class="s2" src="/img/ir_pr-02-800w.webp" srcset="/img/ir_pr-02-800w.webp 800w, /img/ir_pr-02.webp 1600w" sizes="(max-width:820px) 75vw, 400px" width="1600" height="1132" alt="A3 technical board for the directional totem: front view with dimensions, palette and type" loading="lazy" decoding="async"></div>
 </section>
 </main>
 <ul class="idx" aria-label="Sections"><li><a href="#intro">Intro</a></li><li><a href="#work">Work</a></li><li><a href="#voar">Research</a></li><li><a href="#kennedy">Identity</a></li><li><a href="#iracema">Wayfinding</a></li></ul>
 <footer id="contact"><p class="line">Let's make something people can&nbsp;actually&nbsp;use.</p><a class="mail" href="mailto:victormac@edu.unifor.br">victormac@edu.unifor.br</a>
-<nav class="links"><a href="/cv.html">CV</a><a href="/files/curriculo-carlos-victor-aguiar-de-macedo.pdf">Currículo (PDF)</a><a href="/files/portfolio-carlos-victor-aguiar-de-macedo.pdf">Portfolio (PDF)</a><a href="https://ordinary.vision">ordinary.vision</a><a href="/microblog.html">microblog</a></nav><div class="name">Victor Aguiar-Macedo</div></footer>
+<nav class="links"><a href="/cv.html">CV</a><a href="/files/curriculo-carlos-victor-aguiar-de-macedo.pdf">Currículo (PDF)</a><a href="/files/portfolio-carlos-victor-aguiar-de-macedo.pdf">Portfolio (PDF)</a><a href="https://ordinary.vision">ordinary.vision</a><a href="/microblog.html">microblog</a></nav><div class="name" aria-hidden="true" data-name="Victor Aguiar-Macedo"></div></footer>
 <script>
 document.documentElement.classList.add('js');
 
