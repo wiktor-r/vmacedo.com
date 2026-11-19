@@ -375,6 +375,25 @@ footer .credit{margin-top:18px;font-size:13px;color:var(--mut)}footer .credit a{
  .about-photo .pb5{left:30%;top:0;width:40%;rotate:4deg;z-index:0}
  .about-text p{text-wrap:pretty}.about-text h2{text-wrap:balance}
 }
+
+/* phones: the portrait is pinned like the board's prints, with a caption, a post-it behind it, and a string down to About */
+.m-pin,.m-cap,.m-note,.m-string{display:none}
+@media (max-width:820px){
+ .about{position:relative}
+ .about-photo .taped-print::after{display:none}
+ .about-photo .print-photo:not(.pile-b){padding:8px 8px 0}
+ .m-pin{display:block;position:absolute;top:-5px;left:50%;width:14px;height:14px;margin-left:-7px;border-radius:50%;z-index:8;
+  background:radial-gradient(circle at 35% 35%,#e98a80,#b52a20 55%,#7d1a14);box-shadow:1px 2px 2px rgba(40,20,10,.3)}
+ .m-cap{display:block;font:500 21px/1 'Caveat',cursive;color:#2b2723;text-align:center;padding:9px 0 11px}
+ .m-note{display:flex;align-items:flex-end;position:absolute;left:3%;bottom:-3%;width:27%;aspect-ratio:1;padding:9px;z-index:5;rotate:-8deg;
+  background:linear-gradient(#efe1a2,#ead993);box-shadow:0 1px 1px rgba(40,30,15,.10),0 6px 12px -6px rgba(40,30,15,.2)}
+ .m-note p{margin:0;font:500 17px/1.05 'Caveat',cursive;color:#2b2723}
+ .m-note u{text-decoration-color:#a8231c;text-decoration-thickness:1.5px;text-underline-offset:3px}
+ .about-photo{z-index:2}
+ .m-string{display:block;position:absolute;left:0;top:0;width:100%;height:100%;z-index:1;pointer-events:none;overflow:visible}
+ .m-string .str{fill:none;stroke:#a8231c;stroke-width:1.3;stroke-linecap:round;opacity:.9;filter:drop-shadow(0 2px 1.2px rgba(40,20,10,.28))}
+ .m-string .hd{fill:#b52a20}.m-string .sh{fill:rgba(40,20,10,.28)}.m-string .hl{fill:rgba(255,255,255,.65)}
+}
 </style></head><body>
 <a class="skip" href="#work">Skip to the work</a>
 <header class="top"><a href="/">Victor Aguiar-Macedo</a><nav aria-label="Main"><a class="wide" href="#work">Work</a><a href="#contact">Contact</a></nav></header>
@@ -422,8 +441,9 @@ footer .credit{margin-top:18px;font-size:13px;color:var(--mut)}footer .credit a{
 <div class="hello-in"><div class="rv"><h1>Victor Aguiar-Macedo</h1><p class="hero-cap">Design student in Fortaleza, working in <i>interaction design</i> and <i>design research</i>.</p></div></div>
 </section>
 <section class="wrap about" id="about" aria-labelledby="h-about">
+<svg class="m-string" aria-hidden="true"><path class="str"/><g class="pin"><circle class="sh" r="4.6" cx="1.6" cy="2.4"/><circle class="hd" r="4.6"/><circle class="hl" r="1.5" cx="-1.4" cy="-1.5"/></g></svg>
   <h1 class="m-intro">Hello! I'm Victor and I take projects from <i>the&nbsp;field</i> to <i>the&nbsp;screen</i>.</h1>
- <div class="about-photo rv"><figure class="print-photo pile-b pb1" aria-hidden="true"><img src="/img/board/stickies.webp" alt="" loading="lazy" decoding="async"></figure><figure class="print-photo pile-b pb2" aria-hidden="true"><img src="/img/board/door.webp" alt="" loading="lazy" decoding="async"></figure><figure class="print-photo pile-b pb3" aria-hidden="true"><img src="/img/board/sign.webp" alt="" loading="lazy" decoding="async"></figure><figure class="print-photo pile-b pb4" aria-hidden="true"><img src="/img/board/phone.webp" alt="" loading="lazy" decoding="async"></figure><figure class="print-photo pile-b pb5" aria-hidden="true"><img src="/img/board/coffee.webp" alt="" loading="lazy" decoding="async"></figure><figure class="print-photo taped-print"><img src="/img/victor.webp" width="604" height="800" alt="Portrait of Victor" loading="lazy" decoding="async"></figure></div>
+ <div class="about-photo rv"><figure class="print-photo pile-b pb1" aria-hidden="true"><img src="/img/board/stickies.webp" alt="" loading="lazy" decoding="async"></figure><figure class="print-photo pile-b pb2" aria-hidden="true"><img src="/img/board/door.webp" alt="" loading="lazy" decoding="async"></figure><figure class="print-photo pile-b pb3" aria-hidden="true"><img src="/img/board/sign.webp" alt="" loading="lazy" decoding="async"></figure><figure class="print-photo pile-b pb4" aria-hidden="true"><img src="/img/board/phone.webp" alt="" loading="lazy" decoding="async"></figure><figure class="print-photo pile-b pb5" aria-hidden="true"><img src="/img/board/coffee.webp" alt="" loading="lazy" decoding="async"></figure><div class="m-note" aria-hidden="true"><p>Who is<br>this <u>for</u>?</p></div><figure class="print-photo taped-print"><span class="m-pin" aria-hidden="true"></span><img src="/img/victor.webp" width="604" height="800" alt="Portrait of Victor" loading="lazy" decoding="async"><figcaption class="m-cap" aria-hidden="true">that's me</figcaption></figure></div>
  <div class="about-text rv"><div class="k">About</div>
   <h2 id="h-about">A design student who still likes to build the thing.</h2>
   <p>I'm a design student at the University of Fortaleza (Unifor), in Brazil. I came to design after a year of computer science, and I still build what I design: working prototypes in HTML, CSS and JavaScript.</p>
@@ -492,6 +512,19 @@ document.querySelectorAll('.rv').forEach(el=>io.observe(el));
      const r=(Math.random()*10-5).toFixed(1); el.style.setProperty('--r',r+'deg'); el.dataset.r=r; draw()};
    el.addEventListener('pointermove',move); el.addEventListener('pointerup',up,{once:true}); el.addEventListener('pointercancel',up,{once:true});});
  });
+})();
+
+// phones: red string from the portrait's pin, behind the print, down to the About label
+(()=>{const sec=document.getElementById('about'), svg=sec&&sec.querySelector('.m-string'); if(!svg) return;
+ const mq=matchMedia('(max-width:820px)');
+ const draw=()=>{ if(!mq.matches) return; const S=sec.getBoundingClientRect(), p=sec.querySelector('.m-pin').getBoundingClientRect(),
+   f=sec.querySelector('.taped-print').getBoundingClientRect(), kr=document.createRange(); kr.selectNodeContents(sec.querySelector('.about-text .k')); const k=kr.getBoundingClientRect();
+   const x1=p.left+p.width/2-S.left, y1=p.top+p.height/2-S.top, x2=k.right+16-S.left, y2=k.top+k.height/2-S.top, fr=f.right-S.left;
+   svg.setAttribute('viewBox',`0 0 ${S.width} ${S.height}`);
+   svg.querySelector('.str').setAttribute('d',`M${x1} ${y1} C${fr+40} ${y1+30} ${fr+46} ${y2-90} ${x2} ${y2}`);
+   svg.querySelector('.pin').setAttribute('transform',`translate(${x2} ${y2})`)};
+ addEventListener('resize',draw); new ResizeObserver(draw).observe(sec); sec.querySelectorAll('img').forEach(i=>i.addEventListener('load',draw));
+ document.fonts&&document.fonts.ready.then(draw); sec.addEventListener('transitionend',draw); draw();
 })();
 </script>
 </body></html>
