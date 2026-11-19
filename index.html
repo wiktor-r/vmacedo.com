@@ -199,19 +199,121 @@ footer .name{color:rgba(26,25,22,.06)}
 html.at-end{background-color:var(--paper)}
 
 .dusk{position:fixed;inset:0;z-index:40;pointer-events:none;background:#e3dccf;mix-blend-mode:multiply;opacity:0}
-body{timeline-scope:--foot}
+body{timeline-scope:--foot,--hello}
+.hello{view-timeline:--hello block;view-timeline-inset:0}
 footer{view-timeline:--foot block}
 @supports (animation-timeline: view()){.dusk{animation:dusk linear both;animation-timeline:--foot;animation-range:entry 0% entry 100%}}
 @keyframes dusk{to{opacity:.85}}
+@supports (animation-timeline: view()){.dusk.d1{animation:dusk1 linear both;animation-timeline:--hello;animation-range:exit 0% exit 100%}}
+@keyframes dusk1{from{opacity:0}to{opacity:.5}}
 footer .name{color:rgba(26,25,22,.07)}
+
+/* ---- desktop at ~150%: the whole page is zoomed; sizes below are in zoomed px, widths in %, so nothing relies on vw/vh ---- */
+@media (min-width:1101px){
+ html{zoom:var(--z)}
+ :root{--z:1.3;--fout:56px;--fpad:40px;--cmax:1100px}
+ .wrap{max-width:none;width:min(calc(100% - 2*(var(--fout) + var(--fpad))),var(--cmax));margin-inline:auto;padding-inline:0}
+ body::after{width:min(calc(100% - 2*var(--fout)),calc(var(--cmax) + 2*var(--fpad)))}
+ header.top{padding:22px 32px 34px}
+ .hello{min-height:calc(78svh / var(--z));grid-template-columns:1fr 250px;gap:40px;padding-top:96px;padding-bottom:24px}
+ .hello>div:first-child{padding-right:24px}
+ .hello h1{font-size:42px}
+ .stack .print-photo.b2{right:-12%}
+ .hello p{font-size:21px}
+ .sec{padding-top:28px;margin-top:8px;padding-bottom:16px}
+ .sec h2{font-size:34px}
+ .work{gap:48px;padding-block:36px}
+ .work h2{font-size:30px}
+ .work p{font-size:19px}
+ a.go{font-size:18px}
+ .k{font-size:12.5px}
+ footer{container-type:inline-size;margin-top:24px;padding:110px max(calc(var(--fout) + var(--fpad)),calc((100% - var(--cmax)) / 2)) 0}
+ footer .line{font-size:44px}
+ footer .mail{font-size:24px;margin-top:28px}
+ footer .links{font-size:16px;margin-top:48px}
+ footer .name{font-size:calc(100cqi / 8.3);margin-top:56px}
+}
+@media (min-width:1340px){:root{--z:1.5}}
+@media (min-width:1600px){:root{--z:1.6}}
+@media (min-width:1920px){:root{--z:1.75}}
+@media (min-width:2400px){:root{--z:2}}
+
+/* ---- intro: a full-screen detective board ---- */
+footer .credit{margin-top:18px;font-size:13px;color:var(--mut)}footer .credit a{color:inherit}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:400 700;font-display:swap;src:url(/fonts/Caveat-latin.woff2) format('woff2')}
+.hello{display:block!important;position:relative;min-height:100svh!important;padding:0!important;margin:0}
+.hello-in{position:absolute;left:39%;top:50%;translate:-50% -50%;width:min(15.5em,40%);z-index:950;pointer-events:none}
+.hello-in h1{font-weight:400;font-size:clamp(30px,3.3vw,58px);line-height:1.04;letter-spacing:-.02em}
+.board,.hello>.board{position:absolute!important;inset:0;padding:0!important;z-index:auto!important;container-type:size;--str:#a8231c}
+.strings,.pins{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:visible}.pins{z-index:900}
+.str{fill:none;stroke:var(--str);stroke-width:1.3;stroke-linecap:round;opacity:.9;filter:drop-shadow(0 2px 1.2px rgba(40,20,10,.28))}
+.pin .hd{fill:#b52a20}.pin .sh{fill:rgba(40,20,10,.28)}.pin .hl{fill:rgba(255,255,255,.65)}
+.ev{--W:var(--w);position:absolute;left:calc(var(--x) * 1%);top:calc(var(--y) * 1%);width:calc(var(--W) * 1cqw);translate:-50% -50%;rotate:var(--r);
+ box-shadow:0 1px 1px rgba(40,30,15,.10),0 5px 10px -4px rgba(40,30,15,.16),0 22px 34px -20px rgba(40,30,15,.34);
+ transition:rotate .35s cubic-bezier(.2,.7,.2,1),scale .25s ease,box-shadow .25s ease;user-select:none;-webkit-user-select:none}
+.ev img,.ev svg{display:block;width:100%;height:auto;pointer-events:none}
+.polaroid{background:#fbfaf6;padding:calc(var(--W) * .05cqw) calc(var(--W) * .05cqw) 0}
+.polaroid img{aspect-ratio:1/1;object-fit:cover;filter:contrast(.95) saturate(.82) sepia(.08)}
+.polaroid.wide img{aspect-ratio:4/3}.polaroid.tall img{aspect-ratio:4/5}
+#ev-me img{object-position:50% 30%}
+.cap,.lbl,.note p,.index p,.scrawl{font-family:'Caveat',cursive;line-height:1.05;color:#2b2723;margin:0;font-style:normal;max-width:none}
+.cap{display:block;padding:calc(var(--W) * .05cqw) 2px calc(var(--W) * .07cqw);font-size:max(11px,1.25cqw);text-align:center}
+.note{aspect-ratio:1;padding:calc(var(--W) * .11cqw);display:flex;align-items:center}
+.note p{font-size:max(12px,1.55cqw);font-weight:500}
+.note u{text-decoration-color:var(--str);text-decoration-thickness:1.5px;text-underline-offset:3px}
+.note.yellow{background:linear-gradient(#efe1a2,#ead993)}.note.rose{background:linear-gradient(#f0c6b8,#e9b9aa)}
+.index{background:#fbfaf6 repeating-linear-gradient(transparent 0 calc(1.15cqw - 1px),rgba(70,110,170,.22) calc(1.15cqw - 1px) 1.15cqw);background-position:0 .8cqw;border-top:3px solid rgba(181,42,32,.55);padding:calc(var(--W) * .06cqw) calc(var(--W) * .08cqw) calc(var(--W) * .08cqw)}
+.index .hd{font-size:max(12px,1.5cqw);font-weight:700}.index p{font-size:max(11px,1.3cqw)}
+.graph{background:#fbfaf6;background-image:linear-gradient(rgba(70,110,170,.16) 1px,transparent 1px),linear-gradient(90deg,rgba(70,110,170,.16) 1px,transparent 1px);background-size:calc(var(--W) * .08cqw) calc(var(--W) * .08cqw);padding:calc(var(--W) * .06cqw) calc(var(--W) * .06cqw) 2px}
+.lbl{display:block;font-size:max(11px,1.2cqw);padding:4px 0 2px;text-align:center}
+.taped{background:#fff;padding:calc(var(--W) * .04cqw)}.taped img{aspect-ratio:1;object-fit:cover}
+.taped::before,.taped::after{content:"";position:absolute;width:38%;height:12%;background:rgba(236,226,196,.75);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.taped::before{top:-5%;left:-8%;rotate:-32deg}.taped::after{bottom:-5%;right:-8%;rotate:-32deg}
+.scrawl{position:absolute;left:calc(var(--x) * 1%);top:calc(var(--y) * 1%);translate:-50% -50%;rotate:var(--r);font-size:max(12px,1.45cqw);color:#5a4f45;opacity:.85;pointer-events:none;white-space:nowrap;text-align:center}
+.scrawl::after{content:"";position:absolute;inset:-20% -14%;border:1.3px solid rgba(181,42,32,.55);border-radius:50%;rotate:-4deg}
+@media (hover:hover) and (pointer:fine){.ev{cursor:grab}.ev:hover{scale:1.03;box-shadow:0 1px 1px rgba(40,30,15,.10),0 10px 18px -6px rgba(40,30,15,.2),0 34px 50px -24px rgba(40,30,15,.4)}
+ .ev.held{cursor:grabbing;scale:1.07;rotate:0deg;transition:scale .2s ease,box-shadow .2s ease;box-shadow:0 2px 2px rgba(40,30,15,.10),0 18px 28px -8px rgba(40,30,15,.28),0 50px 70px -30px rgba(40,30,15,.45)}}
+.board.pinning .ev{animation:land .55s cubic-bezier(.2,.7,.2,1) both}
+.board.pinning .str{stroke-dasharray:1600;animation:pull 1.1s ease-out 1s both}
+.board.pinning .pin{animation:pinin .3s ease-out both}
+@keyframes land{from{opacity:0;translate:-50% -62%;scale:1.08}}
+@keyframes pull{from{stroke-dashoffset:1600}to{stroke-dashoffset:0}}
+@keyframes pinin{from{opacity:0}}
+.board.pinning #ev-me{animation-delay:0.00s}.board.pinning #ev-stickies{animation-delay:0.08s}.board.pinning #ev-door{animation-delay:0.16s}.board.pinning #ev-heur{animation-delay:0.24s}.board.pinning #ev-q1{animation-delay:0.32s}.board.pinning #ev-q2{animation-delay:0.40s}.board.pinning #ev-sign{animation-delay:0.48s}.board.pinning #ev-wire{animation-delay:0.56s}.board.pinning #ev-phone{animation-delay:0.64s}.board.pinning #ev-lens{animation-delay:0.72s}
+@media (min-width:1101px){ .hello{min-height:calc(100svh / var(--z))!important} .hello-in h1{font-size:46px} }
+@media (max-width:820px){
+ .hello-in{left:50%;top:24%;width:calc(100% - 44px)}
+ .hello-in h1{font-size:clamp(30px,8.4vw,40px)}
+ .ev{--W:var(--mw);left:calc(var(--mx) * 1%);top:calc(var(--my) * 1%);rotate:var(--mr)}
+ .ev.nm,.scrawl.nm{display:none}
+ .cap{font-size:max(11px,3.4cqw)}.note p{font-size:max(13px,4.6cqw)}
+}
 </style></head><body>
 <a class="skip" href="#work">Skip to the work</a>
 <header class="top"><a href="/">Victor Aguiar-Macedo</a><nav aria-label="Main"><a class="wide" href="#work">Work</a><a href="#contact">Contact</a></nav></header>
-<div class="dusk" aria-hidden="true"></div>
+<div class="dusk d1" aria-hidden="true"></div><div class="dusk" aria-hidden="true"></div>
 <main>
-<section class="wrap hello" id="intro" aria-label="Introduction">
- <div class="rv"><h1>Hello, I'm Victor.<br>I take projects from <i>the&nbsp;field</i> to <i>the&nbsp;screen</i>.</h1></div>
- <div class="rv portrait"><div class="stack"><div class="print-photo back b1"><img src="/img/stack-geo1.webp" width="900" height="600" alt="Concentric circles, a section mark from Victor's edition of Flatland" loading="lazy" decoding="async"></div><div class="print-photo back b2"><img src="/img/stack-geo2.webp" width="720" height="900" alt="A circle flattening into a line, a section mark from Victor's edition of Flatland" loading="lazy" decoding="async"></div><div class="print-photo"><img src="/img/victor.webp" width="604" height="800" alt="Portrait of Victor" decoding="async"></div><div class="print-photo back b3"><img src="/img/stack-geo3.webp" width="700" height="700" alt="A polygon ring, a section mark from Victor's edition of Flatland" loading="lazy" decoding="async"></div></div></div>
+<section class="hello" id="intro" aria-label="Introduction">
+<div class="board" role="img" aria-label="A detective board: Victor's portrait pinned among photos and notes about interaction design, tied together with red string">
+<svg class="strings" aria-hidden="true"></svg>
+<div class="ev polaroid tall" id="ev-me" style="--x:66;--y:47;--w:15;--r:3deg;--mx:70;--my:60;--mw:40;--mr:3deg" data-pin><img src="/img/victor.webp" alt="" decoding="async" width="604" height="800"><span class="cap">V. Aguiar-Macedo · last seen in the field</span></div>
+<div class="ev polaroid wide" id="ev-stickies" style="--x:13;--y:30;--w:15;--r:-6deg;--mx:27;--my:55;--mw:40;--mr:-5deg" data-pin><img src="/img/board/stickies.webp" alt="" loading="lazy" decoding="async"><span class="cap">affinity wall, day 2</span></div>
+<div class="ev note yellow" id="ev-q1" style="--x:26;--y:19;--w:9;--r:5deg;--mx:24;--my:80;--mw:30;--mr:4deg" data-pin><p>Who is this <u>for</u>?</p></div>
+<div class="ev index nm" id="ev-heur" style="--x:45;--y:19;--w:13;--r:-2deg" data-pin><p class="hd">Heuristic no. 1</p><p>visibility of system status: keep people informed</p></div>
+<div class="ev polaroid tall" id="ev-door" style="--x:86;--y:26;--w:11;--r:5deg;--mx:75;--my:85;--mw:30;--mr:-4deg" data-pin><img src="/img/board/door.webp" alt="" loading="lazy" decoding="async"><span class="cap">push? pull?</span></div>
+<div class="ev note rose nm" id="ev-q2" style="--x:89;--y:56;--w:9;--r:-4deg" data-pin><p>Where did they <u>hesitate</u>?</p></div>
+<div class="ev polaroid wide nm" id="ev-sign" style="--x:80;--y:82;--w:14;--r:4deg" data-pin><img src="/img/board/sign.webp" alt="" loading="lazy" decoding="async"><span class="cap">where am I going?</span></div>
+<div class="ev graph nm" id="ev-wire" style="--x:55;--y:83;--w:11;--r:-3deg" data-pin><svg viewBox="0 0 120 150" aria-hidden="true"><g fill="none" stroke="#3a352f" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+<path d="M31 9 C55 8 78 9 90 10 C91 50 90 100 89 141 C70 142 50 141 31 140 C30 100 31 50 31 9Z"/><path d="M38 20 L83 20"/><path d="M38 29 C50 28 70 29 83 29 L82 60 C67 61 52 60 38 60Z"/><path d="M39 30 L82 59 M82 30 L39 59"/>
+<path d="M38 70 L76 70 M38 77 L70 77 M38 84 L79 84"/><path d="M40 100 C55 99 68 100 80 100 L80 113 C66 114 53 113 40 113Z"/><path d="M50 106.5 L70 106.5"/>
+<path d="M95 104 C104 100 108 92 104 84" stroke="#b52a20"/><path d="M101 86 L104 83 L107 87" stroke="#b52a20"/></g>
+<text x="100" y="78" font-family="Caveat" font-size="11" fill="#b52a20" text-anchor="middle">tap?</text></svg><span class="lbl">checkout v3</span></div>
+<div class="ev polaroid tall nm" id="ev-phone" style="--x:31;--y:83;--w:9;--r:-5deg" data-pin><img src="/img/board/phone.webp" alt="" loading="lazy" decoding="async"><span class="cap">test it out there</span></div>
+<div class="ev taped nm" id="ev-lens" style="--x:9;--y:72;--w:13;--r:9deg"><img src="/img/board/lens.webp" alt="" loading="lazy" decoding="async"></div>
+<div class="scrawl nm" aria-hidden="true" style="--x:19;--y:57;--r:-7deg">talk to people<br>before pixels</div>
+<div class="scrawl nm" aria-hidden="true" style="--x:20;--y:92;--r:5deg">5 users find<br>most problems</div>
+</div>
+<div class="hello-in"><div class="rv"><h1>Hello, I'm Victor.<br>I take projects from <i>the&nbsp;field</i> to <i>the&nbsp;screen</i>.</h1></div></div>
 </section>
 <section class="wrap sec" id="work" aria-labelledby="h-work"><h2 class="rv" id="h-work">Selected&nbsp;work</h2></section>
 <section class="wrap work" id="voar" aria-labelledby="h-voar">
@@ -228,7 +330,7 @@ footer .name{color:rgba(26,25,22,.07)}
 </section>
 </main>
 <footer id="contact"><p class="line">Let's make something people can&nbsp;actually&nbsp;use.</p><a class="mail" href="mailto:victormac@edu.unifor.br">victormac@edu.unifor.br</a>
-<nav class="links"><a href="/cv.html">CV</a><a href="/files/curriculo-carlos-victor-aguiar-de-macedo.pdf">Currículo (PDF)</a><a href="/files/portfolio-carlos-victor-aguiar-de-macedo.pdf">Portfolio (PDF)</a><a href="https://ordinary.vision">ordinary.vision</a><a href="/microblog.html">microblog</a></nav><div class="name" aria-hidden="true" data-name="Victor Aguiar-Macedo"></div></footer>
+<nav class="links"><a href="/cv.html">CV</a><a href="/files/curriculo-carlos-victor-aguiar-de-macedo.pdf">Currículo (PDF)</a><a href="/files/portfolio-carlos-victor-aguiar-de-macedo.pdf">Portfolio (PDF)</a><a href="https://ordinary.vision">ordinary.vision</a><a href="/microblog.html">microblog</a></nav><p class="credit">Board photos from <a href="https://unsplash.com">Unsplash</a>; push/pull door by Robert S. Donovan, <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a>.</p><div class="name" aria-hidden="true" data-name="Victor Aguiar-Macedo"></div></footer>
 <script>
 document.documentElement.classList.add('js');
 
@@ -238,5 +340,38 @@ addEventListener('scroll',endFlag,{passive:true}); addEventListener('resize',end
 
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{rootMargin:'0px 0px -8% 0px'});
 document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+
+// detective board: red string between pins, items can be picked up and re-pinned (mouse/trackpad)
+(()=>{const board=document.querySelector('.board'); if(!board) return;
+ const svg=board.querySelector('.strings'), NS='http://www.w3.org/2000/svg';
+ const links=[['me','door'],['me','q2'],['me','sign'],['me','wire'],['wire','phone'],['stickies','q1'],['q1','heur'],['heur','me'],['heur','door']];
+ const ev=id=>board.querySelector('#ev-'+id);
+ const pinOf=el=>{const cs=getComputedStyle(el), x=el.offsetLeft, y=el.offsetTop;
+   const r=(parseFloat(cs.rotate)||0)*Math.PI/180, dy=-el.offsetHeight/2+9;
+   return [x - dy*Math.sin(r), y + dy*Math.cos(r)]};
+ const paths=links.map(()=>{const p=document.createElementNS(NS,'path');p.setAttribute('class','str');svg.appendChild(p);return p});
+ const psvg=document.createElementNS(NS,'svg');psvg.setAttribute('class','pins');psvg.setAttribute('aria-hidden','true');board.appendChild(psvg);
+ const pins=[...board.querySelectorAll('[data-pin]')].map(el=>{const g=document.createElementNS(NS,'g');g.setAttribute('class','pin');
+   g.innerHTML='<circle class="sh" r="4.6" cx="1.6" cy="2.4"/><circle class="hd" r="4.6"/><circle class="hl" r="1.5" cx="-1.4" cy="-1.5"/>';psvg.appendChild(g);return [el,g]});
+ const draw=()=>{const W=board.offsetWidth,H=board.offsetHeight;svg.setAttribute('viewBox',`0 0 ${W} ${H}`);psvg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+   links.forEach(([a,b],i)=>{const A=ev(a),B=ev(b); paths[i].style.display=(A.offsetParent&&B.offsetParent)?'':'none'; if(paths[i].style.display) return; const [x1,y1]=pinOf(ev(a)),[x2,y2]=pinOf(ev(b)),d=Math.hypot(x2-x1,y2-y1);
+     paths[i].setAttribute('d',`M${x1.toFixed(1)} ${y1.toFixed(1)} Q${((x1+x2)/2).toFixed(1)} ${((y1+y2)/2+d*.09).toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}`)});
+   pins.forEach(([el,g])=>{g.style.display=el.offsetParent?'':'none'; const [x,y]=pinOf(el);g.setAttribute('transform',`translate(${x.toFixed(1)} ${y.toFixed(1)})`)})};
+ addEventListener('resize',draw); new ResizeObserver(draw).observe(board); board.querySelectorAll('img').forEach(i=>i.addEventListener('load',draw)); draw();
+ if(matchMedia('(prefers-reduced-motion:no-preference)').matches){board.classList.add('pinning');setTimeout(()=>board.classList.remove('pinning'),2600)}
+ if(!matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+ let top=10;
+ board.querySelectorAll('.ev').forEach(el=>{
+  el.addEventListener('pointerdown',e=>{if(e.button!==0)return; e.preventDefault(); el.setPointerCapture(e.pointerId);
+   const k=board.getBoundingClientRect().width/board.offsetWidth, W=board.offsetWidth, H=board.offsetHeight, cs=getComputedStyle(el);
+   let x=parseFloat(cs.getPropertyValue('--x')), y=parseFloat(cs.getPropertyValue('--y')); const sx=e.clientX, sy=e.clientY, x0=x, y0=y;
+   el.style.zIndex=++top; el.classList.add('held');
+   const move=m=>{x=Math.min(98,Math.max(2,x0+(m.clientX-sx)/k/W*100)); y=Math.min(98,Math.max(2,y0+(m.clientY-sy)/k/H*100));
+     el.style.setProperty('--x',x.toFixed(2)); el.style.setProperty('--y',y.toFixed(2)); draw()};
+   const up=()=>{el.removeEventListener('pointermove',move); el.classList.remove('held');
+     const r=(Math.random()*10-5).toFixed(1); el.style.setProperty('--r',r+'deg'); el.dataset.r=r; draw()};
+   el.addEventListener('pointermove',move); el.addEventListener('pointerup',up,{once:true}); el.addEventListener('pointercancel',up,{once:true});});
+ });
+})();
 </script>
 </body></html>
