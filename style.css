@@ -192,3 +192,11 @@ body .fx p,body .fx li,body .fx dd,body .fx .v,body .fx .c{max-width:38em}
  .meta{grid-template-columns:1fr 1fr;gap:16px 24px}
  .hero-kv,.hero-kv:has(.fx){max-width:760px!important;margin-left:auto!important;margin-right:auto!important;margin-top:36px!important}
 }
+
+/* stronger headings; embedded figures no wider than ~720px (Victor, 19/11 evening) */
+h1,h2,.art-head h1,.prose h2{font-weight:600}
+.prose h2{letter-spacing:-.005em}
+.art-fig,.art-fig:has(.fx),.fx-fig,.hero-kv,.hero-kv:has(.fx){max-width:720px!important;margin-left:auto!important;margin-right:auto!important}
+.art-fig.narrow{max-width:520px!important}
+
+.art-head .byline,.art-head p+p{text-indent:0}

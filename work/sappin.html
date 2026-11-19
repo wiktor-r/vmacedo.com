@@ -1,104 +1,140 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><link rel="icon" href="/favicon.ico?v=cream" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=cream"><link rel="apple-touch-icon" href="/apple-touch-icon.png?v=cream"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sappin — Victor Aguiar-Macedo</title><meta name="description" content="Sappin, an app for local illustrators in Ceará: how four interviews turned an app for selling illustration into one for learning the profession.">
-<meta property="og:title" content="Sappin — Victor Aguiar-Macedo"><meta property="og:description" content="Sappin, an app for local illustrators in Ceará: how four interviews turned an app for selling illustration into one for learning the profession."><meta property="og:image" content="https://vmacedo.com/img/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
-<link rel="stylesheet" href="/style.css?v=53f914dd">
+<title>Sappin — Victor Aguiar-Macedo</title><meta name="description" content="Sappin, a group project for the User Experience course at Unifor: research and information architecture for an app for local illustrators in Ceará.">
+<meta property="og:title" content="Sappin — Victor Aguiar-Macedo"><meta property="og:description" content="Sappin, a group project for the User Experience course at Unifor: research and information architecture for an app for local illustrators in Ceará."><meta property="og:image" content="https://vmacedo.com/img/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<link rel="stylesheet" href="/style.css?v=040f0053">
 <link rel="canonical" href="https://vmacedo.com/work/sappin.html"><meta name="twitter:card" content="summary_large_image">
 <style>
-/* Sappin figures — inline HTML, uses vmacedo.com tokens (--bg --ink --soft --mut --rule --mat) */
+/* Sappin figures — inline HTML, uses vmacedo.com tokens (--bg --ink --soft --mut --rule --mat).
+   Shared style.css caps figures at 720px, so layouts respond to the figure's own width (container queries). */
 .fx{margin:40px 0;padding:44px 48px;background:var(--mat,#eeeae0)}
-.fx .fx-in{background:var(--bg,#fdfcf8);padding:36px 40px}
+.fx .fx-in{background:var(--bg,#fdfcf8);padding:36px 40px;container:fx/inline-size}
 .fx .sc{font-variant:small-caps;text-transform:lowercase;letter-spacing:.07em;color:var(--mut);font-size:17px}
 .fx h3.t{font-weight:400;font-style:italic;font-size:28px;line-height:1.15;margin:4px 0 24px}
 .fx .note{margin-top:18px;font-size:15.5px;font-style:italic;color:var(--mut)}
 .fx .soft{color:var(--soft)}
-.fx-01 .planes{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--ink)}
-.fx-01 .p{padding:16px 18px 6px 0;border-right:1px solid var(--rule);margin-right:18px}
-.fx-01 .p:last-child{border-right:none}
-.fx-01 .n{font-style:italic;color:var(--mut);font-size:18px}
-.fx-01 .t{font-size:28px;margin:2px 0 10px}
-.fx-01 .d{font-size:17px;color:var(--soft);line-height:1.4}
+/* 01 · five planes */
+.fx-01 .planes{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-top:1px solid var(--ink)}
+.fx-01 .p{padding:14px 10px 6px 0;border-right:1px solid var(--rule);margin-right:10px;min-width:0}
+.fx-01 .p:last-child{border-right:none;margin-right:0}
+.fx-01 .n{font-style:italic;color:var(--mut);font-size:17px}
+.fx-01 .t{font-size:22px;margin:2px 0 8px}
+.fx-01 .d{font-size:15.5px;color:var(--soft);line-height:1.4}
 .fx-01 .off .t,.fx-01 .off .d{color:var(--mut)}
-.fx-01 .axis{display:flex;justify-content:space-between;margin-top:26px;font-style:italic;color:var(--mut);font-size:16px}
+.fx-01 .axis{display:flex;justify-content:space-between;gap:16px;margin-top:22px;font-style:italic;color:var(--mut);font-size:16px}
+/* 02 · problem (hero) */
 .fx-02 .lead{font-size:26px;line-height:1.35;max-width:900px;margin-bottom:30px}
-.fx-02 .r{display:grid;grid-template-columns:150px 1fr;border-top:1px solid var(--rule);padding:12px 0}
+.fx-02 .r{display:grid;grid-template-columns:110px minmax(0,1fr);border-top:1px solid var(--rule);padding:12px 0}
 .fx-02 .r:last-child{border-bottom:1px solid var(--rule)}
 .fx-02 .k{font-variant:small-caps;text-transform:lowercase;letter-spacing:.07em;color:var(--mut)}
 .fx-02 .v{color:var(--soft)}
-.fx-03 .qs{display:grid;grid-template-columns:1fr 1fr;gap:34px 56px}
-.fx-03 .q{border-left:1px solid var(--ink);padding:2px 0 2px 24px}
-.fx-03 .q p{font-style:italic;font-size:27px;line-height:1.28}
+/* 03 · quotes */
+.fx-03 .qs{display:grid;grid-template-columns:1fr 1fr;gap:30px 40px}
+.fx-03 .q{border-left:1px solid var(--ink);padding:2px 0 2px 20px}
+.fx-03 .q p{font-style:italic;font-size:24px;line-height:1.28}
 .fx-03 .who{margin-top:10px;font-size:16px;color:var(--mut)}
-.fx-04 ol{list-style:none;columns:2;column-gap:56px;border-top:1px solid var(--rule)}
-.fx-04 li{break-inside:avoid;padding:12px 0 12px 40px;position:relative;border-bottom:1px solid var(--rule);color:var(--soft)}
+/* 04 · findings */
+.fx-04 ol{list-style:none;columns:2;column-gap:40px;border-top:1px solid var(--rule)}
+.fx-04 li{break-inside:avoid;padding:12px 0 12px 36px;position:relative;border-bottom:1px solid var(--rule);color:var(--soft)}
 .fx-04 .i{position:absolute;left:0;font-style:italic;color:var(--mut)}
-.fx-05 .hd,.fx-05 .row{display:grid;grid-template-columns:1fr 50px 1fr;align-items:center}
+/* 05 · scope */
+.fx-05 .hd,.fx-05 .row{display:grid;grid-template-columns:minmax(0,1fr) 40px minmax(0,1fr);align-items:center}
 .fx-05 .hd{padding-bottom:8px}
 .fx-05 .row{border-top:1px solid var(--rule);padding:16px 0}
-.fx-05 .row:last-child{border-bottom:1px solid var(--rule)}
+.fx-05 .row:last-of-type{border-bottom:1px solid var(--rule)}
 .fx-05 .ar{text-align:center;color:var(--mut);font-size:24px}
-.fx-05 .c{color:var(--soft);font-size:20px;line-height:1.35}
+.fx-05 .c{color:var(--soft);font-size:18.5px;line-height:1.35}
 .fx-05 .fn{background:var(--mat);padding:12px 16px;color:var(--ink)}
-.fx-05 .ep{font-style:italic;font-size:25px;border-left:1px solid var(--ink);padding-left:22px;margin-bottom:30px}
+.fx-05 .ep{font-style:italic;font-size:23px;line-height:1.35;border-left:1px solid var(--ink);padding-left:20px;margin-bottom:30px}
 .fx-05 .ep span{font-style:normal;font-size:16px;color:var(--mut)}
-.fx-06 .wrap{display:grid;grid-template-columns:90px 1fr;grid-template-rows:600px 60px}
-.fx-06 .yl{display:flex;flex-direction:column;justify-content:space-between;padding:60px 0;font-style:italic;color:var(--mut);font-size:17px}
+/* 06 · impact × effort (numbered points + key) */
+.fx-06 .wrap{display:grid;grid-template-columns:30px minmax(0,1fr);grid-template-rows:340px 44px;padding:0;max-width:none}
+.fx-06 .yl{display:flex;flex-direction:column;justify-content:space-between;padding:20px 0;font-style:italic;color:var(--mut);font-size:14px}
+.fx-06 .yl span{writing-mode:vertical-rl;transform:rotate(180deg)}
 .fx-06 .plot{position:relative;border-left:1px solid var(--ink);border-bottom:1px solid var(--ink);background:
  linear-gradient(var(--rule),var(--rule)) 50% 0/1px 100% no-repeat, linear-gradient(var(--rule),var(--rule)) 0 50%/100% 1px no-repeat}
-.fx-06 .q{position:absolute;font-variant:small-caps;text-transform:lowercase;letter-spacing:.07em;color:var(--mut);font-size:16px}
-.fx-06 .it{position:absolute;transform:translate(-50%,-50%);width:158px;background:var(--mat);padding:8px 11px;font-size:16.5px;line-height:1.25;color:var(--ink);text-align:center}
-.fx-06 .xl{grid-column:2;display:flex;justify-content:space-around;padding-top:12px;font-style:italic;color:var(--mut);font-size:17px}
-.fx-07 .fl{display:flex;flex-wrap:wrap;align-items:center;gap:10px 0}
-.fx-07 .b,.fx-07 .s,.fx-07 .d{font-size:17px;line-height:1.2;text-align:center}
-.fx-07 .b{border:1px solid var(--ink);padding:8px 12px;background:var(--bg)}
-.fx-07 .s{border:1px solid var(--ink);border-radius:999px;padding:8px 16px;font-style:italic}
-.fx-07 .d{background:var(--mat);padding:8px 12px;font-style:italic}
-.fx-07 .a{color:var(--mut);padding:0 8px;font-size:20px}
+.fx-06 .it{position:absolute;transform:translate(-50%,-50%)}
+.fx-06 .it .lb{display:none}
+.fx-06 .it .no{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--mat);font-weight:400;font-size:15px;color:var(--ink)}
+.fx-06 .xl{grid-column:2;display:flex;justify-content:space-around;padding-top:12px;font-style:italic;color:var(--mut);font-size:14px}
+.fx-06 .mx-key{margin:18px 0 0;padding-left:1.4em;font-size:16px;line-height:1.35;columns:2;column-gap:32px}
+.fx-06 .mx-key li{margin:0 0 6px;break-inside:avoid}
+/* 07 · task flow: each step carries its own arrow, so a line never ends on an arrow */
+.fx-07 .fl{display:flex;flex-wrap:wrap;align-items:center;gap:22px 0}
+.fx-07 .st{display:flex;align-items:center}
+.fx-07 .b,.fx-07 .s,.fx-07 .d{font-size:16px;line-height:1.2;text-align:center}
+.fx-07 .b{border:1px solid var(--ink);padding:7px 10px;background:var(--bg)}
+.fx-07 .s{border:1px solid var(--ink);border-radius:999px;padding:7px 14px;font-style:italic}
+.fx-07 .d{background:var(--mat);padding:7px 10px;font-style:italic}
+.fx-07 .a{color:var(--mut);padding:0 7px;font-size:18px}
 .fx-07 .br{display:flex;flex-direction:column;gap:6px}
-.fx-07 .lab{font-size:14px;color:var(--mut);font-style:italic;text-align:center}
-.fx-07 .row2{margin-top:26px}
-.fx-08 .home{width:200px;margin:0 auto;border:1px solid var(--ink);text-align:center;padding:10px;font-size:22px}
+.fx-07 .br:has(.lab){position:relative}.fx-07 .lab{position:absolute;bottom:100%;left:0;right:0;padding-bottom:1px;font-size:14px;color:var(--mut);font-style:italic;text-align:center;line-height:1.2}
+.fx-07 .row2{margin-top:18px}
+/* 08 · site map */
+.fx-08 .home{width:200px;max-width:100%;margin:0 auto;border:1px solid var(--ink);text-align:center;padding:10px;font-size:21px}
 .fx-08 .stem{width:1px;height:28px;background:var(--ink);margin:0 auto}
-.fx-08 .cols{display:grid;grid-template-columns:repeat(5,1fr);gap:18px;border-top:1px solid var(--ink);padding-top:28px;position:relative}
-.fx-08 .top{border:1px solid var(--ink);padding:9px 12px;font-size:21px;margin-bottom:12px}
-.fx-08 .leaf{border-left:1px solid var(--rule);margin-left:14px;padding:6px 0 6px 14px;font-size:17.5px;color:var(--soft)}
-.fx-08 .num{font-size:14px;color:var(--mut);margin-right:8px;font-style:italic}
-.fx-09 .r{display:grid;grid-template-columns:240px 1fr;gap:24px;border-top:1px solid var(--rule);padding:12px 0}
-.fx-09 .r:last-of-type{border-bottom:1px solid var(--rule)}
-.fx-09 .ideas{margin-top:30px;border-left:1px solid var(--ink);padding-left:24px}
-.fx-09 .ideas li{list-style:none;font-style:italic;font-size:23px;line-height:1.4}
-@media (max-width:820px){
-.fx{padding:0;background:none}.fx .fx-in{padding:24px 0}
-.fx-01 .planes{grid-template-columns:1fr}.fx-01 .p{border-right:none;border-bottom:1px solid var(--rule);margin-right:0;padding-bottom:12px}
-.fx-03 .qs{grid-template-columns:1fr}
-.fx-04 ol{columns:1}
-.fx-05 .hd{display:none}.fx-05 .row{grid-template-columns:1fr}.fx-05 .ar{transform:rotate(90deg);text-align:left;padding:4px 0}
-.fx-06 .it{width:120px;font-size:14px;padding:6px 8px}.fx-06 .wrap{grid-template-columns:60px 1fr;grid-template-rows:520px 50px}
-.fx-08 .cols{grid-template-columns:1fr 1fr}
-.fx-09 .r{grid-template-columns:1fr;gap:2px}
+.fx-08 .cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 18px;border-top:1px solid var(--ink);padding-top:24px}
+.fx-08 .top{border:1px solid var(--ink);padding:8px 10px;font-size:19px;margin-bottom:10px}
+.fx-08 .leaf{border-left:1px solid var(--rule);margin-left:12px;padding:5px 0 5px 12px;font-size:16.5px;line-height:1.3;color:var(--soft)}
+.fx-08 .num{font-size:14px;color:var(--mut);margin-right:7px;font-style:italic}
+/* 09 · benchmark */
+.fx-09 .r{display:grid;grid-template-columns:170px minmax(0,1fr);gap:16px;border-top:1px solid var(--rule);padding:12px 0}
+.fx-09 .r:has(+ .ideas){border-bottom:1px solid var(--rule)}
+.fx-09 .ideas{margin-top:30px;border-left:1px solid var(--ink);padding-left:22px}
+.fx-09 .ideas ul{padding:0}
+.fx-09 .ideas li{list-style:none;font-style:italic;font-size:21px;line-height:1.35;margin-bottom:8px}
+/* figure width 400–559px */
+@container fx (max-width:559px){
+ .fx-01 .planes{grid-template-columns:1fr}
+ .fx-01 .p{display:grid;grid-template-columns:2.4em minmax(0,1fr);align-items:baseline;border-right:none;border-bottom:1px solid var(--rule);margin-right:0;padding:12px 0}
+ .fx-01 .t{margin:0 0 4px}.fx-01 .d{grid-column:2}
+ .fx-01 .axis{display:none}
+ .fx-03 .qs{grid-template-columns:1fr;gap:26px}
+ .fx-03 .q p{font-size:22px}
+ .fx-04 ol{columns:1}
+ .fx-05 .hd{display:none}
+ .fx-05 .row{grid-template-columns:1fr;gap:6px}
+ .fx-05 .row .c:first-child::before,.fx-05 .row .fn::before{display:block;font-variant:small-caps;text-transform:lowercase;letter-spacing:.07em;color:var(--mut);font-size:15px;margin-bottom:2px}
+ .fx-05 .row .c:first-child::before{content:"User requirement"}
+ .fx-05 .row .fn::before{content:"Functional requirement"}
+ .fx-05 .ar{font-size:0;text-align:left;padding-left:16px;line-height:1}
+ .fx-05 .ar::after{content:"↓";font-size:22px}
+ .fx-05 .ep{font-size:21px}
+ .fx-06 .mx-key{columns:1}
+ .fx-08 .cols{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .fx-09 .r{grid-template-columns:1fr;gap:2px}
+ .fx-09 .ideas li{font-size:20px}
+}
+/* figure width under 400px (phones) */
+@container fx (max-width:399px){
+ .fx h3.t{font-size:24px;margin-bottom:20px}
+ .fx-02 .lead{font-size:22px;margin-bottom:22px}
+ .fx-02 .r{grid-template-columns:1fr;gap:2px}
+ .fx-03 .q{padding-left:16px}.fx-03 .q p{font-size:20px}
+ .fx-04 li{padding-left:30px}
+ .fx-05 .c{font-size:17.5px}.fx-05 .ep{font-size:19px;padding-left:16px}
+ .fx-06 .wrap{grid-template-rows:280px 40px}
+ .fx-08 .cols{grid-template-columns:1fr;gap:18px}
+ .fx-08 .home{font-size:19px}
+ .fx-09 .ideas{padding-left:16px}.fx-09 .ideas li{font-size:19px}
+}
+/* phones: slimmer mat frame, more room for the figure */
+@media (max-width:520px){
+ body .fx-fig .fx,body .hero-kv .fx{padding:8px}
+ body .fx-fig .fx .fx-in,body .hero-kv .fx .fx-in{padding:20px 14px}
 }
 .fx-fig{margin:0}.fx-fig .fx{margin-bottom:10px}.fx-fig figcaption{font-size:14px;color:var(--mut);font-style:italic;margin:0 0 40px}
 .hero-kv .fx{margin:0}
-.fx-06 .it .no{display:none}.fx-06 .mx-key{display:none}
-@media (max-width:1200px){
- .fx-06 .wrap{grid-template-columns:30px 1fr;grid-template-rows:340px 44px}
- .fx-06 .yl{padding:20px 0;font-size:13px}.fx-06 .yl span{writing-mode:vertical-rl;transform:rotate(180deg)}
- .fx-06 .it{width:auto;padding:0;background:none}.fx-06 .it .lb{display:none}
- .fx-06 .it .no{display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--mat);font-weight:400;font-size:14px;color:var(--ink)}
- .fx-06 .xl{font-size:13px}
- .fx-06 .mx-key{display:block;margin:18px 0 0;padding-left:1.4em;font-size:15px;line-height:1.35}.fx-06 .mx-key li{margin:4px 0}
-}
-@media (min-width:821px) and (max-width:1100px){.fx-08 .cols{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head><body>
 <nav class="top"><div class="wrap"><a class="name" href="/">Victor Aguiar-Macedo</a>
 <ul><li><a href="/#work">Work</a></li><li class="hide"><a href="/#play">Play</a></li><li><a href="/cv.html">CV</a></li></ul></div></nav>
-<main class="wrap"><header class="art-head"><div class="kicker">Sappin · UX research · Information architecture</div><h1>What do small illustrators in Ceará actually need?</h1><p class="lede">Sappin is an app for local illustrators in Ceará. We set out to help them sell their work and reach people outside the state. Four interviews later the problem looked different: what they missed most was guidance on the professional side of art.</p><p class="byline">User Experience (G716), Unifor · semester 2025.2 · group project</p></header>
+<main class="wrap"><header class="art-head"><div class="kicker">Sappin · UX research · Information architecture</div><h1>What do small illustrators in Ceará need?</h1><p class="lede">Sappin was a group project for the User Experience course at Unifor: an app for local illustrators in Ceará. We set out to help them sell their work and reach people outside the state. The interviews pointed to a different need: guidance on the professional side of art.</p><p class="byline">User Experience (G716), Unifor · semester 2025.2 · group project</p></header>
 <div class="meta"><div><b>Project</b>Sappin, an app for local illustrators</div><div><b>Course</b>User Experience (G716)</div><div><b>Method</b>Garrett’s five planes</div><div><b>Output</b>Requirements · flows · site map · sketches</div></div>
 <div class="hero-kv"><div class="fx fx-02"><div class="fx-in">
 <div class="sc">The problem</div>
 <p class="lead" style="margin-top:12px"><i>Promote small illustrators in Ceará professionally.</i></p><div class="r"><div class="k">Who</div><div class="v">Local illustrators in Ceará who sell mostly in the regional market.</div></div><div class="r"><div class="k">What</div><div class="v">Difficulty reaching audiences outside the state, and use of their work without permission or payment.</div></div><div class="r"><div class="k">When</div><div class="v">Continuously, above all in today’s digital and commercial exchanges.</div></div><div class="r"><div class="k">Where</div><div class="v">Online, where work circulates without control and reach stays limited.</div></div><div class="r"><div class="k">Why</div><div class="v">It cuts creators’ income, holds back cultural development and distances people in Ceará from local artists.</div></div><div class="r"><div class="k">How</div><div class="v">Little visibility and few channels beyond the region, and no mechanisms for protection or fair pay.</div></div>
 </div></div></div>
-<article><div class="prose"><p class="first">The problem came first. Local illustrators in Ceará sell mostly in the regional market, find it hard to reach anyone outside the state, and see their work used without permission or payment. That cuts their income and keeps people in Ceará away from their own artists.</p><p>The brief we wrote for ourselves asked for a digital product that brings the community and local illustrators together, to help with promotion, sales and the region’s cultural identity. A note on the board warned against rushing: don’t think about the product yet, we aren’t there.</p><p>We worked through Jesse James Garrett’s five planes of user experience, in order: strategy, scope, structure, skeleton, surface. The board follows that line literally. It runs left to right, one red title bar per plane, joined by a single arrow from “Início” to “Definitivo”.</p><p>I took part in every stage except the visual identity, which others on the team designed.</p><h2>Reading before asking</h2><p>The research plan listed what we wanted to know, where to look and which words to search for: papers, reports from UNESCO, the Ministry of Culture, IPEA, Sebrae and IBGE, art sales platforms, and local cultural policy. The desk research was split into one block per team member, and feedback notes on the board pushed it further: one block was too short, another should explain its source in our own words, and every number we found should be kept for defending the theme later.</p><p>The reading went into a CSD matrix: what we were certain of, what we supposed, and what we doubted. We were certain the internet helps link artists with buyers, and that events connect artists with each other, not only with customers. We supposed the average person in Ceará isn’t familiar with local visual artists, and that most artists have a second job. The doubts were the questions only people could answer: what share of local artists sell online, and what is the main income of those who can’t live on art?</p></div><figure class="fx-fig"><div class="fx fx-01"><div class="fx-in">
+<article><div class="prose"><p class="first">Local illustrators in Ceará sell mostly in the regional market, find it hard to reach anyone outside the state, and see their work used without permission or payment. That cuts their income and keeps people in Ceará away from their own artists.</p><p>According to <a href="https://www.ibge.gov.br/estatisticas/multidominio/cultura-recreacao-e-esporte/9388-indicadores-culturais.html">IBGE</a>, about 254,000 people worked in Ceará’s cultural sector in 2024, and 61% of them worked informally: without a signed work contract, or self-employed without paying into social security. In Brazil as a whole the share was 45%. IBGE’s cultural sector is broad and also counts advertising, printing, clothing and furniture making, so the figure covers more than illustrators.</p><p>The brief we wrote for ourselves asked for a digital product that brings the community and local illustrators together, to help with promotion, sales and the region’s cultural identity. A note on the board warned against rushing: don’t think about the product yet, we aren’t there.</p><p>The project set out to understand this problem before designing anything. In UX terms, we used Jesse James Garrett’s five planes of user experience as the guide, in order: strategy, scope, structure, skeleton, surface. The board follows that line literally. It runs left to right, one red title bar per plane, joined by a single arrow from “Início” to “Definitivo”.</p><p>I took part in every stage except the visual identity, which others on the team designed.</p><h2>Reading before asking</h2><p>The research plan listed what we wanted to know, where to look and which words to search for: papers, reports from UNESCO, the Ministry of Culture, IPEA, Sebrae and IBGE, art sales platforms, and local cultural policy. The desk research was split into one block per team member, and feedback notes on the board pushed it further: one block was too short, another should explain its source in our own words, and every number we found should be kept for defending the theme later.</p><p>The reading went into a CSD matrix: what we were certain of, what we supposed, and what we doubted. We were certain the internet helps link artists with buyers, and that events connect artists with each other, not only with customers. We supposed the average person in Ceará isn’t familiar with local visual artists, and that most artists have a second job. The doubts were the questions only people could answer: what share of local artists sell online, and what is the main income of those who can’t live on art?</p></div><figure class="fx-fig"><div class="fx fx-01"><div class="fx-in">
 <div class="sc">The board, left to right</div><h3 class="t">Five planes, from abstract to concrete</h3>
 <div class="planes"><div class="p"><div class="n">i.</div><div class="t">Strategy</div><div class="d">Choosing the problem · research plan · desk research · CSD matrix · proto-personas · interview script · 4 interviews · synthesis · affinity diagram · findings</div></div><div class="p"><div class="n">ii.</div><div class="t">Scope</div><div class="d">Pain → user requirement → functional requirement</div></div><div class="p"><div class="n">iii.</div><div class="t">Structure</div><div class="d">Impact × effort matrix · task flows · site map</div></div><div class="p"><div class="n">iv.</div><div class="t">Skeleton</div><div class="d">Paper sketches (rabisco-frames) · benchmark · pitch</div></div><div class="p off"><div class="n">v.</div><div class="t">Surface</div><div class="d">Visual identity: mascot, logo drafts, palettes</div></div></div>
 <div class="axis"><span>← abstract · the problem</span><span>the product · concrete →</span></div>
@@ -106,9 +142,9 @@
 </div></div><figcaption>The board followed Garrett’s five planes, left to right. The surface plane, the visual identity, was led by teammates.</figcaption></figure><div class="prose"><p>Alongside the matrix we drafted four proto-personas: an artist already part of the local scene, an events organiser, a family man as an average consumer, and a psychology student who would rather be drawing. They were assumptions to check, not findings.</p><h2>Four interviews</h2><p>We wrote a semi-structured script — ice-breaker, the art scene, difficulties, cultural consumption, ways to bring artists and people closer — with separate questions for artists and for the public. Later we rewrote it to focus on illustrators, and added questions about starting out, being self-taught and contact with other artists.</p><p>We interviewed four artists, transcribed the recordings and cut them into quotes, tagged User 1 to 4. The quotes went into an affinity diagram, one row per theme: starting a career, distinct art markets, motivation to continue, art in everyday life, reaching an audience online, living from art, digital media, generations in art, pricing.</p></div><figure class="fx-fig"><div class="fx fx-03"><div class="fx-in">
 <div class="sc">Four interviews with artists</div><h3 class="t">What hurt, in their words</h3><div class="qs"><div class="q"><p>“From my generation on, we all have great difficulty with media.”</p><div class="who">Visual artist and collagist, working since 1992</div></div><div class="q"><p>“It’s hard to measure how much the creative part is worth.”</p><div class="who">Artist, on pricing</div></div><div class="q"><p>“I depend on myself. […] I don’t have an agent.”</p><div class="who">Self-taught illustrator and graphic designer</div></div><div class="q"><p>“Being self-taught is a lot of trial and error.”</p><div class="who">Self-taught illustrator and graphic designer</div></div></div>
 <p class="note">Translated from Portuguese. Interviewees are anonymised, as on the board.</p>
-</div></div><figcaption>Four of the interview quotes behind the affinity diagram, translated from Portuguese. Interviewees stay anonymous.</figcaption></figure><div class="prose"><p>What came back was not mainly about sales. Several had started with few options and no one to point the way. Turning into “an artist” was hard against family expectations. There was no structured training on the business side of art, and beginners struggled to price their work. A large part of artists’ income came from other artists. Older generations found it harder to promote themselves on social media.</p></div><figure class="fx-fig"><div class="fx fx-04"><div class="fx-in">
+</div></div><figcaption>Four of the interview quotes behind the affinity diagram, translated from Portuguese. Interviewees stay anonymous.</figcaption></figure><div class="prose"><p>What came back was mostly about building a career. Several had started with few options and no one to point the way. Turning into “an artist” was hard against family expectations. There was no structured training on the business side of art, and beginners struggled to price their work. A large part of artists’ income came from other artists. Older generations found it harder to promote themselves on social media.</p></div><figure class="fx-fig"><div class="fx fx-04"><div class="fx-in">
 <div class="sc">Synthesis → affinity diagram</div><h3 class="t">Main research findings</h3><ol><li><span class="i">i.</span>Many started their careers with few options and no guidance on the artistic path.</li><li><span class="i">ii.</span>Taking on the title of “artist” is hard, especially against family and social expectations.</li><li><span class="i">iii.</span>There is little structured training on the professional side of art.</li><li><span class="i">iv.</span>Illustrators starting out struggle to price their work.</li><li><span class="i">v.</span>Cultural events lack accessible venues and times.</li><li><span class="i">vi.</span>Visual art needs to reach the everyday life of the average person.</li><li><span class="i">vii.</span>A significant share of artists’ income comes from other artists.</li><li><span class="i">viii.</span>Older generations find it harder to promote their work and build an audience on social media.</li><li><span class="i">ix.</span>A market for art supplies depends on artists to keep going.</li></ol>
-</div></div><figcaption>The nine findings the synthesis arrived at.</figcaption></figure><p class="pull">“I depend on myself… I’m the one who doesn’t have an agent.”</p><div class="prose"><p>That line, from one of the illustrators, describes the person the product ended up being for: someone self-taught, running their own career, deciding alone when to stop drawing and start looking for work.</p><h2>From pain to requirement</h2><p>The scope plane turned the research into a list. Each row starts with a quote, the pain, then states what the user needs, then what the product must do. An artist with no agent, who has to plan their own growth, became a study track that guides the user. “From my generation on, we all have a hard time with media” became tools for managing social media posts, metrics and a calendar. Other rows asked for technical feedback on one’s work, places to work or exhibit, events and calls for artists, a way to find market opportunities without a middleman, chat between artists, and modules on negotiation.</p></div><figure class="fx-fig"><div class="fx fx-05"><div class="fx-in">
+</div></div><figcaption>The nine findings the synthesis arrived at.</figcaption></figure><p class="pull">“I depend on myself… I’m the one who doesn’t have an agent.”</p><div class="prose"><p>That line, from one of the illustrators, describes the person the product ended up being for: someone self-taught who runs their own career without an agent.</p><h2>From pain to requirement</h2><p>The scope plane turned the research into a list. Each row starts with a quote, the pain, then states what the user needs, then what the product must do. An artist with no agent, who has to plan their own growth, became a study track that guides the user. “From my generation on, we all have a hard time with media” became tools for managing social media posts, metrics and a calendar. Other rows asked for technical feedback on one’s work, places to work or exhibit, events and calls for artists, a way to find market opportunities without a middleman, chat between artists, and modules on negotiation.</p></div><figure class="fx-fig"><div class="fx fx-05"><div class="fx-in">
 <div class="sc">Scope</div><h3 class="t">From what users need to what the product does</h3>
 <p class="ep">“From my generation on, we all have great difficulty with media.” <span>— the interview quote behind the second row</span></p>
 <div class="hd"><div class="sc">User requirement</div><div></div><div class="sc">Functional requirement</div></div><div class="row"><div class="c">Find a study track that helps them evolve without compromising their work</div><div class="ar">→</div><div class="c fn">A study track that guides users through their process</div></div><div class="row"><div class="c">Manage social media more easily, with guidance</div><div class="ar">→</div><div class="c fn">Social media management tools: posts, metrics, calendar</div></div><div class="row"><div class="c">Find new spaces to work in</div><div class="ar">→</div><div class="c fn">Search and locate new spaces, virtual or physical, to work or exhibit</div></div><div class="row"><div class="c">Get feedback for their technical development</div><div class="ar">→</div><div class="c fn">A channel where artists get technical feedback on their work</div></div>
@@ -121,17 +157,17 @@
 <ol class="mx-key"><li>Social media management tools</li><li>Find market opportunities without an intermediary</li><li>Study track</li><li>Messages and connections between artists</li><li>Search for new spaces to work or exhibit</li><li>Technical feedback channel</li><li>Events and open calls tab</li><li>Negotiation modules</li><li>Map of art fairs and events in Ceará</li></ol><p class="note">Approximate positions from the team’s board, spaced for legibility.</p>
 </div></div><figcaption>Impact × effort: what goes in first.</figcaption></figure><div class="prose"><p>From there we drew six task flows, each a goal from start to end: take a lesson on the track, message another user, post a work for feedback, give feedback, sign up for an event, and apply to exhibit at one. The track flow sends a new user through a level check first, so the track can start where they are.</p></div><figure class="fx-fig"><div class="fx fx-07"><div class="fx-in">
 <div class="sc">Structure · task flow i of 6</div><h3 class="t">Taking a lesson on the study track</h3>
-<div class="fl"><div class="s">Start</div><span class="a">→</span><div class="b">Splash screen</div><span class="a">→</span><div class="b">Onboarding</div><span class="a">→</span><div class="br"><div class="b">Sign up</div><div class="b">Log in</div></div><span class="a">→</span><div class="b">Home</div></div><div class="fl row2"><span class="a">→</span><div class="d">Level check done?</div><span class="a">→</span><div class="br"><div class="lab">if not</div><div class="b">Level check</div></div><span class="a">→</span><div class="b">Tap roadmap icon</div><span class="a">→</span><div class="b">Roadmap</div></div><div class="fl row2"><span class="a">→</span><div class="b">View courses</div><span class="a">→</span><div class="b">Choose course</div><span class="a">→</span><div class="b">View module</div><span class="a">→</span><div class="b">Choose module</div><span class="a">→</span><div class="b">Choose lesson</div><span class="a">→</span><div class="s">End</div></div><p class="note">Six flows were mapped: the study track, messaging, posting work for feedback, giving feedback, signing up for an event, and exhibiting.</p>
+<div class="fl"><div class="st"><div class="s">Start</div></div><div class="st"><span class="a">→</span><div class="b">Splash screen</div></div><div class="st"><span class="a">→</span><div class="b">Onboarding</div></div><div class="st"><span class="a">→</span><div class="br"><div class="b">Sign up</div><div class="b">Log in</div></div></div><div class="st"><span class="a">→</span><div class="b">Home</div></div></div><div class="fl row2"><div class="st"><span class="a">→</span><div class="d">Level check done?</div></div><div class="st"><span class="a">→</span><div class="br"><div class="lab">if not</div><div class="b">Level check</div></div></div><div class="st"><span class="a">→</span><div class="b">Tap roadmap icon</div></div><div class="st"><span class="a">→</span><div class="b">Roadmap</div></div></div><div class="fl row2"><div class="st"><span class="a">→</span><div class="b">View courses</div></div><div class="st"><span class="a">→</span><div class="b">Choose course</div></div><div class="st"><span class="a">→</span><div class="b">View module</div></div><div class="st"><span class="a">→</span><div class="b">Choose module</div></div><div class="st"><span class="a">→</span><div class="b">Choose lesson</div></div><div class="st"><span class="a">→</span><div class="s">End</div></div></div><p class="note">Six flows were mapped: the study track, messaging, posting work for feedback, giving feedback, signing up for an event, and exhibiting.</p>
 </div></div><figcaption>One of the six task flows: taking a lesson on the study track.</figcaption></figure><div class="prose"><p>The flows set the site map: a home screen and five sections — Roadmap, with courses, modules and lessons; Explore, with projects to comment on; Events, down to taking part and exhibiting; Chat; and Profile.</p></div><figure class="fx-fig"><div class="fx fx-08"><div class="fx-in">
 <div class="sc">Structure</div><h3 class="t">Site map</h3><div class="home"><span class="num">1</span>Home · feed</div><div class="stem"></div><div class="cols"><div class="col"><div class="top"><span class="num">1.1</span>Roadmap</div><div class="leaf"><span class="num">1.1.1</span>Courses</div><div class="leaf"><span class="num">1.1.2</span>Module</div><div class="leaf"><span class="num">1.1.3</span>Lessons</div></div><div class="col"><div class="top"><span class="num">1.2</span>Explore</div><div class="leaf"><span class="num">1.2.1</span>Browse</div><div class="leaf"><span class="num">1.2.2</span>Projects</div><div class="leaf"><span class="num">1.2.3</span>Comment on projects</div></div><div class="col"><div class="top"><span class="num">1.3</span>Events</div><div class="leaf"><span class="num">1.3.1</span>Events dashboard</div><div class="leaf"><span class="num">1.3.2</span>Single event</div><div class="leaf"><span class="num">1.3.3</span>Join an event</div><div class="leaf"><span class="num">1.3.4</span>Exhibit</div></div><div class="col"><div class="top"><span class="num">1.4</span>Chat</div><div class="leaf"><span class="num">1.4.1</span>Conversations</div><div class="leaf"><span class="num">1.4.2</span>Send a message</div></div><div class="col"><div class="top"><span class="num">1.5</span>Profile</div><div class="leaf"><span class="num">1.5.1</span>Profile info</div><div class="leaf"><span class="num">1.5.2</span>Settings</div></div></div>
 </div></div><figcaption>The site map.</figcaption></figure><div class="prose"><h2>Sketching the screens</h2><p>The skeleton started with rough screens drawn digitally: home, explore, track, events. A second round was drawn by hand on paper, photographed and labelled on the board: splash, log in, sign up, a home feed for feedback, chat, creating a post, two versions of the track and two of events. Notes beside them ask for a screen to share location and a short quiz to place the user’s level. One note warns that the changes mean the flows must be updated.</p></div><div class="prose"><p>We benchmarked by theme rather than by competitor: an events platform for the event screens, course platforms for the track, art-critique communities for feedback, portfolio networks for artists, and a mobile game for the way it shows progress. Three decisions came out of it. Home would be a feed of work for feedback. Events would become workshops. And the game’s progression would become levels on the track.</p></div><figure class="fx-fig"><div class="fx fx-09"><div class="fx-in">
 <div class="sc">Skeleton</div><h3 class="t">Benchmark, and what we took from it</h3><div class="r"><div class="sc">Events</div><div>Sympla</div></div><div class="r"><div class="sc">Feedback</div><div>Reddit r/artcrit · Comunidade da Arte</div></div><div class="r"><div class="sc">Course hubs</div><div>Coursera · Skillshare</div></div><div class="r"><div class="sc">Artist platforms</div><div>Cara · Artfol · ArtStation · DeviantArt · ARTMO · Tumblr</div></div><div class="r"><div class="sc">Progress gamification</div><div>Clash Royale</div></div><div class="ideas"><div class="sc" style="margin-bottom:6px">Ideas written on the board</div><ul><li>The home becomes a feed of work for feedback.</li><li>“Events” becomes “workshops”.</li><li>Clash Royale’s arenas become levels on the study track.</li></ul></div>
-</div></div><figcaption>The benchmark, by theme, and what we took from it.</figcaption></figure><div class="prose"><p>The navigation marked “Definitivo” at the end of the board has courses, community, progress, workshops and the user’s own area. Selling art, where the project started, isn’t in it.</p><h2>The surface</h2><p>The visual identity was designed by others on the team. Its brief: keep it simple, lean on the region, keep the feel of illustration and avoid looking too corporate. The mascot is the Maranguape frog, a species found only in Ceará, meant to work the way the owl works for Duolingo. The board holds seven drafts of it, with the team’s votes on sticky notes, and six palettes still to choose from.</p></div><div class="numbers"><div><span>CSD matrix</span><span>13 certainties · 14 suppositions · 16 doubts</span></div><div><span>Proto-personas</span><span>4</span></div><div><span>Interviews</span><span>4, with artists</span></div><div><span>Requirements</span><span>8, each traced to a quote</span></div><div><span>Task flows</span><span>6</span></div><div><span>Site map</span><span>home + 5 sections</span></div></div><p class="endnote">Sappin. Group project, User Experience (G716), Universidade de Fortaleza, 2025.2. Board text and interview quotes are our translation from Portuguese.</p></article>
+</div></div><figcaption>The benchmark, by theme, and what we took from it.</figcaption></figure><div class="prose"><p>The navigation marked “Definitivo” at the end of the board has courses, community, progress, workshops and the user’s own area. Selling art, the starting point of the project, is not part of it.</p><h2>The surface</h2><p>The visual identity was designed by others on the team. Its brief: keep it simple, lean on the region, keep the feel of illustration and avoid looking too corporate. The mascot is the Maranguape frog, a species found only in Ceará, meant to work the way the owl works for Duolingo. The board holds seven drafts of it, with the team’s votes on sticky notes, and six palettes still to choose from.</p></div><div class="numbers"><div><span>CSD matrix</span><span>13 certainties · 14 suppositions · 16 doubts</span></div><div><span>Proto-personas</span><span>4</span></div><div><span>Interviews</span><span>4, with artists</span></div><div><span>Requirements</span><span>8, each traced to a quote</span></div><div><span>Task flows</span><span>6</span></div><div><span>Site map</span><span>home + 5 sections</span></div></div><figure class="art-fig sap-vid" style="padding:0;background:none"><video autoplay muted loop playsinline preload="metadata" poster="/img/sappin-telas-poster.webp" width="1600" height="1000" style="width:100%;height:auto;display:block" aria-label="Concept screens of the Sappin app sliding past on a phone"><source src="/img/sappin-telas.webm" type="video/webm"><source src="/img/sappin-telas.mp4" type="video/mp4"></video><figcaption>Concept screens made after the course, based on the requirements and the site map: onboarding, home, the study track, feedback requests and events.</figcaption></figure><style>@media (prefers-reduced-motion:reduce){.sap-vid video{display:none}.sap-vid{background:url(/img/sappin-telas-poster.webp) center/contain no-repeat;aspect-ratio:16/10}}</style><p class="endnote">Sappin. Group project, User Experience (G716), Universidade de Fortaleza, 2025.2. Board text and interview quotes are our translation from Portuguese. Figures on cultural work: IBGE, <a href="https://www.ibge.gov.br/estatisticas/multidominio/cultura-recreacao-e-esporte/9388-indicadores-culturais.html">Sistema de Informações e Indicadores Culturais 2013–2024</a>, table 6.4 (PNAD Contínua 2024).</p></article>
 <div class="next"><a href="/#work">← All work</a><a href="/work/voar.html">Voar →</a></div></main>
 <footer class="big-foot"><div class="wrap">
 <p class="bf-line">Let's make something<br>people can actually use.</p>
 <a class="bf-mail" href="mailto:victormac@edu.unifor.br">victormac@edu.unifor.br</a>
-<nav class="bf-links"><a href="/cv.html">CV</a><a href="/files/curriculo-carlos-victor-aguiar-de-macedo.pdf">Currículo (PDF)</a><a href="/files/portfolio-carlos-victor-aguiar-de-macedo.pdf">Portfolio (PDF)</a><a href="https://ordinary.vision">ordinary.vision</a></nav>
+<nav class="bf-links"><a href="/cv.html">CV</a><a href="/files/curriculo-carlos-victor-aguiar-de-macedo.pdf">CV (PDF)</a></nav>
 <div class="bf-name">Victor Aguiar-Macedo</div>
 </div></footer>
 </body></html>
