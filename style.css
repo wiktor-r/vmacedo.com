@@ -8,7 +8,7 @@ body{background:var(--bg);color:var(--ink);font:400 20px/1.55 "EB Garamond",Gara
 a{color:inherit;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;text-decoration-color:color-mix(in srgb,currentColor 45%,transparent)}
 a:hover{text-decoration-color:currentColor}
 img,video{display:block;max-width:100%;height:auto}
-.wrap{max-width:1180px;margin:0 auto;padding:0 32px}
+.wrap{max-width:960px;margin:0 auto;padding:0 32px}
 nav.top{border-bottom:1px solid var(--rule)}
 nav.top .wrap{display:flex;align-items:baseline;justify-content:space-between;padding-top:26px;padding-bottom:18px}
 nav.top .name,.sc{font-variant:small-caps;text-transform:lowercase;letter-spacing:.07em;text-decoration:none;font-size:19px}
