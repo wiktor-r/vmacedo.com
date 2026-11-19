@@ -190,9 +190,24 @@ body::before{background:url(/img/grain-light.webp) 0 0/128px,
  .hello,.work{scroll-snap-align:center}
  footer{scroll-snap-align:end}
 }
+
+/* ending: dusk — the paper dims to warm grey as the footer arrives (scroll-driven) */
+footer{background:transparent;color:var(--ink);box-shadow:none}
+footer .mail{color:var(--ink)}
+footer .links{border-top-color:rgba(120,86,52,.18);color:var(--soft)}
+footer .name{color:rgba(26,25,22,.06)}
+html.at-end{background-color:var(--paper)}
+
+.dusk{position:fixed;inset:0;z-index:40;pointer-events:none;background:#e3dccf;mix-blend-mode:multiply;opacity:0}
+body{timeline-scope:--foot}
+footer{view-timeline:--foot block}
+@supports (animation-timeline: view()){.dusk{animation:dusk linear both;animation-timeline:--foot;animation-range:entry 0% entry 100%}}
+@keyframes dusk{to{opacity:.85}}
+footer .name{color:rgba(26,25,22,.07)}
 </style></head><body>
 <a class="skip" href="#work">Skip to the work</a>
 <header class="top"><a href="/">Victor Aguiar-Macedo</a><nav aria-label="Main"><a class="wide" href="#work">Work</a><a href="#contact">Contact</a></nav></header>
+<div class="dusk" aria-hidden="true"></div>
 <main>
 <section class="wrap hello" id="intro" aria-label="Introduction">
  <div class="rv"><h1>Hello, I'm Victor.<br>I take projects from <i>the&nbsp;field</i> to <i>the&nbsp;screen</i>.</h1></div>
