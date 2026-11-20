@@ -414,6 +414,14 @@ body{background:var(--paper) url(/img/grain-light.webp) 0 0/128px}
  .about-end .about-photo{padding:34px 22% 10px}
  .about-end .taped-print img{aspect-ratio:auto;object-fit:contain}
 }
+
+/* desktop: the About portrait small (~45% of the original width); the text gets the room */
+@media (min-width:821px){
+ .about-end{grid-template-columns:1.55fr 1fr}
+ .about-end .about-photo{padding:4% 4%}
+}
+@media (min-width:821px) and (max-width:1100px){ .about-end .about-photo .print-photo{width:min(100%,170px)} }
+@media (min-width:1101px){ .about-end .about-photo .print-photo{width:min(100%,140px)} }
 </style></head><body>
 <a class="skip" href="#work">Skip to the work</a>
 <header class="top"><a href="/">Victor Aguiar-Macedo</a><nav aria-label="Main"><a class="wide" href="#work">Work</a><a href="#contact">Contact</a></nav></header>
