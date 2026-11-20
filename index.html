@@ -401,6 +401,7 @@ body{background:var(--paper) url(/img/grain-light.webp) 0 0/128px}
 @media (prefers-reduced-motion:no-preference){.hello{animation:hero-in .8s ease both}}
 @keyframes hero-in{from{opacity:0}}
 .desk.sapv{aspect-ratio:16/12;display:flex;align-items:center;justify-content:center}.desk.sapv .s1{position:relative;left:auto;top:auto;width:100%;height:auto;border-radius:6px;transform:rotate(-2deg);box-shadow:0 1px 2px rgba(40,30,20,.12),0 22px 44px -16px rgba(40,30,20,.35)}
+/* cardv */.media.cardv{display:block}.media.cardv video{width:100%;height:auto;aspect-ratio:16/10;display:block;border-radius:4px;box-shadow:0 1px 2px rgba(40,30,20,.10),0 22px 44px -18px rgba(40,30,20,.30);background:#eeeae0}
 </style></head><body>
 <a class="skip" href="#work">Skip to the work</a>
 <header class="top"><a href="/">Victor Aguiar-Macedo</a><nav aria-label="Main"><a class="wide" href="#work">Work</a><a href="#contact">Contact</a></nav></header>
@@ -461,7 +462,7 @@ body{background:var(--paper) url(/img/grain-light.webp) 0 0/128px}
 <section class="wrap sec" id="work" aria-labelledby="h-work"><h2 class="rv" id="h-work">Selected&nbsp;work</h2></section>
 <section class="wrap work" id="sappin" aria-labelledby="h-sap">
  <div class="rv"><div class="k">UX design</div><h2 id="h-sap">What do small illustrators in Ceará need?</h2><p>Sappin, an app for local illustrators: interviews, requirements, task flows and a site map, in a team of&nbsp;students.</p><a class="go" href="/work/sappin.html" aria-label="Read the article about Sappin">Read the article</a></div>
- <div class="media desk sapv rv"><img class="s1" src="/img/sappin-app-poster.webp" width="1600" height="1000" alt="Sappin concept screen on a phone" loading="lazy" decoding="async"></div>
+ <div class="media cardv rv"><video class="cover-vid" autoplay muted loop playsinline preload="none" poster="/img/cover-sappin-poster.webp" width="1600" height="1000" aria-label="Sappin concept screens on a phone"><source data-src="/img/cover-sappin.webm" type="video/webm"><source data-src="/img/cover-sappin.mp4" type="video/mp4"></video></div>
 </section>
 <section class="wrap work flip" id="voar" aria-labelledby="h-voar">
  <div class="rv"><div class="k">UX research</div><h2 id="h-voar">How can an NGO stay close to its individual&nbsp;donors?</h2><p>For Associação Voar, an NGO in Fortaleza: field visit, interviews, usability testing — published as a&nbsp;paper.</p><a class="go" href="/work/voar.html" aria-label="Read the article about Voar">Read the article</a></div>
@@ -523,4 +524,5 @@ document.querySelectorAll('.rv').forEach(el=>io.observe(el));
 })();
 
 </script>
+<script>/* lazy cover videos */(function(){var vs=document.querySelectorAll('video.cover-vid[preload=none]');if(matchMedia('(prefers-reduced-motion:reduce)').matches){return}var io=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;var v=e.target;v.querySelectorAll('source[data-src]').forEach(function(s){s.src=s.dataset.src;s.removeAttribute('data-src')});v.load();v.play&&v.play().catch(function(){});io.unobserve(v)})},{rootMargin:'200px'});vs.forEach(function(v){io.observe(v)})})();</script>
 </body></html>

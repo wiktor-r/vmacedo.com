@@ -200,3 +200,9 @@ h1,h2,.art-head h1,.prose h2{font-weight:600}
 .art-fig.narrow{max-width:520px!important}
 
 .art-head .byline,.art-head p+p{text-indent:0}
+
+/* meta block straight into the text (no cover): close it with the same hairline */
+.meta:has(+ article){border-bottom:1px solid var(--rule);padding-bottom:22px;margin-bottom:56px}
+
+/* meta + .hero-kv on phones */
+@media (max-width:820px){.meta + .hero-kv{margin-top:28px}}
