@@ -422,52 +422,37 @@ body{background:var(--paper) url(/img/grain-light.webp) 0 0/128px}
 }
 @media (min-width:821px) and (max-width:1100px){ .about-end .about-photo .print-photo{width:min(100%,170px)} }
 @media (min-width:1101px){ .about-end .about-photo .print-photo{width:min(100%,140px)} }
+
+/* ---- desktop hero C: the phone opening for wide screens (replaces the board; phones keep .m-open + .flowlines) ---- */
+.dh{display:none}
+@media (min-width:821px){
+ .dh{display:block;position:relative;overflow:hidden;view-timeline:--hello block;height:max(500px,calc(100svh - 190px))}
+ .dh-in{position:relative;z-index:2;padding-top:clamp(112px,15vh,150px)}
+ .dh h1{font-family:'Instrument Serif',Georgia,serif;font-weight:400;letter-spacing:-.015em;font-size:clamp(40px,4.5vw,56px);line-height:1.02;max-width:8.4em;text-wrap:balance}
+ .dh h1 i{color:var(--soft)}
+ /* the lines live in the right half only: they rise from the bottom middle into the upper right */
+ .dflow{position:absolute;left:50%;right:0;top:64px;bottom:0;pointer-events:none;z-index:1;
+  -webkit-mask-image:linear-gradient(to right,transparent 0,#000 6%),linear-gradient(to bottom,transparent 0,#000 5%,#000 70%,transparent 99%);-webkit-mask-composite:source-in;
+  mask-image:linear-gradient(to right,transparent 0,#000 6%),linear-gradient(to bottom,transparent 0,#000 5%,#000 70%,transparent 99%);mask-composite:intersect}
+ .dflow canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+}
+/* desktop: the home is zoomed (html{zoom:var(--z)}), so heights are divided by --z */
+@media (min-width:1101px){
+ .dh{height:max(470px,calc(100svh / var(--z) - 150px))}
+ .dh-in{padding-top:96px}
+ .dh h1{font-size:46px}
+}
+@media (min-width:1101px) and (hover:hover) and (pointer:fine){.dh{scroll-snap-align:start}}
+
+/* the dusk dim starts at zero at the top (scroll-padding must not shift the hero's exit range); after the hero's view-timeline shorthand */
+@media (min-width:821px){.dh{view-timeline-inset:0}}
 </style></head><body>
 <a class="skip" href="#work">Skip to the work</a>
 <header class="top"><a href="/">Victor Aguiar-Macedo</a><nav aria-label="Main"><a class="wide" href="#work">Work</a><a href="#contact">Contact</a></nav></header>
 <div class="dusk d1" aria-hidden="true"></div><div class="dusk" aria-hidden="true"></div>
 <main>
-<section class="hello" id="intro" aria-label="Introduction">
-<div class="board" role="img" aria-label="A detective board: Victor's portrait pinned among photos and notes about interaction design, tied together with red string">
-<svg class="strings" aria-hidden="true"></svg>
-<div class="ev polaroid wide" id="ev-stickies" style="--x:13;--y:30;--w:15;--r:-6deg;--mx:23;--my:15;--mw:36;--mr:-5deg" data-pin><img src="/img/board/stickies.webp" alt="" loading="lazy" decoding="async"><span class="cap">affinity wall, day 2</span></div>
-<div class="ev note yellow" id="ev-q1" style="--x:26;--y:19;--w:9;--r:5deg;--mx:57;--my:12;--mw:20;--mr:5deg" data-pin><p>Who is this <u>for</u>?</p></div>
-<div class="ev index nm" id="ev-heur" style="--x:45;--y:19;--w:13;--r:-2deg" data-pin><p class="hd">Heuristic no. 1</p><p>visibility of system status: keep people informed</p></div>
-<div class="ev polaroid tall" id="ev-door" style="--x:86;--y:26;--w:11;--r:5deg;--mx:84;--my:17;--mw:24;--mr:5deg" data-pin><img src="/img/board/door.webp" alt="" loading="lazy" decoding="async"><span class="cap">push? pull?</span></div>
-<div class="ev note rose" id="ev-q2" style="--x:89;--y:56;--w:9;--r:-4deg;--mx:84;--my:91;--mw:21;--mr:-4deg" data-pin><p>Where did they <u>hesitate</u>?</p></div>
-<div class="ev polaroid wide" id="ev-sign" style="--x:80;--y:82;--w:14;--r:4deg;--mx:82;--my:72;--mw:34;--mr:4deg" data-pin><img src="/img/board/sign.webp" alt="" loading="lazy" decoding="async"><span class="cap">where am I going?</span></div>
-<div class="ev graph" id="ev-wire" style="--x:55;--y:83;--w:11;--r:-3deg;--mx:49;--my:79;--mw:26;--mr:-3deg" data-pin><svg viewBox="0 0 120 150" aria-hidden="true"><g fill="none" stroke="#3a352f" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-<path d="M31 9 C55 8 78 9 90 10 C91 50 90 100 89 141 C70 142 50 141 31 140 C30 100 31 50 31 9Z"/><path d="M38 20 L83 20"/><path d="M38 29 C50 28 70 29 83 29 L82 60 C67 61 52 60 38 60Z"/><path d="M39 30 L82 59 M82 30 L39 59"/>
-<path d="M38 70 L76 70 M38 77 L70 77 M38 84 L79 84"/><path d="M40 100 C55 99 68 100 80 100 L80 113 C66 114 53 113 40 113Z"/><path d="M50 106.5 L70 106.5"/>
-<path d="M95 104 C104 100 108 92 104 84" stroke="#b52a20"/><path d="M101 86 L104 83 L107 87" stroke="#b52a20"/></g>
-<text x="100" y="78" font-family="Caveat" font-size="11" fill="#b52a20" text-anchor="middle">tap?</text></svg><span class="lbl">checkout v3</span></div>
-<div class="ev polaroid tall" id="ev-phone" style="--x:31;--y:83;--w:9;--r:-5deg;--mx:15;--my:70;--mw:24;--mr:-5deg" data-pin><img src="/img/board/phone.webp" alt="" loading="lazy" decoding="async"><span class="cap">test it out there</span></div>
-<div class="ev taped" id="ev-lens" style="--x:9;--y:72;--w:13;--r:9deg;--mx:52;--my:95;--mw:24;--mr:8deg"><img src="/img/board/lens.webp" alt="" loading="lazy" decoding="async"></div>
-<div class="ev graph nm" id="ev-journey" style="--x:37;--y:46;--w:22;--r:-3deg" data-pin><svg viewBox="0 0 220 90" aria-hidden="true"><g fill="none" stroke="#3a352f" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 45 L212 45" stroke-dasharray="3 4" opacity=".5"/><path d="M10 10 L10 82"/>
-<path d="M14 40 C40 18 55 20 70 34 C85 50 95 74 112 70 C130 66 140 30 160 26 C180 22 195 34 208 20" stroke="#b52a20"/>
-<circle cx="40" cy="24" r="3"/><circle cx="112" cy="70" r="3"/><circle cx="160" cy="26" r="3"/><path d="M60 82 L60 78 M110 82 L110 78 M160 82 L160 78"/></g>
-<g font-family="Caveat" font-size="11" fill="#3a352f"><text x="28" y="14">sign up</text><text x="96" y="86">form?!</text><text x="150" y="16">done</text></g></svg><span class="lbl">journey map — where it dips</span></div>
-<div class="ev note green nm" id="ev-q3" style="--x:29;--y:63;--w:8;--r:6deg" data-pin><p>What did they <u>expect</u>?</p></div>
-<div class="ev receipt nm" id="ev-receipt" style="--x:50;--y:34;--w:8;--r:7deg"><p class="mono">SESSION 03<br>task 2 ......... ✓<br>task 3 ......... ✗<br>4 of 5 finished<br>avg 2:14</p></div>
-<div class="ev index nm" id="ev-persona" style="--x:55;--y:61;--w:10;--r:-5deg" data-pin><p class="hd">Persona</p><svg viewBox="0 0 40 40" aria-hidden="true" class="av"><g fill="none" stroke="#3a352f" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="20" cy="15" r="7"/><path d="M7 38 C9 27 31 27 33 38"/></g></svg><p>"just let me finish this on my phone"</p></div>
-<div class="ev polaroid tall" id="ev-coffee" style="--x:5;--y:49;--w:9;--r:-4deg;--mx:10;--my:36;--mw:20;--mr:-4deg" data-pin><img src="/img/board/coffee.webp" alt="" loading="lazy" decoding="async"><span class="cap">day 1 notes</span></div>
-<div class="ev polaroid wide nm" id="ev-handle" style="--x:66;--y:14;--w:9;--r:-6deg" data-pin><img src="/img/board/door2.webp" alt="" loading="lazy" decoding="async"><span class="cap">affordance</span></div>
-<div class="ev graph nm" id="ev-flow" style="--x:67;--y:88;--w:11;--r:2deg" data-pin><svg viewBox="0 0 160 110" aria-hidden="true"><g fill="none" stroke="#3a352f" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="12" width="34" height="18" rx="2"/><path d="M42 21 L58 21"/><path d="M76 8 L94 21 L76 34 L58 21Z"/>
-<path d="M94 21 L112 21"/><rect x="112" y="12" width="38" height="18" rx="2"/><path d="M76 34 L76 56"/><rect x="58" y="56" width="36" height="18" rx="2"/><path d="M58 65 C30 66 25 50 25 30" stroke="#b52a20"/><path d="M21 34 L25 29 L29 34" stroke="#b52a20"/></g>
-<g font-family="Caveat" font-size="10" fill="#3a352f"><text x="12" y="25">start</text><text x="70" y="24">ok?</text><text x="117" y="25">pay</text><text x="62" y="69">retry</text><text x="20" y="95">loop back = pain</text></g></svg></div>
-<div class="ev graph nm" id="ev-fitts" style="--x:95;--y:88;--w:8;--r:5deg" data-pin><svg viewBox="0 0 120 120" aria-hidden="true"><g fill="none" stroke="#3a352f" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="22" cy="86" r="5"/><circle cx="92" cy="34" r="16"/><circle cx="92" cy="34" r="3"/>
-<path d="M27 82 C50 68 66 52 78 43" stroke="#b52a20"/><path d="M72 41 L79 42 L77 49" stroke="#b52a20"/></g>
-<g font-family="Caveat" font-size="11" fill="#3a352f"><text x="10" y="18">Fitts</text><text x="40" y="108">bigger + closer = faster</text></g></svg></div>
-<div class="ev note blue" id="ev-q4" style="--x:42;--y:92;--w:7;--r:-6deg;--mx:20;--my:90;--mw:20;--mr:-6deg" data-pin><p>Fewer <u>steps</u>?</p></div>
-<div class="ev polaroid tall" id="ev-sign2" style="--x:96;--y:46;--w:8;--r:-3deg;--mx:91;--my:38;--mw:17;--mr:-3deg" data-pin><img src="/img/board/sign2.webp" alt="" loading="lazy" decoding="async"><span class="cap">which way?</span></div>
-<div class="ev chips nm" id="ev-chips" style="--x:21;--y:42;--w:5;--r:4deg"><i style="background:#e9e1cf"></i><i style="background:#d9542e"></i><i style="background:#4a78b5"></i><i style="background:#1f3f73"></i></div>
-<div class="scrawl nm" aria-hidden="true" style="--x:93;--y:69;--r:-6deg">why?</div>
-<div class="scrawl nm" aria-hidden="true" style="--x:75;--y:68;--r:4deg">same problem<br>twice</div>
-<div class="scrawl nm" aria-hidden="true" style="--x:19;--y:57;--r:-7deg">talk to people<br>before pixels</div>
-<div class="scrawl nm" aria-hidden="true" style="--x:20;--y:92;--r:5deg">5 users find<br>most problems</div>
-</div>
-<div class="hello-in"><div><h1>Victor Aguiar-Macedo</h1><p class="hero-cap">Design student in Fortaleza, working in <i>interaction design</i> and <i>design research</i>.</p></div></div>
-</section>
+<section class="dh" id="intro" aria-label="Introduction"><div class="wrap dh-in"><h1>Hello! I'm Victor.<br> I&nbsp;design apps, visual identities and signage, starting from <i>what people actually&nbsp;need</i>.</h1></div>
+<div class="dflow" aria-hidden="true" data-cfg='{"mode": "C", "n": 15, "x0": 0.03, "x1": 0.3, "lean": 0.28, "cy": 0.66, "cx": 0.5, "ye0": 0.0, "ye1": 0.66, "rp": 0.6, "amp": 0.03, "k": 1.5}'><canvas></canvas></div></section>
 <section class="wrap about m-open" aria-label="Introduction">
   <h1 class="m-intro">Hello! I'm Victor. I&nbsp;design apps, visual identities and signage, starting from <i>what people actually&nbsp;need</i>.</h1>
 <!-- Flowing lines: place right after the mobile headline (h1.m-intro). Self-contained, no dependencies. -->
@@ -589,5 +574,52 @@ document.querySelectorAll('.rv').forEach(el=>io.observe(el));
 
 </script>
 <script>/* lazy cover videos */(function(){var vs=document.querySelectorAll('video.cover-vid[preload=none]');if(matchMedia('(prefers-reduced-motion:reduce)').matches){return}var io=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;var v=e.target;v.querySelectorAll('source[data-src]').forEach(function(s){s.src=s.dataset.src;s.removeAttribute('data-src')});v.load();v.play&&v.play().catch(function(){});io.unobserve(v)})},{rootMargin:'200px'});vs.forEach(function(v){io.observe(v)})})();
+// desktop hero C: flowing lines in the right half
+(()=>{const box=document.querySelector('.dflow'); if(!box) return; const cv=box.querySelector('canvas'), ctx=cv.getContext('2d');
+ const C=Object.assign({mode:'C',n:15,amp:.035,k:1.6,wmin:2.2,wmax:6.8},JSON.parse(box.dataset.cfg||'{}'));
+ const RAMP=[[79,122,147],[150,180,196],[240,220,203],[232,160,122],[201,74,91],[192,57,43]], SEG=180;   // the phone's ramp, blue -> red
+ const col=t=>{const v=t*(RAMP.length-1),i=Math.min(RAMP.length-2,Math.floor(v)),f=v-i;return RAMP[i].map((c,k)=>Math.round(c+(RAMP[i+1][k]-c)*f))};
+ const rnd=s=>{const x=Math.sin(s*12.9898+78.233)*43758.5453;return x-Math.floor(x)};
+ const L=Array.from({length:C.n},(_,i)=>{const t=i/(C.n-1);return {t,c:col(t),w:C.wmin+t*(C.wmax-C.wmin)+rnd(i*3.1)*1.3,f:.6+rnd(i*5.7)*.8,s:.16+rnd(i*7.3)*.18,ph:rnd(i*9.1)*6.28,a:.6+rnd(i*4.4)*.8,j:rnd(i*2.3)-.5,q:rnd(i*6.1)-.5}});
+ let W=0,H=0,D=1;
+ const fit=()=>{const z=parseFloat(getComputedStyle(document.documentElement).zoom)||1;W=box.clientWidth;H=box.clientHeight;D=Math.min(3,window.devicePixelRatio||1)*z;
+  cv.width=Math.round(W*D);cv.height=Math.round(H*D);ctx.setTransform(D,0,0,D,0,0)};
+ const rgb=(c,a,k=1)=>`rgba(${c.map(v=>Math.max(0,Math.min(255,Math.round(v*k))))},${a})`;
+ const cl=v=>Math.max(0,Math.min(1,v)), ss=(a,b,v)=>{const x=cl((v-a)/(b-a));return x*x*(3-2*x)};
+ const bez=(p0,p1,p2,p3,s)=>{const m=1-s;return [m*m*m*p0[0]+3*m*m*s*p1[0]+3*m*s*s*p2[0]+s*s*s*p3[0], m*m*m*p0[1]+3*m*m*s*p1[1]+3*m*s*s*p2[1]+s*s*s*p3[1]]};
+ // control points in box fractions (x of width, y of height), per line t: 0 = blue (outer), 1 = red (inner)
+ const ctrl=l=>{const t=l.t, sp=Math.pow(t,C.rp??.6);
+  if(C.mode==='C'){ // enter from the bottom edge near column 7, sweep up and open into the upper-right corner
+   const xs=C.x0+(C.x1-C.x0)*(t+l.j*.3/(C.n-1)), ye=C.ye0+(C.ye1-C.ye0)*sp;
+   return [[xs,1.1],[xs+C.lean,C.cy+.16*t],[C.cx+.22*t,ye+.03],[1.08,ye]]}
+  else {            // enter from the right edge low, flow left a little, turn up into the upper right
+   const ys=C.ys0+(C.ys1-C.ys0)*(t+l.j*.3/(C.n-1)), g=1-ss(C.g0??.55,C.g1??.72,t), tt=Math.min(1,t/(C.g0??.55));
+   const xt=C.xt0+(C.xt1-C.xt0)*tt, xe=C.xe0+(C.xe1-C.xe0)*tt;   // turn point and exit on the top edge
+   const lerp=(a,b)=>[a[0]+(b[0]-a[0])*g,a[1]+(b[1]-a[1])*g];
+   const E=g>=.5?[-.12+(xe+.12)*(g-.5)*2,-.12]:[-.12,-.12+(ys-.02+.12)*(1-g*2)];
+   return [[1.08,ys], lerp([.62,ys+.01],[xt,ys+.02]), lerp([.3,ys+.02],[xt+.04,ys-.36]), E]}};
+ const draw=T=>{ctx.clearRect(0,0,W,H); ctx.lineCap='round'; ctx.lineJoin='round';
+  for(const l of L){const [p0,p1,p2,p3]=ctrl(l).map(([x,y])=>[x*W,y*H]); const base=[];
+   for(let s=0;s<=SEG;s++) base.push(bez(p0,p1,p2,p3,s/SEG));
+   const pts=base.map(([x,y],s)=>{const u=s/SEG, a=base[Math.max(0,s-1)], b=base[Math.min(SEG,s+1)], dx=b[0]-a[0], dy=b[1]-a[1], n=Math.hypot(dx,dy)||1;
+    const env=ss(.06,.4,u)*(1-.5*ss(.8,1,u));                         // parallel entry, soft crossings in the middle, calmer at the end
+    const o=env*H*C.amp*(l.a*Math.sin(u*l.f*6.283*C.k+T*l.s+l.ph)+.35*Math.sin(u*9*C.k-T*l.s*1.4+l.ph*2)) + H*.008*Math.sin(u*2.2+T*.12);
+    return [x-dy/n*o, y+dx/n*o]});
+   const w=l.w*(1+.12*Math.sin(T*.27+l.ph)), path=()=>{ctx.beginPath();pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y))};
+   path(); ctx.strokeStyle=rgb(l.c,.9,.62); ctx.lineWidth=w; ctx.stroke();          // shadow edge
+   path(); ctx.strokeStyle=rgb(l.c,1); ctx.lineWidth=w*.72; ctx.stroke();           // body
+   ctx.save(); ctx.translate(-w*.12,-w*.2); path(); ctx.strokeStyle=rgb(l.c,.5,1.28); ctx.lineWidth=Math.max(.6,w*.22); ctx.stroke(); ctx.restore()}  // highlight
+ };
+ window.__deskFlow=t=>{fit();draw(t)};
+ fit();
+ const still=matchMedia('(prefers-reduced-motion: reduce)');
+ let raf=0, visible=true, t0=performance.now(), tAcc=7.3;
+ const loop=now=>{tAcc+=(now-t0)/1000; t0=now; draw(tAcc); raf=requestAnimationFrame(loop)};
+ const run=()=>{cancelAnimationFrame(raf); if(!box.offsetParent) return; if(still.matches){draw(7.3);return} if(visible&&!document.hidden){t0=performance.now(); raf=requestAnimationFrame(loop)} else draw(tAcc)};
+ new IntersectionObserver(e=>{visible=e[0].isIntersecting; run()}).observe(box);
+ document.addEventListener('visibilitychange',run); still.addEventListener?.('change',run);
+ new ResizeObserver(()=>{fit(); draw(tAcc); run()}).observe(box);
+ run();
+})();
 </script>
 </body></html>
