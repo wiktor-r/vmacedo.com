@@ -38,3 +38,6 @@ html body footer#contact.nf *{box-sizing:border-box}
 .nf1 .nf-line{font-size:39px;line-height:42px}
 @media (min-width:1101px){ .nf1 .nf-line{font-size:31px;line-height:38px} }
 @media (max-width:820px){ .nf1 .nf-line{font-size:31px;line-height:36px} }
+
+/* the phone line band bleeds 22px past the text column on purpose; clip it at the footer so pages without a global overflow clip (posts, CV) don't scroll sideways */
+html body footer#contact.nf{overflow-x:clip}
