@@ -445,7 +445,54 @@ body{background:var(--paper) url(/img/grain-light.webp) 0 0/128px}
 
 /* the dusk dim starts at zero at the top (scroll-padding must not shift the hero's exit range); after the hero's view-timeline shorthand */
 @media (min-width:821px){.dh{view-timeline-inset:0}}
-</style></head><body>
+</style><link rel="preconnect" href="https://api.fontshare.com"><link rel="preconnect" href="https://cdn.fontshare.com" crossorigin><link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=sentient@1,2&amp;display=swap">
+<style>
+/* ==== type: preset 12 'Ensaio' (Victor, 22/11) ====
+   Instrument Serif for the opening sentence and the closing line; Sentient (Fontshare, ITF FFL — served by the Fontshare CDN,
+   never committed: the licence forbids copies in a public repository) for everything else.
+   Sizes are the live ones; font-size-adjust keeps each font optically at the old size (text by x-height, headings by cap height).
+   Italic only for quotations, titles of works and asides; never headings, captions or the address.
+   One label style: 12px tracked capitals. */
+html body{font-family:'Sentient',Georgia,serif;font-size-adjust:ex-height .43}
+html body #h-work,
+html body #h-about,
+html body .sechead h2{font-family:'Sentient',Georgia,serif;font-weight:500;letter-spacing:-.018em;font-size-adjust:cap-height .653;font-style:normal;}
+html body section.work h2,
+html body .art-head h1,
+html body .case-hero h1{font-family:'Sentient',Georgia,serif;font-weight:500;letter-spacing:-.018em;font-size-adjust:cap-height .653;font-style:normal;}
+html body .prose h2,
+html body .fx h3,
+html body .fx h3.t,
+html body .callout h3{font-family:'Sentient',Georgia,serif;font-weight:500;letter-spacing:-.01em;font-size-adjust:cap-height .653;font-style:normal;}
+html body footer#contact .line,
+html body footer#contact .name{font-family:'Instrument Serif',Georgia,serif;font-weight:400;letter-spacing:-.015em;font-size-adjust:cap-height .72;font-style:normal;}
+html body .pull,
+html body .fx-03 .q p,
+html body .fx-v2 .q p,
+html body .fx-05 .ep,
+html body .fx-09 .ideas li,
+html body .rk-line{font-family:'Instrument Serif',Georgia,serif;font-weight:400;letter-spacing:0;font-style:italic;}
+html body .kicker,
+html body .meta b,
+html body .sc,
+html body .fx .sc,
+html body .fx-02 .k,
+html body .fx-v0 .k,
+html body .fx-v2 .ctx,
+html body .fx-06 .q,
+html body .pull .who,
+html body .fx-05 .row .c:first-child::before,
+html body .fx-05 .row .fn::before{font-family:'Sentient',Georgia,serif;font-weight:500;letter-spacing:.1em;font-variant:normal;text-transform:uppercase;font-size:12px;font-size-adjust:none;}
+html body header.top a,
+html body footer#contact .links,
+html body footer#contact .links a{font-family:'Sentient',Georgia,serif;font-weight:400;letter-spacing:.16em;font-size-adjust:cap-height .653;font-variant:normal;}
+html body figcaption,
+html body .fx-fig figcaption,
+html body figcaption::before,
+html body footer#contact .mail{font-style:normal}
+html body .list li span:first-child{font-variant:normal;text-transform:none;letter-spacing:0}
+</style>
+</head><body>
 <a class="skip" href="#work">Skip to the work</a>
 <header class="top"><a href="/">Victor Aguiar-Macedo</a><nav aria-label="Main"><a class="wide" href="#work">Work</a><a href="#contact">Contact</a></nav></header>
 <div class="dusk d1" aria-hidden="true"></div><div class="dusk" aria-hidden="true"></div>
@@ -454,7 +501,7 @@ body{background:var(--paper) url(/img/grain-light.webp) 0 0/128px}
 <div class="dflow" aria-hidden="true" data-cfg='{"mode": "C", "n": 15, "x0": 0.03, "x1": 0.3, "lean": 0.28, "cy": 0.66, "cx": 0.5, "ye0": 0.0, "ye1": 0.66, "rp": 0.6, "amp": 0.03, "k": 1.5}'><canvas></canvas></div></section>
 <section class="wrap about m-open" aria-label="Introduction">
   <h1 class="m-intro">Hello! I'm Victor. I&nbsp;design apps, visual identities and signage, starting from what people actually&nbsp;need.</h1>
-<!-- Flowing lines: place right after the mobile headline (h1.m-intro). Self-contained, no dependencies. -->
+<!-- Flowing lines, glow v3: one soft flat stroke per line (v3 composition and motion). Replaces the live .flowlines block right after h1.m-intro. Self-contained, no dependencies. -->
 <div class="flowlines" aria-hidden="true"><canvas></canvas></div>
 <style>
 .flowlines{display:none}
@@ -472,20 +519,27 @@ body{background:var(--paper) url(/img/grain-light.webp) 0 0/128px}
  const rnd=s=>{const x=Math.sin(s*12.9898+78.233)*43758.5453;return x-Math.floor(x)};
  const L=Array.from({length:N},(_,i)=>{const t=i/(N-1);return {t,c:col(t),w:2+t*4.2+rnd(i*3.1)*1.4,f:.55+rnd(i*5.7)*.7,s:.16+rnd(i*7.3)*.18,ph:rnd(i*9.1)*6.28,a:.055+rnd(i*4.4)*.05,y:.27+t*.48}});
  let W=0,H=0,D=1;
- const fit=()=>{const r=cv.getBoundingClientRect();D=Math.min(3,window.devicePixelRatio||1);W=r.width;H=r.height;cv.width=Math.round(W*D);cv.height=Math.round(H*D);ctx.setTransform(D,0,0,D,0,0)};
+ const fit=()=>{const r=cv.getBoundingClientRect();D=Math.min(2,window.devicePixelRatio||1);W=r.width;H=r.height;cv.width=Math.round(W*D);cv.height=Math.round(H*D);ctx.setTransform(D,0,0,D,0,0);gfit()};
  const rgb=(c,a,k=1)=>`rgba(${c.map(v=>Math.max(0,Math.min(255,Math.round(v*k))))},${a})`;
- const draw=t=>{ctx.clearRect(0,0,W,H); ctx.lineCap='round'; ctx.lineJoin='round';
+
+ // ---- v3 rendering: ONE flat stroke per line (no strands, edges or highlights), normal blending.
+ //      Soft, airbrushed edge: the same stroke is laid three times, slightly wider and fainter each time (feather ~1.5 px). ----
+ const colc=t=>col(Math.max(0,Math.min(1,t)));
+ const gfit=()=>{};
+ const FE=[[3.2,.16],[1.6,.3],[0,.62]];   // [extra width in CSS px, opacity]: outer feather -> flat body
+ const glow=ls=>{ctx.clearRect(0,0,W,H); ctx.globalCompositeOperation='source-over'; ctx.lineCap='round'; ctx.lineJoin='round';
+  for(const l of ls){const p=l.pts, w=1.2+l.w*.55; ctx.beginPath(); p.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));
+   for(const [e,a] of FE){ctx.strokeStyle=rgb(l.c,a); ctx.lineWidth=w+e; ctx.stroke()}}
+ };
+ const draw=t=>{const ls=[];
   for(const l of L){const pts=[];
    for(let s=0;s<=SEG;s++){const u=s/SEG, x=-W*.05+u*W*1.1;
     const env=u<.08?0:Math.pow(Math.min(1,(u-.08)/.66),1.35);   // calm parallel entry, opening up to the right
     const y=H*(l.y-(u-.5)*.24) + H*.02*Math.sin(u*2.4+t*.12)
       + env*(H*l.a*Math.sin(u*l.f*6.283+t*l.s+l.ph) + H*.016*Math.sin(u*4.7-t*l.s*1.4+l.ph*2) + H*.012*Math.sin(u*3.1+t*.11+l.ph));
     pts.push([x,y])}
-   const w=l.w*(1+.12*Math.sin(t*.27+l.ph)), path=()=>{ctx.beginPath();pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y))};
-   path(); ctx.strokeStyle=rgb(l.c,.9,.62); ctx.lineWidth=w; ctx.stroke();          // shadow edge
-   path(); ctx.strokeStyle=rgb(l.c,1); ctx.lineWidth=w*.72; ctx.stroke();           // body
-   ctx.save(); ctx.translate(-w*.12,-w*.2); path(); ctx.strokeStyle=rgb(l.c,.5,1.28); ctx.lineWidth=Math.max(.6,w*.22); ctx.stroke(); ctx.restore()}  // highlight
- };
+   ls.push({pts,c:l.c,t:l.t,w:l.w*(1+.12*Math.sin(t*.27+l.ph))})}
+  glow(ls)};
  window.__flowPaint=t=>{fit();draw(t)};
  fit();
  const still=matchMedia('(prefers-reduced-motion: reduce)');
@@ -581,8 +635,8 @@ document.querySelectorAll('.rv').forEach(el=>io.observe(el));
  const rnd=s=>{const x=Math.sin(s*12.9898+78.233)*43758.5453;return x-Math.floor(x)};
  const L=Array.from({length:C.n},(_,i)=>{const t=i/(C.n-1);return {t,c:col(t),w:C.wmin+t*(C.wmax-C.wmin)+rnd(i*3.1)*1.3,f:.6+rnd(i*5.7)*.8,s:.16+rnd(i*7.3)*.18,ph:rnd(i*9.1)*6.28,a:.6+rnd(i*4.4)*.8,j:rnd(i*2.3)-.5,q:rnd(i*6.1)-.5}});
  let W=0,H=0,D=1;
- const fit=()=>{const z=parseFloat(getComputedStyle(document.documentElement).zoom)||1;W=box.clientWidth;H=box.clientHeight;D=Math.min(3,window.devicePixelRatio||1)*z;
-  cv.width=Math.round(W*D);cv.height=Math.round(H*D);ctx.setTransform(D,0,0,D,0,0)};
+ const fit=()=>{const z=parseFloat(getComputedStyle(document.documentElement).zoom)||1;W=box.clientWidth;H=box.clientHeight;D=Math.min(2,window.devicePixelRatio||1)*z;
+  cv.width=Math.round(W*D);cv.height=Math.round(H*D);ctx.setTransform(D,0,0,D,0,0);gfit()};
  const rgb=(c,a,k=1)=>`rgba(${c.map(v=>Math.max(0,Math.min(255,Math.round(v*k))))},${a})`;
  const cl=v=>Math.max(0,Math.min(1,v)), ss=(a,b,v)=>{const x=cl((v-a)/(b-a));return x*x*(3-2*x)};
  const bez=(p0,p1,p2,p3,s)=>{const m=1-s;return [m*m*m*p0[0]+3*m*m*s*p1[0]+3*m*s*s*p2[0]+s*s*s*p3[0], m*m*m*p0[1]+3*m*m*s*p1[1]+3*m*s*s*p2[1]+s*s*s*p3[1]]};
@@ -597,18 +651,25 @@ document.querySelectorAll('.rv').forEach(el=>io.observe(el));
    const lerp=(a,b)=>[a[0]+(b[0]-a[0])*g,a[1]+(b[1]-a[1])*g];
    const E=g>=.5?[-.12+(xe+.12)*(g-.5)*2,-.12]:[-.12,-.12+(ys-.02+.12)*(1-g*2)];
    return [[1.08,ys], lerp([.62,ys+.01],[xt,ys+.02]), lerp([.3,ys+.02],[xt+.04,ys-.36]), E]}};
- const draw=T=>{ctx.clearRect(0,0,W,H); ctx.lineCap='round'; ctx.lineJoin='round';
+
+ // ---- v3 rendering: ONE flat stroke per line (no strands, edges or highlights), normal blending.
+ //      Soft, airbrushed edge: the same stroke is laid three times, slightly wider and fainter each time (feather ~1.5 px). ----
+ const colc=t=>col(Math.max(0,Math.min(1,t)));
+ const gfit=()=>{};
+ const FE=[[3.2,.16],[1.6,.3],[0,.62]];   // [extra width in CSS px, opacity]: outer feather -> flat body
+ const glow=ls=>{ctx.clearRect(0,0,W,H); ctx.globalCompositeOperation='source-over'; ctx.lineCap='round'; ctx.lineJoin='round';
+  for(const l of ls){const p=l.pts, w=1.2+l.w*.55; ctx.beginPath(); p.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));
+   for(const [e,a] of FE){ctx.strokeStyle=rgb(l.c,a); ctx.lineWidth=w+e; ctx.stroke()}}
+ };
+ const draw=T=>{const ls=[];
   for(const l of L){const [p0,p1,p2,p3]=ctrl(l).map(([x,y])=>[x*W,y*H]); const base=[];
    for(let s=0;s<=SEG;s++) base.push(bez(p0,p1,p2,p3,s/SEG));
    const pts=base.map(([x,y],s)=>{const u=s/SEG, a=base[Math.max(0,s-1)], b=base[Math.min(SEG,s+1)], dx=b[0]-a[0], dy=b[1]-a[1], n=Math.hypot(dx,dy)||1;
     const env=ss(.06,.4,u)*(1-.5*ss(.8,1,u));                         // parallel entry, soft crossings in the middle, calmer at the end
     const o=env*H*C.amp*(l.a*Math.sin(u*l.f*6.283*C.k+T*l.s+l.ph)+.35*Math.sin(u*9*C.k-T*l.s*1.4+l.ph*2)) + H*.008*Math.sin(u*2.2+T*.12);
     return [x-dy/n*o, y+dx/n*o]});
-   const w=l.w*(1+.12*Math.sin(T*.27+l.ph)), path=()=>{ctx.beginPath();pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y))};
-   path(); ctx.strokeStyle=rgb(l.c,.9,.62); ctx.lineWidth=w; ctx.stroke();          // shadow edge
-   path(); ctx.strokeStyle=rgb(l.c,1); ctx.lineWidth=w*.72; ctx.stroke();           // body
-   ctx.save(); ctx.translate(-w*.12,-w*.2); path(); ctx.strokeStyle=rgb(l.c,.5,1.28); ctx.lineWidth=Math.max(.6,w*.22); ctx.stroke(); ctx.restore()}  // highlight
- };
+   ls.push({pts,c:l.c,t:l.t,w:l.w*(1+.12*Math.sin(T*.27+l.ph))})}
+  glow(ls)};
  window.__deskFlow=t=>{fit();draw(t)};
  fit();
  const still=matchMedia('(prefers-reduced-motion: reduce)');

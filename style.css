@@ -250,3 +250,50 @@ footer#contact{view-timeline:--foot block}
 @media (min-width:2400px){:root{--hz:2}}
 /* phones: long list labels (CV) wrap instead of pushing the page sideways */
 @media (max-width:820px){.list li span:first-child{white-space:normal}}
+
+/* ==== type: preset 12 'Ensaio' (Victor, 22/11) ====
+   Instrument Serif for the opening sentence and the closing line; Sentient (Fontshare, ITF FFL — served by the Fontshare CDN,
+   never committed: the licence forbids copies in a public repository) for everything else.
+   Sizes are the live ones; font-size-adjust keeps each font optically at the old size (text by x-height, headings by cap height).
+   Italic only for quotations, titles of works and asides; never headings, captions or the address.
+   One label style: 12px tracked capitals. */
+@font-face{font-family:'Instrument Serif';font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/InstrumentSerif-normal-latin.woff2) format('woff2')}
+@font-face{font-family:'Instrument Serif';font-style:italic;font-weight:400;font-display:swap;src:url(/fonts/InstrumentSerif-italic-latin.woff2) format('woff2')}
+html body{font-family:'Sentient',Georgia,serif;font-size-adjust:ex-height .43}
+html body #h-work,
+html body #h-about,
+html body .sechead h2{font-family:'Sentient',Georgia,serif;font-weight:500;letter-spacing:-.018em;font-size-adjust:cap-height .653;font-style:normal;}
+html body section.work h2,
+html body .art-head h1,
+html body .case-hero h1{font-family:'Sentient',Georgia,serif;font-weight:500;letter-spacing:-.018em;font-size-adjust:cap-height .653;font-style:normal;}
+html body .prose h2,
+html body .fx h3,
+html body .fx h3.t,
+html body .callout h3{font-family:'Sentient',Georgia,serif;font-weight:500;letter-spacing:-.01em;font-size-adjust:cap-height .653;font-style:normal;}
+html body footer#contact .line,
+html body footer#contact .name{font-family:'Instrument Serif',Georgia,serif;font-weight:400;letter-spacing:-.015em;font-size-adjust:cap-height .72;font-style:normal;}
+html body .pull,
+html body .fx-03 .q p,
+html body .fx-v2 .q p,
+html body .fx-05 .ep,
+html body .fx-09 .ideas li,
+html body .rk-line{font-family:'Instrument Serif',Georgia,serif;font-weight:400;letter-spacing:0;font-style:italic;}
+html body .kicker,
+html body .meta b,
+html body .sc,
+html body .fx .sc,
+html body .fx-02 .k,
+html body .fx-v0 .k,
+html body .fx-v2 .ctx,
+html body .fx-06 .q,
+html body .pull .who,
+html body .fx-05 .row .c:first-child::before,
+html body .fx-05 .row .fn::before{font-family:'Sentient',Georgia,serif;font-weight:500;letter-spacing:.1em;font-variant:normal;text-transform:uppercase;font-size:12px;font-size-adjust:none;}
+html body header.top a,
+html body footer#contact .links,
+html body footer#contact .links a{font-family:'Sentient',Georgia,serif;font-weight:400;letter-spacing:.16em;font-size-adjust:cap-height .653;font-variant:normal;}
+html body figcaption,
+html body .fx-fig figcaption,
+html body figcaption::before,
+html body footer#contact .mail{font-style:normal}
+html body .list li span:first-child{font-variant:normal;text-transform:none;letter-spacing:0}
