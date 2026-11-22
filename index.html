@@ -104,7 +104,7 @@ p,li{text-wrap:pretty}
 .k{font-size:14.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--mut)}
 .work h2{font-weight:400;font-size:clamp(30px,2.8vw,46px);line-height:1.1;letter-spacing:-.012em;margin-top:14px}
 .work p{font-size:21px;line-height:1.5;color:var(--soft);margin-top:16px;max-width:30em}
-a.go{display:inline-block;margin-top:20px;font-size:20px;text-decoration:none;border-bottom:1.5px solid var(--ink);padding-bottom:1px}a.go::after{content:" →"}
+a.go{display:inline-block;margin-top:20px;font-size:20px;text-decoration:none;border-bottom:1.5px solid var(--ink);padding-bottom:1px}
 a.go:hover{border-bottom-width:3px}
 .paper{position:relative;display:grid;grid-template-columns:1fr 1fr;align-items:start;padding:3% 2%}
 .paper img{background:#fff}.paper img:first-child{transform:rotate(-6deg)}.paper img:last-child{transform:rotate(5deg) translate(-8%,8%)}
@@ -169,7 +169,6 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 /* background depth: grain + lighter page/deeper margins + window light */
 
 body::before{background:
-  radial-gradient(ellipse 55% 45% at 18% 0%,rgba(255,253,246,1),rgba(255,253,246,0) 70%),
   linear-gradient(115deg,rgba(255,251,240,.0) 40%,rgba(255,251,240,.55) 52%,rgba(255,251,240,0) 64%),
   radial-gradient(ellipse 120% 90% at 50% 50%,rgba(0,0,0,0) 55%,rgba(110,85,50,.16) 100%),
   radial-gradient(ellipse 70% 60% at 90% 100%,rgba(120,95,60,.14),rgba(120,95,60,0) 65%)
@@ -451,10 +450,14 @@ body{background:var(--paper) url(/img/grain-light.webp) 0 0/128px}
 <header class="top"><a href="/">Victor Aguiar-Macedo</a><nav aria-label="Main"><a class="wide" href="#work">Work</a><a href="#contact">Contact</a></nav></header>
 <div class="dusk d1" aria-hidden="true"></div><div class="dusk" aria-hidden="true"></div>
 <main>
+<<<<<<< HEAD
 <section class="dh" id="intro" aria-label="Introduction"><div class="wrap dh-in"><h1>Hello! I'm Victor.<br> I&nbsp;design apps, visual identities and signage, starting from <i>what people actually&nbsp;need</i>.</h1></div>
+=======
+<section class="dh" id="intro" aria-label="Introduction"><div class="wrap dh-in"><h1>Hello! I'm Victor.<br> I&nbsp;design apps, visual identities and signage, starting from what people actually&nbsp;need.</h1></div>
+>>>>>>> preview
 <div class="dflow" aria-hidden="true" data-cfg='{"mode": "C", "n": 15, "x0": 0.03, "x1": 0.3, "lean": 0.28, "cy": 0.66, "cx": 0.5, "ye0": 0.0, "ye1": 0.66, "rp": 0.6, "amp": 0.03, "k": 1.5}'><canvas></canvas></div></section>
 <section class="wrap about m-open" aria-label="Introduction">
-  <h1 class="m-intro">Hello! I'm Victor. I&nbsp;design apps, visual identities and signage, starting from <i>what people actually&nbsp;need</i>.</h1>
+  <h1 class="m-intro">Hello! I'm Victor. I&nbsp;design apps, visual identities and signage, starting from what people actually&nbsp;need.</h1>
 <!-- Flowing lines: place right after the mobile headline (h1.m-intro). Self-contained, no dependencies. -->
 <div class="flowlines" aria-hidden="true"><canvas></canvas></div>
 <style>
@@ -502,19 +505,19 @@ body{background:var(--paper) url(/img/grain-light.webp) 0 0/128px}
 </section>
 <section class="wrap sec" id="work" aria-labelledby="h-work"><h2 class="rv" id="h-work">Selected&nbsp;work</h2></section>
 <section class="wrap work" id="sappin" aria-labelledby="h-sap">
- <div class="rv"><div class="k">UX design</div><h2 id="h-sap">What do small illustrators in Ceará need?</h2><p>Sappin, an app for local illustrators: interviews, requirements, task flows and a site map, in a team of&nbsp;students.</p><a class="go" href="/work/sappin" aria-label="Read the article about Sappin">Read the article</a></div>
+ <div class="rv"><h2 id="h-sap">What do small illustrators in Ceará need?</h2><p>Sappin, an app for local illustrators: interviews, requirements, task flows and a site map, in a team of&nbsp;students.</p><a class="go" href="/work/sappin" aria-label="Read the article about Sappin">Read the article</a></div>
  <div class="media cardv rv"><video class="cover-vid" autoplay muted loop playsinline preload="none" poster="/img/cover-sappin-poster.webp" width="1600" height="1000" style="background:#F0DCCC" aria-label="Sappin concept screens on a phone"><source data-src="/img/cover-sappin.webm" type="video/webm"><source data-src="/img/cover-sappin.mp4" type="video/mp4"></video></div>
 </section>
 <section class="wrap work flip" id="voar" aria-labelledby="h-voar">
- <div class="rv"><div class="k">UX research</div><h2 id="h-voar">How can an NGO stay close to its individual&nbsp;donors?</h2><p>For Associação Voar, an NGO in Fortaleza: field visit, interviews, usability testing — published as a&nbsp;paper.</p><a class="go" href="/work/voar" aria-label="Read the article about Voar">Read the article</a></div>
+ <div class="rv"><h2 id="h-voar">How can an NGO stay close to its individual&nbsp;donors?</h2><p>For Associação Voar, an NGO in Fortaleza: field visit, interviews, usability testing — published as a&nbsp;paper.</p><a class="go" href="/work/voar" aria-label="Read the article about Voar">Read the article</a></div>
  <div class="media cardv rv"><video class="cover-vid" autoplay muted loop playsinline preload="none" poster="/img/cover-voar-poster.webp" width="1600" height="1000" style="background:#E9D8D8" aria-label="The Voar paper's pages open and a phone with the app rises between them"><source data-src="/img/cover-voar.webm" type="video/webm"><source data-src="/img/cover-voar.mp4" type="video/mp4"></video></div>
 </section>
 <section class="wrap work" id="iracema" aria-labelledby="h-ira">
- <div class="rv"><div class="k">Wayfinding</div><h2 id="h-ira">Praia de Iracema: a wayfinding&nbsp;case</h2><p>For Praia de Iracema, Fortaleza's waterfront: a shared 3D survey and a sign family drawn from the&nbsp;shore.</p><a class="go" href="/work/iracema" aria-label="Read the article about Praia de Iracema wayfinding">Read the article</a></div>
+ <div class="rv"><h2 id="h-ira">Praia de Iracema: a wayfinding&nbsp;case</h2><p>For Praia de Iracema, Fortaleza's waterfront: a shared 3D survey and a sign family drawn from the&nbsp;shore.</p><a class="go" href="/work/iracema" aria-label="Read the article about Praia de Iracema wayfinding">Read the article</a></div>
  <div class="media cardv rv"><video class="cover-vid" autoplay muted loop playsinline preload="none" poster="/img/cover-iracema-poster.webp" width="1600" height="1000" style="background:#DBE6EA" aria-label="The delivered location map draws itself and the 37 sign pieces appear by type"><source data-src="/img/cover-iracema.webm" type="video/webm"><source data-src="/img/cover-iracema.mp4" type="video/mp4"></video></div>
 </section>
 <section class="wrap work flip" id="kennedy" aria-labelledby="h-rk">
- <div class="rv"><div class="k">Visual identity</div><h2 id="h-rk">Roberto Kennedy: visual identity for a&nbsp;photographer</h2><p>For Roberto Kennedy, a photographer: a monogram where two columns frame a single point of&nbsp;light.</p><a class="go" href="/work/roberto-kennedy" aria-label="Read the article about the Roberto Kennedy identity">Read the article</a></div>
+ <div class="rv"><h2 id="h-rk">Roberto Kennedy: visual identity for a&nbsp;photographer</h2><p>For Roberto Kennedy, a photographer: a monogram where two columns frame a single point of&nbsp;light.</p><a class="go" href="/work/roberto-kennedy" aria-label="Read the article about the Roberto Kennedy identity">Read the article</a></div>
  <div class="media cardv rv"><video class="cover-vid" autoplay muted loop playsinline preload="none" poster="/img/cover-rk-poster.webp" width="1600" height="1000" style="background:#0E0E0E" aria-label="The RK monogram draws itself, the spark lights and the frame closes over a photograph"><source data-src="/img/cover-rk.webm" type="video/webm"><source data-src="/img/cover-rk.mp4" type="video/mp4"></video></div>
 </section>
 <section class="wrap about about-end" id="about" aria-labelledby="h-about">
