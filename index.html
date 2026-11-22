@@ -183,12 +183,6 @@ body::before{background:
 /* B phone gap */
 @media (max-width:820px){.hello{min-height:0!important;padding-bottom:24px!important}.sec{padding-top:28px!important;margin-top:0!important}}
 
-/* desktop: scroll settles on each focal part (intro, each project, the footer) */
-@media (min-width:1101px) and (hover:hover) and (pointer:fine){
- html{scroll-snap-type:y mandatory}
- .hello,.work{scroll-snap-align:center}
- footer{scroll-snap-align:end}
-}
 
 /* ending: dusk — the paper dims to warm grey as the footer arrives (scroll-driven) */
 footer{background:transparent;color:var(--ink);box-shadow:none}
@@ -321,7 +315,6 @@ footer .credit{margin-top:18px;font-size:13px;color:var(--mut)}footer .credit a{
  .about-photo .print-photo{animation:dk2 linear both;animation-timeline:view()}
 }}
 @media (min-width:1101px){ .about{gap:48px;padding-block:44px} .about-text h2{font-size:32px} .about-text p{font-size:19px} }
-@media (min-width:1101px) and (hover:hover) and (pointer:fine){ .about{scroll-snap-align:center} }
 @media (max-width:820px){ .about{grid-template-columns:1fr;gap:28px;padding-block:56px 0} .about-text p{font-size:18px} }
 
 /* hero type: Instrument Serif for the statement only (body stays EB Garamond) */
@@ -441,7 +434,6 @@ body{background:var(--paper) url(/img/grain-light.webp) 0 0/128px}
  .dh-in{padding-top:96px}
  .dh h1{font-size:46px}
 }
-@media (min-width:1101px) and (hover:hover) and (pointer:fine){.dh{scroll-snap-align:start}}
 
 /* the dusk dim starts at zero at the top (scroll-padding must not shift the hero's exit range); after the hero's view-timeline shorthand */
 @media (min-width:821px){.dh{view-timeline-inset:0}}
