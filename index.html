@@ -6,7 +6,7 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://vmacedo.com/#website","url":"https://vmacedo.com/","name":"Victor Aguiar-Macedo","inLanguage":"en","publisher":{"@id":"https://vmacedo.com/#victor"}},{"@type":"Person","@id":"https://vmacedo.com/#victor","name":"Victor Aguiar-Macedo","alternateName":"Carlos Victor Aguiar de Macedo","url":"https://vmacedo.com/","image":"https://vmacedo.com/img/victor.webp","jobTitle":"Design student","email":"mailto:hello@vmacedo.com","affiliation":{"@type":"CollegeOrUniversity","name":"Universidade de Fortaleza (Unifor)"},"address":{"@type":"PostalAddress","addressLocality":"Fortaleza","addressCountry":"BR"}}]}</script><link rel="preload" href="/fonts/InstrumentSerif-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preconnect" href="https://api.fontshare.com"><link rel="preconnect" href="https://cdn.fontshare.com" crossorigin><link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=sentient@1,2&amp;display=swap">
 <style>
-/* home 'Stack' (23/11): every part of the home is a sheet of one stack — sheets to come wait at the bottom with their tabs showing, read sheets pile at the top, the last is the peach cover with the address */
+/* home 'Line' (23/11): the sentence is the page — one line from left to right (top to bottom on phones), the work hangs from its words; it ends at 'need.' with the address */
 @font-face{font-family:'Instrument Serif';font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/InstrumentSerif-normal-latin.woff2) format('woff2')}
 :root{--paper:#f4f1ea;--ink:#1a1916;--soft:#4b463e;--mut:#736c60;--hair:rgba(120,86,52,.2);
  --c0:79,122,147;--c1:150,180,196;--c2:240,220,203;--c3:232,160,122;--c4:201,74,91;--c5:192,57,43;
@@ -26,76 +26,85 @@ h1,h2,h3{font-weight:400}
 .skip{position:absolute;left:-9999px}.skip:focus{left:12px;top:12px;z-index:99;background:var(--paper);padding:8px 12px}
 :focus-visible{outline:2px solid rgb(var(--c0));outline-offset:3px}
 
-:root{--T:30px;--L:12px;--m:clamp(28px,4.4vw,64px)}
-html{scroll-behavior:smooth}
-.sheet{position:sticky;top:calc(var(--i)*var(--T));bottom:calc((15 - var(--i))*var(--T) - 100vh);margin-left:calc(var(--i)*var(--L));min-height:calc(100vh - 7*var(--T));background:var(--paper);display:flex;flex-direction:column;--c:var(--c0)}
-/* the edge of each sheet: flat ramp colour with the soft edge of the pieces, along the top (its tab) and the left */
-.sheet::before{content:"";position:absolute;left:0;top:var(--T);bottom:0;width:var(--L);background:rgba(var(--c),.62);box-shadow:0 0 0 .8px rgba(var(--c),.3),0 0 0 1.6px rgba(var(--c),.16)}
-.tab{position:relative;display:flex;justify-content:space-between;align-items:center;height:var(--T);flex:none;padding:0 var(--m) 0 calc(var(--L) + 14px);background:rgba(var(--c),.62);box-shadow:0 0 0 .8px rgba(var(--c),.3),0 0 0 1.6px rgba(var(--c),.16);
- font-size:12px;letter-spacing:.16em;text-transform:uppercase;text-decoration:none;white-space:nowrap}
-.tab nav{display:flex;gap:28px}.tab a{text-decoration:none}
-a.tab:hover span{text-decoration:underline;text-underline-offset:4px}
-.in{flex:1;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(32px,4.5vw,72px);align-items:center;padding:clamp(24px,4.4vh,48px) var(--m) clamp(24px,4.4vh,48px) calc(var(--L) + var(--m))}
-.fig{width:min(100%,calc((100vh - 8*var(--T) - 2*clamp(24px,4.4vh,48px))*1.6));justify-self:end}
-.fig.piece{aspect-ratio:16/10}
-h1{font:400 clamp(44px,min(5vw,8.6vh),76px)/1 var(--display);letter-spacing:-.02em;text-wrap:balance}
-.sheet h2{font:400 clamp(34px,3.5vw,52px)/1.04 var(--display);letter-spacing:-.015em;text-wrap:balance}
-.sheet p{font-size:19px;line-height:1.5;color:var(--soft);margin-top:18px;max-width:30em;text-wrap:pretty}
-.sheet .go{display:inline-block;margin-top:22px;font-size:17px}
-.more .in{grid-template-columns:repeat(4,minmax(0,1fr));align-items:start;align-content:center;gap:clamp(20px,2.4vw,36px)}
-.more h2{font-size:clamp(26px,2.4vw,34px);margin-top:16px}.more h2 a{text-decoration:none}.more h2 a:hover{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:5px}
-.more p{font-size:16px;margin-top:8px}
-.about img{width:min(100%,210px);height:auto;border-radius:3px;justify-self:start}
-.about .in{grid-template-columns:210px minmax(0,1fr);gap:clamp(32px,4vw,64px)}.about .in>div{order:2}
-.about p{font-size:21px;max-width:31em}.about p:first-child{margin-top:0}
-.end{--c:var(--c2);background:linear-gradient(rgba(var(--c2),.62),rgba(var(--c2),.62)),var(--paper)}
-.end .t{font:400 clamp(36px,4vw,60px)/1.02 var(--display);letter-spacing:-.015em;color:var(--ink);margin:0;text-wrap:balance}
-.end .mail{display:inline-block;margin-top:30px;font:400 clamp(30px,3vw,44px)/1.1 var(--display);text-decoration:none;border-bottom:1.5px solid var(--ink);padding-bottom:3px}
-.end nav{display:flex;gap:24px;margin-top:22px;font-size:16px}.end nav a{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.25em}
-.flat .sheet{position:relative!important;top:auto!important;bottom:auto!important}
+:root{--m:56px;--top:60px;--fs:clamp(58px,min(12.6vh,8.6vw),120px);--ch:min(46vh,450px);--cw:calc(var(--ch)*1.6);--band:calc(var(--fs)*1.1 + 3.4vh)}
+html{overflow-y:hidden;scroll-behavior:smooth;scroll-padding-left:var(--m)}
+body{width:max-content;height:100vh;height:100dvh}
+.top{position:fixed;inset:0 0 auto 0;height:var(--top);display:flex;justify-content:space-between;align-items:center;padding:0 var(--m);z-index:9;background:linear-gradient(var(--paper) 70%,rgba(244,241,234,0))}
+.top a{text-decoration:none;font-size:12px;letter-spacing:.16em;text-transform:uppercase}.top nav{display:flex;gap:28px}
+.h1{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.strip{position:relative;display:flex;height:100vh;height:100dvh;padding-top:var(--top)}
+/* the line the work hangs from: one stroke along the whole page, sea blue at the greeting, red at the address */
+.strip::before{content:"";position:absolute;left:var(--m);right:var(--m);top:calc(var(--top) + var(--band));height:2px;border-radius:2px;
+ background:linear-gradient(90deg,rgb(var(--c0)),rgb(var(--c1)) 22%,rgb(var(--c3)) 58%,rgb(var(--c4)) 82%,rgb(var(--c5)));opacity:.62;box-shadow:0 0 0 .8px rgba(var(--c3),.16)}
+.bay{flex:none;padding-left:var(--m);padding-right:40px}
+.bay:last-child{padding-right:var(--m)}
+.ph{position:sticky;left:var(--m);width:max-content;height:var(--band);display:flex;align-items:center;gap:.16em;font:400 var(--fs)/1.1 var(--display);letter-spacing:-.02em;white-space:nowrap}
+.bay:last-child .ph{position:static}
+.pic{flex:none;width:1.34em;height:1.12em;margin:0 .02em}
+.hang{display:flex;gap:56px;align-items:flex-start;padding-top:3.6vh}
+.work{width:var(--cw);flex:none}
+.work .cap{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:2.2vh}
+.work h2{font:400 clamp(24px,3.4vh,31px)/1.08 var(--display);letter-spacing:-.012em;text-wrap:balance}
+.work p,.sm p,.me p{font-size:16px;line-height:1.5;color:var(--soft);text-wrap:pretty}
+.work .go{display:inline-block;margin-top:10px;font-size:16px}
+.sm{width:calc(var(--cw)*.46);flex:none}
+.sm h2{font:400 clamp(22px,3vh,27px)/1.1 var(--display);margin:1.8vh 0 6px}
+.sm h2 a{text-decoration:none}.sm h2 a:hover{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:5px}
+.me{display:flex;gap:30px;align-items:flex-start;width:calc(170px + 30px + 500px)}
+.me img{width:170px;height:auto;border-radius:3px;flex:none}
+.me div{width:500px}.me p{font-size:clamp(17px,2.25vh,20px);line-height:1.5}.me p+p{margin-top:14px}.me .go{display:inline-block;margin-top:18px;font-size:17px}
+.mo{display:none}
+/* the ending: the page stops at the full stop. On the last screen the line reads "what people actually need." flush with the end of the page
+   (the whole clause when the screen is wide enough for it), never cut inside a word; the address hangs from "need." like every other part hangs from its word */
+:root{--room:calc(100vw - 2*var(--m) - 13*var(--fs))}  /* > 0 when the whole clause (12.9 em) fits one screen */
+.finrow{display:flex;align-items:flex-start;justify-content:flex-end;min-width:calc(100vw - 2*var(--m))}
+.fin{flex:none;min-width:clamp(0px,calc(var(--room)*-9999),calc(100vw - var(--m)));display:flex;flex-direction:column;align-items:flex-end}
+.bay:last-child .ph.a{margin-right:.17em}
+.cta{display:flex;flex-direction:column;align-items:flex-end;text-align:right}
+.cta .mail{font:400 clamp(30px,5vh,46px)/1.1 var(--display);letter-spacing:-.01em;text-decoration:none;border-bottom:1.5px solid var(--ink);padding-bottom:3px}
+.cta nav{display:flex;gap:24px;margin-top:2.6vh;font-size:16px}.cta nav a{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.25em}
 @media (max-width:820px){
- :root{--T:22px;--L:4px;--m:18px}
- .tab{font-size:10px;letter-spacing:.14em;padding-left:calc(var(--L) + 10px)}.tab nav{gap:16px}
- .in{display:block;padding:22px var(--m) 26px calc(var(--L) + var(--m))}
- .fig{width:100%;margin-top:22px}.fig.piece{aspect-ratio:1/1;margin-top:6px}
- h1{font-size:clamp(38px,11vw,48px)}.sheet h2{font-size:32px}.sheet p{font-size:17px;margin-top:12px}.sheet .go{margin-top:14px}
- .more .in{display:grid;grid-template-columns:1fr 1fr;gap:20px 16px}.more h2{font-size:23px;margin-top:10px}.more p{font-size:14.5px;line-height:1.42;margin-top:5px}
- .about img{height:auto;width:34%;margin-bottom:16px}.about p{font-size:17px}
- .end .t{font-size:33px}.end .mail{font-size:29px;margin-top:22px}
+ :root{--m:20px;--fs:clamp(40px,12vw,54px)}
+ html{overflow-y:auto;scroll-padding-top:80px}body{width:auto;height:auto}
+ .top{position:static;height:56px;background:none}.top nav{gap:20px}
+ .strip{display:block;height:auto;padding-top:0}
+ .strip::before{left:9px;right:auto;top:64px;bottom:40px;width:2px;height:auto;background:linear-gradient(180deg,rgb(var(--c0)),rgb(var(--c1)) 22%,rgb(var(--c3)) 58%,rgb(var(--c4)) 82%,rgb(var(--c5)))}
+ .bay,.bay:last-child{padding:0 var(--m) 20px 28px}
+ .ph{position:sticky;left:auto;top:0;z-index:3;width:auto;height:auto;white-space:normal;flex-wrap:wrap;padding:10px 0 12px;background:linear-gradient(var(--paper) 86%,rgba(244,241,234,0))}
+ .bay:last-child .ph{position:static}
+ .pic{width:1.3em;height:1.08em}
+ .hang{display:block;padding-top:4px}
+ .work{width:auto;margin-bottom:44px}.work .cap{display:block;margin-top:14px}.work h2{font-size:29px}.work p{margin-top:8px;font-size:17px}
+ .sm{width:auto;display:grid;grid-template-columns:42% 1fr;gap:0 16px;align-items:start;margin-bottom:26px}.sm .cover{grid-row:1/3}.sm h2{margin:-3px 0 4px;font-size:25px}.sm p{font-size:15.5px;line-height:1.45}
+ .me{display:block;width:auto;margin-bottom:28px}.me img{width:34%;margin-bottom:18px}.me div{width:auto}.me p{font-size:17px}
+ .mo{display:block}.wd{display:none!important}.finrow,.fin{display:block;min-width:0}
+ .cta{align-items:flex-start;text-align:left;margin:10px 0 64px}.cta .mail{font-size:31px}.cta nav{margin-top:20px;gap:22px}
 }
 </style></head><body>
-<a class="skip" href="#sappin">Skip to the work</a>
-<main class="stack">
-<section class="sheet" id="hello" style="--i:0;--c:79,122,147"><a class="tab" href="#hello"><span>Victor Aguiar-Macedo</span></a>
- <div class="in"><h1>Hello! I'm Victor. I&nbsp;design apps, visual identities and signage, starting from what people actually&nbsp;need.</h1><div class="fig piece" data-piece="cycle" data-cfg='{"inset":0.86}' aria-hidden="true"></div></div></section>
-<section class="sheet" id="sappin" style="--i:1;--c:150,180,196"><a class="tab" href="#sappin"><span>Sappin</span></a>
- <div class="in"><div><h2>What do small illustrators in Ceará&nbsp;need?</h2><p>Sappin, an app for local illustrators: interviews, requirements, task flows and a site map, in a team of&nbsp;students.</p><a class="go" href="/work/sappin" aria-label="Read the article about Sappin">Read the article</a></div><div class="fig"><video class="cover cover-vid" autoplay muted loop playsinline preload="none" poster="/img/cover-sappin-poster.webp" width="1600" height="1000" style="background:#F0DCCC" aria-label="Sappin concept screens on a phone" ><source data-src="/img/cover-sappin.webm" type="video/webm"><source data-src="/img/cover-sappin.mp4" type="video/mp4"></video></div></div></section><section class="sheet" id="voar" style="--i:2;--c:240,220,203"><a class="tab" href="#voar"><span>Voar</span></a>
- <div class="in"><div><h2>How can an NGO stay close to its individual&nbsp;donors?</h2><p>For Associação Voar, an NGO in Fortaleza: field visit, interviews, usability testing — published as a&nbsp;paper.</p><a class="go" href="/work/voar" aria-label="Read the article about Voar">Read the article</a></div><div class="fig"><video class="cover cover-vid" autoplay muted loop playsinline preload="none" poster="/img/cover-voar-poster.webp" width="1600" height="1000" style="background:#E9D8D8" aria-label="The Voar paper's pages open and a phone with the app rises between them" ><source data-src="/img/cover-voar.webm" type="video/webm"><source data-src="/img/cover-voar.mp4" type="video/mp4"></video></div></div></section><section class="sheet" id="iracema" style="--i:3;--c:236,190,162"><a class="tab" href="#iracema"><span>Praia de Iracema</span></a>
- <div class="in"><div><h2>Praia de Iracema: a wayfinding&nbsp;case</h2><p>For Praia de Iracema, Fortaleza's waterfront: a shared 3D survey and a sign family drawn from the&nbsp;shore.</p><a class="go" href="/work/iracema" aria-label="Read the article about Praia de Iracema wayfinding">Read the article</a></div><div class="fig"><video class="cover cover-vid" autoplay muted loop playsinline preload="none" poster="/img/cover-iracema-poster.webp" width="1600" height="1000" style="background:#DBE6EA" aria-label="The delivered location map draws itself and the 37 sign pieces appear by type" ><source data-src="/img/cover-iracema.webm" type="video/webm"><source data-src="/img/cover-iracema.mp4" type="video/mp4"></video></div></div></section><section class="sheet" id="rk" style="--i:4;--c:232,160,122"><a class="tab" href="#rk"><span>Roberto Kennedy</span></a>
- <div class="in"><div><h2>Roberto Kennedy: visual identity for a&nbsp;photographer</h2><p>For Roberto Kennedy, a photographer: a monogram where two columns frame a single point of&nbsp;light.</p><a class="go" href="/work/roberto-kennedy" aria-label="Read the article about the Roberto Kennedy identity">Read the article</a></div><div class="fig"><video class="cover cover-vid" autoplay muted loop playsinline preload="none" poster="/img/cover-rk-poster.webp" width="1600" height="1000" style="background:#0E0E0E" aria-label="The RK monogram draws itself, the spark lights and the frame closes over a photograph" ><source data-src="/img/cover-rk.webm" type="video/webm"><source data-src="/img/cover-rk.mp4" type="video/mp4"></video></div></div></section>
-<section class="sheet more" id="more" style="--i:5;--c:201,74,91"><a class="tab" href="#more"><span>RUPTURA · Flatland · Vansire · Prototypes</span></a><div class="in"><article><img class="cover" src="/img/kv-ed.webp" width="1600" height="1000" alt="RUPTURA magazine cover and a spread" loading="lazy" decoding="async"><h2><a href="/work/ruptura">RUPTURA</a></h2><p>A magazine about decolonial music, built on a strict grid that its pages keep trying to&nbsp;break.</p></article><article><img class="cover" src="/img/kv-flatland.webp" width="1600" height="1000" alt="The Flatland edition open at Part I" loading="lazy" decoding="async"><h2><a href="/work/flatland">Flatland</a></h2><p>An A5 edition of Edwin A. Abbott's Flatland, set by rule and laid out by&nbsp;script.</p></article><article><img class="cover" src="/img/kv-vansire.webp" width="1600" height="1000" alt="The Vansire folder, front and back" loading="lazy" decoding="async"><h2><a href="/work/vansire">Vansire</a></h2><p>A two-colour folder for a Vansire show in Fortaleza, taken all the way to a press-ready&nbsp;file.</p></article><article><img class="cover" src="/img/kv-proto.webp" width="1600" height="1000" alt="One of the prototypes on a laptop" loading="lazy" decoding="async"><h2><a href="/work/prototypes">Prototypes</a></h2><p>Twenty small apps where a skill is learned by doing, and the twenty principles that came out of building&nbsp;them.</p></article></div></section>
-<section class="sheet about" id="about" style="--i:6;--c:192,57,43"><a class="tab" href="#about"><span>About</span></a>
- <div class="in"><div><p>I'm a design student at the University of Fortaleza (Unifor). I'm broadly interested in using design to express ideas and intent as clearly as possible. I enjoy working on wicked problems and exploring different problem&nbsp;spaces.</p><p>Before design, I studied computer science, and I kept those skills: I build websites and applications, program in JavaScript, work in the Godot engine, do sysadmin work on Linux, and work with AI tools more&nbsp;broadly.</p><a class="go" href="/cv">Read the CV</a></div><img src="/img/victor.webp" width="604" height="800" alt="Portrait of Victor"></div></section>
-<section class="sheet end" id="contact" style="--i:7"><a class="tab" href="#contact"><span>Contact</span></a>
- <div class="in"><div><p class="t">Thanks for stopping by. If you&rsquo;d like to talk about a project, or just say hello, I&rsquo;d love to hear from&nbsp;you.</p><a class="mail" href="mailto:hello@vmacedo.com">hello@vmacedo.com</a><nav aria-label="CV and profiles"><a href="/cv">CV</a><a href="/files/curriculo-carlos-victor-aguiar-de-macedo.pdf">CV (PDF)</a><a href="https://www.linkedin.com/in/victor-aguiar-macedo/" target="_blank" rel="noopener">LinkedIn</a></nav></div><div class="fig piece" data-piece="cycle" data-cfg='{"inset":0.86}' aria-hidden="true"></div></div></section>
+<a class="skip" href="#apps">Skip to the work</a>
+<header class="top"><a href="#hello">Victor Aguiar-Macedo</a><nav aria-label="Main"><a href="#apps">Work</a><a href="#contact">Contact</a></nav></header>
+<h1 class="h1">Hello! I'm Victor. I design apps, visual identities and signage, starting from what people actually need.</h1>
+<main class="strip">
+<section class="bay" id="hello"><p class="ph" aria-hidden="true">Hello! I'm&nbsp;Victor.</p>
+ <div class="hang"><div class="me" id="about"><img src="/img/victor.webp" width="604" height="800" alt="Portrait of Victor"><div><p>I'm a design student at the University of Fortaleza (Unifor). I'm broadly interested in using design to express ideas and intent as clearly as possible. I enjoy working on wicked problems and exploring different problem&nbsp;spaces.</p><p>Before design, I studied computer science, and I kept those skills: I build websites and applications, program in JavaScript, work in the Godot engine, do sysadmin work on Linux, and work with AI tools more&nbsp;broadly.</p><a class="go" href="/cv">Read the CV</a></div></div></div></section>
+<section class="bay" id="apps"><p class="ph" aria-hidden="true"><span>I&nbsp;design</span><span class="pic piece" data-piece="turn" data-cfg='{"piece":"collate","at":7.5,"scale":1.1}'></span><span>apps,</span></p>
+ <div class="hang"><article class="work" id="sappin"><video class="cover cover-vid" autoplay muted loop playsinline preload="none" poster="/img/cover-sappin-poster.webp" width="1600" height="1000" style="background:#F0DCCC" aria-label="Sappin concept screens on a phone" ><source data-src="/img/cover-sappin.webm" type="video/webm"><source data-src="/img/cover-sappin.mp4" type="video/mp4"></video><div class="cap"><h2>What do small illustrators in Ceará&nbsp;need?</h2><div><p>Sappin, an app for local illustrators: interviews, requirements, task flows and a site map, in a team of&nbsp;students.</p><a class="go" href="/work/sappin" aria-label="Read the article about Sappin">Read the article</a></div></div></article><article class="work" id="voar"><video class="cover cover-vid" autoplay muted loop playsinline preload="none" poster="/img/cover-voar-poster.webp" width="1600" height="1000" style="background:#E9D8D8" aria-label="The Voar paper's pages open and a phone with the app rises between them" ><source data-src="/img/cover-voar.webm" type="video/webm"><source data-src="/img/cover-voar.mp4" type="video/mp4"></video><div class="cap"><h2>How can an NGO stay close to its individual&nbsp;donors?</h2><div><p>For Associação Voar, an NGO in Fortaleza: field visit, interviews, usability testing — published as a&nbsp;paper.</p><a class="go" href="/work/voar" aria-label="Read the article about Voar">Read the article</a></div></div></article><article class="sm"><img class="cover" src="/img/kv-proto.webp" width="1600" height="1000" alt="One of the prototypes on a laptop" loading="lazy" decoding="async"><h2><a href="/work/prototypes">Prototypes</a></h2><p>Twenty small apps where a skill is learned by doing, and the twenty principles that came out of building&nbsp;them.</p></article></div></section>
+<section class="bay" id="identities"><p class="ph" aria-hidden="true"><span class="pic piece" data-piece="turn" data-cfg='{"piece":"construct","at":0,"scale":1.18}'></span><span>visual identities</span></p>
+ <div class="hang"><article class="work" id="rk"><video class="cover cover-vid" autoplay muted loop playsinline preload="none" poster="/img/cover-rk-poster.webp" width="1600" height="1000" style="background:#0E0E0E" aria-label="The RK monogram draws itself, the spark lights and the frame closes over a photograph" ><source data-src="/img/cover-rk.webm" type="video/webm"><source data-src="/img/cover-rk.mp4" type="video/mp4"></video><div class="cap"><h2>Roberto Kennedy: visual identity for a&nbsp;photographer</h2><div><p>For Roberto Kennedy, a photographer: a monogram where two columns frame a single point of&nbsp;light.</p><a class="go" href="/work/roberto-kennedy" aria-label="Read the article about the Roberto Kennedy identity">Read the article</a></div></div></article><article class="sm"><img class="cover" src="/img/kv-ed.webp" width="1600" height="1000" alt="RUPTURA magazine cover and a spread" loading="lazy" decoding="async"><h2><a href="/work/ruptura">RUPTURA</a></h2><p>A magazine about decolonial music, built on a strict grid that its pages keep trying to&nbsp;break.</p></article><article class="sm"><img class="cover" src="/img/kv-flatland.webp" width="1600" height="1000" alt="The Flatland edition open at Part I" loading="lazy" decoding="async"><h2><a href="/work/flatland">Flatland</a></h2><p>An A5 edition of Edwin A. Abbott's Flatland, set by rule and laid out by&nbsp;script.</p></article><article class="sm"><img class="cover" src="/img/kv-vansire.webp" width="1600" height="1000" alt="The Vansire folder, front and back" loading="lazy" decoding="async"><h2><a href="/work/vansire">Vansire</a></h2><p>A two-colour folder for a Vansire show in Fortaleza, taken all the way to a press-ready&nbsp;file.</p></article></div></section>
+<section class="bay" id="signage"><p class="ph" aria-hidden="true"><span>and</span><span class="pic piece" data-piece="turn" data-cfg='{"piece":"atlas","at":15,"scale":0.98}'></span><span>signage,</span></p>
+ <div class="hang"><article class="work" id="iracema"><video class="cover cover-vid" autoplay muted loop playsinline preload="none" poster="/img/cover-iracema-poster.webp" width="1600" height="1000" style="background:#DBE6EA" aria-label="The delivered location map draws itself and the 37 sign pieces appear by type" ><source data-src="/img/cover-iracema.webm" type="video/webm"><source data-src="/img/cover-iracema.mp4" type="video/mp4"></video><div class="cap"><h2>Praia de Iracema: a wayfinding&nbsp;case</h2><div><p>For Praia de Iracema, Fortaleza's waterfront: a shared 3D survey and a sign family drawn from the&nbsp;shore.</p><a class="go" href="/work/iracema" aria-label="Read the article about Praia de Iracema wayfinding">Read the article</a></div></div></article></div></section>
+<section class="bay" id="need"><p class="ph mo" aria-hidden="true">starting from what people actually&nbsp;need.</p>
+ <div class="finrow"><p class="ph a wd" aria-hidden="true">starting from</p>
+  <div class="fin"><p class="ph wd" aria-hidden="true">what people actually need.</p>
+   <div class="hang"><div class="cta" id="contact"><a class="mail" href="mailto:hello@vmacedo.com">hello@vmacedo.com</a><nav aria-label="CV and profiles"><a href="/cv">CV</a><a href="/files/curriculo-carlos-victor-aguiar-de-macedo.pdf">CV (PDF)</a><a href="https://www.linkedin.com/in/victor-aguiar-macedo/" target="_blank" rel="noopener">LinkedIn</a></nav></div></div></div></div></section>
 </main>
 <script src="/pieces.js"></script>
 <script>
 Pieces.auto();
-// a piece under a later sheet is on screen but hidden: pause it (Pieces draws only uncovered pieces)
-(()=>{const P=[...document.querySelectorAll('[data-piece]')];let q=0;
- const check=()=>{q=0;let any=false;for(const b of P){const i=b._piece;if(!i)continue;const r=b.getBoundingClientRect();
-   const pts=[[.5,.5],[.2,.2],[.8,.8]].map(([fx,fy])=>document.elementFromPoint(r.left+r.width*fx,r.top+r.height*fy));
-   const was=i.covered;i.covered=!pts.some(h=>h&&b.closest('.sheet').contains(h));if(was&&!i.covered)any=true}if(any)Pieces.kick()};
- addEventListener('scroll',()=>{if(!q)q=requestAnimationFrame(check)},{passive:true});addEventListener('resize',check);setTimeout(check,50)})();
-
-// one stack: sheets already read pile at the top, sheets to come wait at the bottom, tabs showing. A sheet taller than the room between
-// the two piles scrolls to its end before the next one rises; a tab brings its sheet up.
-(()=>{const S=[...document.querySelectorAll('.sheet')],N=S.length,T=()=>parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--T'));
- const lay=()=>{const t=T(),vh=innerHeight;S.forEach((s,i)=>{const h=s.offsetHeight;s.style.top=Math.min(i*t,vh-(N-1-i)*t-h)+'px';s.style.bottom=((N-i)*t-h)+'px'})};
- const go=i=>{const t=T();let y=S[0].parentElement.offsetTop;for(let j=0;j<i;j++)y+=S[j].offsetHeight;scrollTo({top:y-i*t,behavior:'smooth'})};
- document.addEventListener('click',e=>{const a=e.target.closest('a[href^="#"]');if(!a)return;const i=S.findIndex(s=>'#'+s.id===a.getAttribute('href'));if(i<0)return;e.preventDefault();go(i);history.replaceState(null,'',a.getAttribute('href'))});
- addEventListener('resize',lay);new ResizeObserver(lay).observe(document.body);lay();window.__still=()=>document.documentElement.classList.add('flat')})();
+// sideways page: a wheel or the usual keys move along the line, one to one (no easing, no snapping); phones scroll down as usual
+(()=>{const wide=matchMedia('(min-width:821px)');
+ addEventListener('wheel',e=>{if(!wide.matches||e.ctrlKey||Math.abs(e.deltaX)>=Math.abs(e.deltaY))return;e.preventDefault();scrollBy({left:e.deltaY*(e.deltaMode?32:1),behavior:'instant'})},{passive:false});
+ addEventListener('keydown',e=>{if(!wide.matches||e.target.closest('input,textarea'))return;const k={ArrowDown:120,ArrowUp:-120,PageDown:innerWidth*.8,PageUp:-innerWidth*.8,' ':innerWidth*.8,Home:-1e6,End:1e6}[e.key];if(k){e.preventDefault();scrollBy({left:e.shiftKey&&e.key===' '?-k:k,behavior:'smooth'})}})})();
 </script>
 <script>/* lazy cover videos */(function(){var vs=document.querySelectorAll('video.cover-vid[preload=none]');if(matchMedia('(prefers-reduced-motion:reduce)').matches){return}var io=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;var v=e.target;v.querySelectorAll('source[data-src]').forEach(function(s){s.src=s.dataset.src;s.removeAttribute('data-src')});v.load();v.play&&v.play().catch(function(){});io.unobserve(v)})},{rootMargin:'200px'});vs.forEach(function(v){io.observe(v)})})();</script>
 </body></html>
