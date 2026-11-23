@@ -497,54 +497,117 @@ html body .list li span:first-child{font-variant:normal;text-transform:none;lett
 <div class="dflow" aria-hidden="true" data-cfg='{"mode": "C", "n": 15, "x0": 0.03, "x1": 0.3, "lean": 0.28, "cy": 0.66, "cx": 0.5, "ye0": 0.0, "ye1": 0.66, "rp": 0.6, "amp": 0.03, "k": 1.5}'><canvas></canvas></div></section>
 <section class="wrap about m-open" aria-label="Introduction">
   <h1 class="m-intro">Hello! I'm Victor. I&nbsp;design apps, visual identities and signage, starting from what people actually&nbsp;need.</h1>
-<!-- Flowing lines, glow v3: one soft flat stroke per line (v3 composition and motion). Replaces the live .flowlines block right after h1.m-intro. Self-contained, no dependencies. -->
+<!-- Alternating opening (Register -> Collate -> Atlas -> Construct), drawn with the glow v3 edge of the lines. Replaces the live .flowlines block right after h1.m-intro (div + style + script). Same box as the lines; only the mask stops moved from 16%/84% to 7%/93% because the pieces are contained. Self-contained, no dependencies. -->
 <div class="flowlines" aria-hidden="true"><canvas></canvas></div>
 <style>
 .flowlines{display:none}
 @media (max-width:820px){
  .flowlines{display:block;position:relative;margin:18px -22px 0;height:min(100vw,400px);pointer-events:none;
-  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 16%,#000 84%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 16%,#000 84%,transparent 100%)}
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 7%,#000 93%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 7%,#000 93%,transparent 100%)}
  .flowlines canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 }
 </style>
 <script>
-(()=>{const box=document.querySelector('.flowlines'); if(!box) return; const cv=box.querySelector('canvas'), ctx=cv.getContext('2d');
- // sea blue -> sea light -> peach -> rose -> red, far to near
- const RAMP=[[79,122,147],[150,180,196],[240,220,203],[232,160,122],[201,74,91],[192,57,43]], N=14, SEG=64;
- const col=t=>{const v=t*(RAMP.length-1),i=Math.min(RAMP.length-2,Math.floor(v)),f=v-i;return RAMP[i].map((c,k)=>Math.round(c+(RAMP[i+1][k]-c)*f))};
- const rnd=s=>{const x=Math.sin(s*12.9898+78.233)*43758.5453;return x-Math.floor(x)};
- const L=Array.from({length:N},(_,i)=>{const t=i/(N-1);return {t,c:col(t),w:2+t*4.2+rnd(i*3.1)*1.4,f:.55+rnd(i*5.7)*.7,s:.16+rnd(i*7.3)*.18,ph:rnd(i*9.1)*6.28,a:.055+rnd(i*4.4)*.05,y:.27+t*.48}});
- let W=0,H=0,D=1;
- const fit=()=>{const r=cv.getBoundingClientRect();D=Math.min(2,window.devicePixelRatio||1);W=r.width;H=r.height;cv.width=Math.round(W*D);cv.height=Math.round(H*D);ctx.setTransform(D,0,0,D,0,0);gfit()};
- const rgb=(c,a,k=1)=>`rgba(${c.map(v=>Math.max(0,Math.min(255,Math.round(v*k))))},${a})`;
+(()=>{const box=document.querySelector('.flowlines'); if(!box) return; const cv=box.querySelector('canvas'), main=cv.getContext('2d'), layer=document.createElement('canvas'), lctx=layer.getContext('2d'); let ctx=main;
+ // the lines' ramp: sea blue -> sea light -> peach -> orange -> rose -> red
+ const RAMP=[[79,122,147],[150,180,196],[240,220,203],[232,160,122],[201,74,91],[192,57,43]], COVER=[240,220,203];
+ const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)), lerp=(a,b,t)=>a+(b-a)*t, ss=(a,b,v)=>{const x=cl((v-a)/(b-a));return x*x*(3-2*x)};
+ const eio=t=>{t=cl(t);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2};
+ const col=t=>{const v=cl(t)*(RAMP.length-1),i=Math.min(RAMP.length-2,Math.floor(v)),f=v-i;return RAMP[i].map((c,k)=>c+(RAMP[i+1][k]-c)*f)};
+ const rgb=(c,a)=>`rgba(${Math.round(c[0])},${Math.round(c[1])},${Math.round(c[2])},${Math.round(cl(a)*1000)/1000})`;
+ const prng=s=>()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+ const h2=(x,y)=>{const s=Math.sin(x*127.1+y*311.7)*43758.5453;return s-Math.floor(s)};
+ const noise=(x,y)=>{const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi,u=xf*xf*(3-2*xf),v=yf*yf*(3-2*yf);return lerp(lerp(h2(xi,yi),h2(xi+1,yi),u),lerp(h2(xi,yi+1),h2(xi+1,yi+1),u),v)*2-1};
+ let W=0,H=0,D=1,CX=0,CY=0,S=1;     // S: half the height of the composition, in CSS px
+ const fit=()=>{const r=cv.getBoundingClientRect();D=Math.min(2,window.devicePixelRatio||1);W=r.width;H=r.height;
+  cv.width=layer.width=Math.round(W*D);cv.height=layer.height=Math.round(H*D);main.setTransform(D,0,0,D,0,0);lctx.setTransform(D,0,0,D,0,0);CX=W*.5;CY=H*.5;S=Math.min(W*.38,H*.42);GA=makeAtlas(10,9);bake()};
 
- // ---- v3 rendering: ONE flat stroke per line (no strands, edges or highlights), normal blending.
- //      Soft, airbrushed edge: the same stroke is laid three times, slightly wider and fainter each time (feather ~1.5 px). ----
- const colc=t=>col(Math.max(0,Math.min(1,t)));
- const gfit=()=>{};
- const FE=[[3.2,.16],[1.6,.3],[0,.62]];   // [extra width in CSS px, opacity]: outer feather -> flat body
- const glow=ls=>{ctx.clearRect(0,0,W,H); ctx.globalCompositeOperation='source-over'; ctx.lineCap='round'; ctx.lineJoin='round';
-  for(const l of ls){const p=l.pts, w=1.2+l.w*.55; ctx.beginPath(); p.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));
-   for(const [e,a] of FE){ctx.strokeStyle=rgb(l.c,a); ctx.lineWidth=w+e; ctx.stroke()}}
- };
- const draw=t=>{const ls=[];
-  for(const l of L){const pts=[];
-   for(let s=0;s<=SEG;s++){const u=s/SEG, x=-W*.05+u*W*1.1;
-    const env=u<.08?0:Math.pow(Math.min(1,(u-.08)/.66),1.35);   // calm parallel entry, opening up to the right
-    const y=H*(l.y-(u-.5)*.24) + H*.02*Math.sin(u*2.4+t*.12)
-      + env*(H*l.a*Math.sin(u*l.f*6.283+t*l.s+l.ph) + H*.016*Math.sin(u*4.7-t*l.s*1.4+l.ph*2) + H*.012*Math.sin(u*3.1+t*.11+l.ph));
-    pts.push([x,y])}
-   ls.push({pts,c:l.c,t:l.t,w:l.w*(1+.12*Math.sin(t*.27+l.ph))})}
-  glow(ls)};
- window.__flowPaint=t=>{fit();draw(t)};
+ // ---- glow v3 edge, as on the lines: every shape is laid three times in flat colour, a little larger and fainter each time
+ //      ([extra size in CSS px, opacity]: outer feather -> flat body), normal blending. K fades a piece, SOFT widens its feather (the dissolve). ----
+ const FE=[[3.2,.16],[1.6,.3],[0,.62]];
+ let K=1, SOFT=0;
+ const fillG=(c,a,build)=>{for(const [e,al] of FE){ctx.fillStyle=rgb(c,al*a*K);ctx.beginPath();build(e/2*(1+SOFT*5));ctx.fill()}};
+ const strokeG=(c,a,w,build)=>{ctx.beginPath();build();for(const [e,al] of FE){ctx.strokeStyle=rgb(c,al*a*K);ctx.lineWidth=w+e*(1+SOFT*3);ctx.stroke()}};
+ const poly=(P,g)=>{const n=P.length;let A=0;for(let i=0;i<n;i++){const b=P[(i+1)%n];A+=P[i][0]*b[1]-b[0]*P[i][1]}const sg=A>0?g:-g;   // polygon grown outwards by g
+  for(let i=0;i<n;i++){const a=P[(i+n-1)%n],b=P[(i+1)%n],dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy)||1,x=P[i][0]+dy/l*sg,y=P[i][1]-dx/l*sg;i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.closePath()};
+ const rr=(x,y,w,h,r)=>{ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()};
+
+ // ---- 1 · Register: three halftone plates, printed out of register, slide into one image ----
+ const PL=[{c:RAMP[0],ang:15,o:[-.33,-.09,-.03],d:u=>ss(.76,.06,u)*.8,ph:0},
+           {c:RAMP[3],ang:45,o:[.21,-.15,.026],d:u=>Math.pow(cl(1-Math.abs(u-.5)/.58),1.15)*.7,ph:2.1},
+           {c:RAMP[4],ang:75,o:[.12,.29,.02],d:u=>ss(.34,.98,u)*.82,ph:4.2}];
+ let PB=null, PBK='';                      // each plate baked once per size: [sharp, misted] bitmaps (the dots never change, only where the plate sits)
+ const bake=()=>{const key=S+'|'+D;if(key===PBK)return;PBK=key;const R=.62*S,p=R/13,size=Math.ceil(2*(R+p)+40),ax=Math.cos(-.93),ay=Math.sin(-.93);
+  PB=PL.map(P=>{const a=P.ang*Math.PI/180,ca=Math.cos(a),sa=Math.sin(a),n=Math.ceil(R/p)+1,dots=[];
+   for(let i=-n;i<=n;i++)for(let j=-n;j<=n;j++){const x=(i*ca-j*sa)*p,y=(i*sa+j*ca)*p,d=Math.hypot(x,y);if(d>R+p)continue;
+    const r=p*.57*Math.sqrt(P.d(.5+(x*ax+y*ay)/(2*R)))*ss(R+p*.5,R-p*.7,d);if(r>.35)dots.push(x,y,r)}
+   return {size,img:[0,.62].map(soft=>{const c=document.createElement('canvas'),x=c.getContext('2d');c.width=c.height=Math.round(size*D);x.setTransform(D,0,0,D,c.width/2,c.width/2);
+    for(const [e,al] of FE){x.fillStyle=rgb(P.c,al);x.beginPath();const g=e/2*(1+soft*5)*.6;for(let i=0;i<dots.length;i+=3){const r=dots[i+2]+g;x.moveTo(dots[i]+r,dots[i+1]);x.arc(dots[i],dots[i+1],r,0,6.2832)}x.fill()}return c})}})};
+ const register=t=>{const R=.62*S,bx=R*1.2,g=eio((t-.5)/5.3),loose=1-g,m=.115*S,q=.055*S,sq=.07*S,mist=ss(.04,.7,SOFT);
+  PL.forEach((P,k)=>{const ox=P.o[0]*S*loose+Math.cos(t*.31+P.ph),oy=P.o[1]*S*loose+Math.sin(t*.27+P.ph),B=PB[k],h=B.size/2;
+   ctx.save();ctx.translate(CX+ox,CY+oy);ctx.rotate(P.o[2]*loose);
+   ctx.globalAlpha=K*(1-mist);ctx.drawImage(B.img[0],-h,-h,B.size,B.size);if(mist>.004){ctx.globalAlpha=K*mist;ctx.drawImage(B.img[1],-h,-h,B.size,B.size)}ctx.globalAlpha=1;
+   strokeG(P.c,1,.9,()=>{for(const sx of[-1,1])for(const sy of[-1,1]){ctx.moveTo(sx*bx,sy*(bx+q));ctx.lineTo(sx*bx,sy*(bx+q+m));ctx.moveTo(sx*(bx+q),sy*bx);ctx.lineTo(sx*(bx+q+m),sy*bx)}
+    for(const [tx,ty] of [[0,-bx-q-m*.55],[-bx-q-m*.55,0],[bx+q+m*.55,0]]){const r0=m*.3;ctx.moveTo(tx+r0,ty);ctx.arc(tx,ty,r0,0,6.2832);ctx.moveTo(tx-m*.55,ty);ctx.lineTo(tx+m*.55,ty);ctx.moveTo(tx,ty-m*.55);ctx.lineTo(tx,ty+m*.55)}});
+   fillG(P.c,1,e=>{[[1,0,0],[0,1,0],[0,0,1],[1,1,0],[0,1,1],[1,0,1],[1,1,1]].forEach((mm,i)=>{if(mm[k])rr(-sq*3.5+i*sq-e,bx+q+m*.2-e,sq-1.5+2*e,sq-1.5+2*e,1+e)})});
+   ctx.restore()})};
+
+ // ---- 2 · Collate: hand-cut scraps are trimmed square and collated into one fanned stack ----
+ const NS=13, PV=7, SHT=[]; {const R=prng(23), cs=[[-1,-1],[1,-1],[1,1],[-1,1]];
+  for(let k=0;k<NS;k++){const pts=[],cj=[0,1,2,3].map(()=>[(R()-.5)*.34,(R()-.5)*.34]);
+   for(let s=0;s<4;s++)for(let i=0;i<PV;i++){const f=i/PV,a=cs[s],b=cs[(s+1)%4],ja=cj[s],jb=cj[(s+1)%4];
+    pts.push([lerp(a[0],b[0],f),lerp(a[1],b[1],f),lerp(a[0]+ja[0],b[0]+jb[0],f)+(i?(R()-.5)*.07:0),lerp(a[1]+ja[1],b[1]+jb[1],f)+(i?(R()-.5)*.07:0)])}
+   SHT.push({k,pts,th:(R()-.5)*1.5,sw:.32+R()*.5,sh:.3+R()*.42,ph:R()*6.28,tau:k<2?.3+k*.3:.95+(k-2)*.36,c:k===NS-1?COVER:col(k/(NS-2))})}}
+ const LOOSE=[[.16,.2],[.62,.12],[.36,.5],[.86,.34],[.12,.72],[.5,.84],[.78,.7],[.3,.14],[.92,.86],[.58,.44],[.1,.44],[.24,.86],[.44,.28]];
+ const collate=t=>{const sw=.95*S,sh=sw*1.414,step=.068*S,ang=lerp(.34,.86,.5+.5*Math.sin(t*.16-1.2)),dx=Math.cos(ang)*step,dy=-Math.sin(ang)*step,bx=CX-(NS-1)*dx/2,by=CY-(NS-1)*dy/2;
+  for(const s of SHT){const o=eio((t-s.tau)/1.7),lift=Math.sin(o*Math.PI),lx=CX+(LOOSE[s.k][0]-.5)*Math.min(2.5*S,W-84)+Math.sin(t*.21+s.ph)*4,ly=CY+(LOOSE[s.k][1]-.5)*1.75*S+Math.cos(t*.17+s.ph)*4;
+   const x=lerp(lx,bx+s.k*dx,o),y=lerp(ly,by+s.k*dy,o)-lift*.1*S,th=lerp(s.th+Math.sin(t*.13+s.ph)*.05,0,o),c=Math.cos(th),sn=Math.sin(th),hw=lerp(sw*s.sw*.34,sw/2,o),hh=lerp(sw*s.sh*.47,sh/2,o);
+   const P=s.pts.map(p=>{const px=lerp(p[2],p[0],o)*hw,py=lerp(p[3],p[1],o)*hh;return [x+px*c-py*sn,y+px*sn+py*c]});
+   fillG(s.c,1,e=>poly(P,e))}};
+
+ // ---- 3 · Atlas: a shuffled sheet of swatches sorts itself, chip by chip, into a tint chart ----
+ let GA=null; const makeAtlas=(cols,rows)=>{const R=prng(41),n=cols*rows,slot=[...Array(n).keys()],chips=[];
+  for(let k=0;k<n*3;k++){const a=Math.floor(R()*n),b=cl((a/cols|0)+Math.round((R()-.5)*7),0,rows-1)*cols+cl(a%cols+Math.round((R()-.5)*7),0,cols-1);[slot[a],slot[b]]=[slot[b],slot[a]]}
+  for(let i=0;i<n;i++){const c=i%cols,r=i/cols|0,f=(c+r)/(cols+rows-2)+R()*.13;
+   chips.push({c,r,sc:slot[i]%cols,sr:slot[i]/cols|0,col:col(c/(cols-1)),a:lerp(.3,1,Math.pow(r/(rows-1),.85)),rot:(R()-.5)*.5,jx:(R()-.5)*.3,jy:(R()-.5)*.3,tau:.4+f/1.13*4.2})}
+  return {cols,rows,chips}};
+ const atlas=t=>{const {cols,rows,chips}=GA,gw=Math.min(2.66*S,W*.9),sz=gw/cols*.7,cell=(gw-sz)/(cols-1),x0=CX-gw/2+sz/2,y0=CY-(cell*(rows-1))/2;
+  const it=chips.map(ch=>{const o=eio((t-ch.tau)/1.6);return {ch,o,lift:Math.sin(o*Math.PI),x:lerp(x0+(ch.sc+ch.jx)*cell,x0+ch.c*cell,o),y:lerp(y0+(ch.sr+ch.jy)*cell,y0+ch.r*cell,o)}}).sort((a,b)=>(a.o<1)-(b.o<1)||a.lift-b.lift||a.ch.tau-b.ch.tau);
+  for(const i of it){const s=sz*(1+i.lift*.08);ctx.save();ctx.translate(i.x,i.y-i.lift*4);ctx.rotate(i.ch.rot*(1-i.o));fillG(i.ch.col,i.ch.a,e=>rr(-s/2-e,-s/2-e,s+2*e,s+2*e,1.5+e));ctx.restore()}};
+
+ // ---- 4 · Construct: pencil shapes are drawn true on a construction grid and become a modular mark ----
+ const NG=4, MC=[RAMP[0],RAMP[1],col(.5),RAMP[3],RAMP[4],RAMP[5]];
+ const MARK=[['q',2,0],['s',0,2],['q',3,4],['-',0,0],['d',0,3],['q',1,0],['q',0,1],['q',3,5],['q',1,5],['q',2,2],['d',0,4],['s',0,3],['-',0,0],['q',0,4],['q',1,1],['q',2,0]];
+ const OUTL={q:(()=>{const p=[[-.5,-.5]];for(let i=0;i<=20;i++){const a=i/20*Math.PI/2;p.push([-.5+Math.cos(a),-.5+Math.sin(a)])}return p})(),
+  d:Array.from({length:36},(_,i)=>[.5*Math.cos(i/36*6.2832),.5*Math.sin(i/36*6.2832)]),
+  s:[[-.5,-.5,.5,-.5],[.5,-.5,.5,.5],[.5,.5,-.5,.5],[-.5,.5,-.5,-.5]].flatMap(([a,b,c,d])=>Array.from({length:8},(_,i)=>[lerp(a,c,i/8),lerp(b,d,i/8)]))};
+ const CELLS=MARK.map((m,i)=>{const R=prng(70+i);return {t:m[0],k:m[1],c:m[2],x:i%NG,y:i/NG|0,jx:(R()-.5)*.26,jy:(R()-.5)*.26,jr:(R()-.5)*.5,js:.82+R()*.3,seed:R()*99,ord:R()}}).filter(c=>c.t!=='-');
+ CELLS.slice().sort((a,b)=>a.ord-b.ord).forEach((c,i)=>c.tau=.5+i*.3);
+ const construct=t=>{const cell=.47*S,G=cell*NG,x0=CX-G/2,y0=CY-G/2,all=eio((t-4.1)/1.9),ov=.11*S*all;
+  if(all>.01)strokeG(RAMP[0],.32*all,.7,()=>{for(let i=0;i<=NG;i++){ctx.moveTo(x0+i*cell,y0-ov);ctx.lineTo(x0+i*cell,y0+G+ov);ctx.moveTo(x0-ov,y0+i*cell);ctx.lineTo(x0+G+ov,y0+i*cell)}});
+  for(const c of CELLS){const o=eio((t-c.tau)/1.5),raw=1-o,cx=x0+(c.x+.5)*cell+c.jx*cell*raw,cy=y0+(c.y+.5)*cell+c.jy*cell*raw,rot=c.k*Math.PI/2+c.jr*raw,sc=lerp(c.js,1,o)*cell,co=Math.cos(rot),si=Math.sin(rot);
+   const shape=(sd,amp)=>OUTL[c.t].map((p,i)=>{const w=amp*raw,x=(p[0]+noise(i*.33+sd,t*.25)*w)*sc,y=(p[1]+noise(i*.33+sd+40,t*.25)*w)*sc;return [cx+x*co-y*si,cy+x*si+y*co]});
+   const P=shape(c.seed,.05), f=ss(.45,1,o);
+   if(f>.004)fillG(MC[c.c],f,e=>poly(P,e));
+   if(raw>.01){strokeG(RAMP[0],.95*ss(0,.5,raw),.9,()=>poly(P,0));const Q=shape(c.seed+17,.07);strokeG(RAMP[0],.5*ss(0,.5,raw),.7,()=>poly(Q,0))}}};
+
+ // ---- the cycle: each piece resolves (~6 s), holds, then dissolves while the next one appears ----
+ const PIECES=[register,collate,atlas,construct], PER=7.5, LOOP=PER*PIECES.length, IN=.25;
+ const draw=T=>{if(!W||!H)return;main.clearRect(0,0,W,H);
+  PIECES.forEach((piece,i)=>{const t=(((T-i*PER+IN)%LOOP)+LOOP)%LOOP-IN;if(t>PER+.2||(T<.2&&i))return;
+   const k=ss(-IN,.65,t)*(1-ss(PER-.7,PER+.2,t));if(k<.004)return;SOFT=1-k;K=1;
+   ctx=k>.999?main:lctx;if(ctx===lctx)ctx.clearRect(0,0,W,H);ctx.lineCap='round';ctx.lineJoin='round';
+   piece(t);                                                    // a piece in transition is drawn on its own layer, then laid down as one sheet at opacity k
+   if(ctx===lctx){main.globalAlpha=k;main.drawImage(layer,0,0,W,H);main.globalAlpha=1}ctx=main})};
+ window.__flowPaint=t=>{if(!W)fit();draw(t)};
  fit();
- const still=matchMedia('(prefers-reduced-motion: reduce)');
- let raf=0, visible=true, t0=performance.now(), tAcc=7.3;
- const loop=now=>{tAcc+=(now-t0)/1000; t0=now; draw(tAcc); raf=requestAnimationFrame(loop)};
- const run=()=>{cancelAnimationFrame(raf); if(still.matches){draw(7.3);return} if(visible&&!document.hidden){t0=performance.now(); raf=requestAnimationFrame(loop)} else draw(tAcc)};
+ const still=matchMedia('(prefers-reduced-motion: reduce)'), STILL=6.4;
+ let raf=0, visible=true, t0=performance.now(), tAcc=-IN;
+ const loop=now=>{tAcc+=Math.min(.1,(now-t0)/1000); t0=now; draw(tAcc); raf=requestAnimationFrame(loop)};
+ const run=()=>{cancelAnimationFrame(raf); if(!box.offsetParent) return; if(still.matches){draw(STILL);return} if(visible&&!document.hidden){t0=performance.now(); raf=requestAnimationFrame(loop)} else draw(Math.max(0,tAcc))};
  new IntersectionObserver(e=>{visible=e[0].isIntersecting; run()}).observe(box);
  document.addEventListener('visibilitychange',run); still.addEventListener?.('change',run);
- new ResizeObserver(()=>{fit(); draw(tAcc)}).observe(box); addEventListener('orientationchange',()=>{fit(); draw(tAcc)});
+ new ResizeObserver(()=>{fit(); draw(still.matches?STILL:tAcc); run()}).observe(box); addEventListener('orientationchange',()=>{fit(); draw(tAcc)});
  run();
 })();
 </script>
@@ -631,57 +694,107 @@ document.querySelectorAll('.rv').forEach(el=>io.observe(el));
 </script>
 <script>/* lazy cover videos */(function(){var vs=document.querySelectorAll('video.cover-vid[preload=none]');if(matchMedia('(prefers-reduced-motion:reduce)').matches){return}var io=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;var v=e.target;v.querySelectorAll('source[data-src]').forEach(function(s){s.src=s.dataset.src;s.removeAttribute('data-src')});v.load();v.play&&v.play().catch(function(){});io.unobserve(v)})},{rootMargin:'200px'});vs.forEach(function(v){io.observe(v)})})();
 // desktop hero C: flowing lines in the right half
-(()=>{const box=document.querySelector('.dflow'); if(!box) return; const cv=box.querySelector('canvas'), ctx=cv.getContext('2d');
- const C=Object.assign({mode:'C',n:15,amp:.035,k:1.6,wmin:2.2,wmax:6.8},JSON.parse(box.dataset.cfg||'{}'));
- const RAMP=[[79,122,147],[150,180,196],[240,220,203],[232,160,122],[201,74,91],[192,57,43]], SEG=180;   // the phone's ramp, blue -> red
- const col=t=>{const v=t*(RAMP.length-1),i=Math.min(RAMP.length-2,Math.floor(v)),f=v-i;return RAMP[i].map((c,k)=>Math.round(c+(RAMP[i+1][k]-c)*f))};
- const rnd=s=>{const x=Math.sin(s*12.9898+78.233)*43758.5453;return x-Math.floor(x)};
- const L=Array.from({length:C.n},(_,i)=>{const t=i/(C.n-1);return {t,c:col(t),w:C.wmin+t*(C.wmax-C.wmin)+rnd(i*3.1)*1.3,f:.6+rnd(i*5.7)*.8,s:.16+rnd(i*7.3)*.18,ph:rnd(i*9.1)*6.28,a:.6+rnd(i*4.4)*.8,j:rnd(i*2.3)-.5,q:rnd(i*6.1)-.5}});
- let W=0,H=0,D=1;
+// desktop hero C: alternating pieces in the right half (glow v3 edge)
+(()=>{const box=document.querySelector('.dflow'); if(!box) return; const cv=box.querySelector('canvas'), main=cv.getContext('2d'), layer=document.createElement('canvas'), lctx=layer.getContext('2d'); let ctx=main;
+ // the lines' ramp: sea blue -> sea light -> peach -> orange -> rose -> red
+ const RAMP=[[79,122,147],[150,180,196],[240,220,203],[232,160,122],[201,74,91],[192,57,43]], COVER=[240,220,203];
+ const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)), lerp=(a,b,t)=>a+(b-a)*t, ss=(a,b,v)=>{const x=cl((v-a)/(b-a));return x*x*(3-2*x)};
+ const eio=t=>{t=cl(t);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2};
+ const col=t=>{const v=cl(t)*(RAMP.length-1),i=Math.min(RAMP.length-2,Math.floor(v)),f=v-i;return RAMP[i].map((c,k)=>c+(RAMP[i+1][k]-c)*f)};
+ const rgb=(c,a)=>`rgba(${Math.round(c[0])},${Math.round(c[1])},${Math.round(c[2])},${Math.round(cl(a)*1000)/1000})`;
+ const prng=s=>()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+ const h2=(x,y)=>{const s=Math.sin(x*127.1+y*311.7)*43758.5453;return s-Math.floor(s)};
+ const noise=(x,y)=>{const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi,u=xf*xf*(3-2*xf),v=yf*yf*(3-2*yf);return lerp(lerp(h2(xi,yi),h2(xi+1,yi),u),lerp(h2(xi,yi+1),h2(xi+1,yi+1),u),v)*2-1};
+ let W=0,H=0,D=1,CX=0,CY=0,S=1;     // S: half the height of the composition, in CSS px
  const fit=()=>{const z=parseFloat(getComputedStyle(document.documentElement).zoom)||1;W=box.clientWidth;H=box.clientHeight;D=Math.min(2,window.devicePixelRatio||1)*z;
-  cv.width=Math.round(W*D);cv.height=Math.round(H*D);ctx.setTransform(D,0,0,D,0,0);gfit()};
- const rgb=(c,a,k=1)=>`rgba(${c.map(v=>Math.max(0,Math.min(255,Math.round(v*k))))},${a})`;
- const cl=v=>Math.max(0,Math.min(1,v)), ss=(a,b,v)=>{const x=cl((v-a)/(b-a));return x*x*(3-2*x)};
- const bez=(p0,p1,p2,p3,s)=>{const m=1-s;return [m*m*m*p0[0]+3*m*m*s*p1[0]+3*m*s*s*p2[0]+s*s*s*p3[0], m*m*m*p0[1]+3*m*m*s*p1[1]+3*m*s*s*p2[1]+s*s*s*p3[1]]};
- // control points in box fractions (x of width, y of height), per line t: 0 = blue (outer), 1 = red (inner)
- const ctrl=l=>{const t=l.t, sp=Math.pow(t,C.rp??.6);
-  if(C.mode==='C'){ // enter from the bottom edge near column 7, sweep up and open into the upper-right corner
-   const xs=C.x0+(C.x1-C.x0)*(t+l.j*.3/(C.n-1)), ye=C.ye0+(C.ye1-C.ye0)*sp;
-   return [[xs,1.1],[xs+C.lean,C.cy+.16*t],[C.cx+.22*t,ye+.03],[1.08,ye]]}
-  else {            // enter from the right edge low, flow left a little, turn up into the upper right
-   const ys=C.ys0+(C.ys1-C.ys0)*(t+l.j*.3/(C.n-1)), g=1-ss(C.g0??.55,C.g1??.72,t), tt=Math.min(1,t/(C.g0??.55));
-   const xt=C.xt0+(C.xt1-C.xt0)*tt, xe=C.xe0+(C.xe1-C.xe0)*tt;   // turn point and exit on the top edge
-   const lerp=(a,b)=>[a[0]+(b[0]-a[0])*g,a[1]+(b[1]-a[1])*g];
-   const E=g>=.5?[-.12+(xe+.12)*(g-.5)*2,-.12]:[-.12,-.12+(ys-.02+.12)*(1-g*2)];
-   return [[1.08,ys], lerp([.62,ys+.01],[xt,ys+.02]), lerp([.3,ys+.02],[xt+.04,ys-.36]), E]}};
+  cv.width=layer.width=Math.round(W*D);cv.height=layer.height=Math.round(H*D);main.setTransform(D,0,0,D,0,0);lctx.setTransform(D,0,0,D,0,0);CX=W*.52;CY=H*.395;S=Math.min(W*.3,H*.33);GA=makeAtlas(12,9);bake()};
 
- // ---- v3 rendering: ONE flat stroke per line (no strands, edges or highlights), normal blending.
- //      Soft, airbrushed edge: the same stroke is laid three times, slightly wider and fainter each time (feather ~1.5 px). ----
- const colc=t=>col(Math.max(0,Math.min(1,t)));
- const gfit=()=>{};
- const FE=[[3.2,.16],[1.6,.3],[0,.62]];   // [extra width in CSS px, opacity]: outer feather -> flat body
- const glow=ls=>{ctx.clearRect(0,0,W,H); ctx.globalCompositeOperation='source-over'; ctx.lineCap='round'; ctx.lineJoin='round';
-  for(const l of ls){const p=l.pts, w=1.2+l.w*.55; ctx.beginPath(); p.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));
-   for(const [e,a] of FE){ctx.strokeStyle=rgb(l.c,a); ctx.lineWidth=w+e; ctx.stroke()}}
- };
- const draw=T=>{const ls=[];
-  for(const l of L){const [p0,p1,p2,p3]=ctrl(l).map(([x,y])=>[x*W,y*H]); const base=[];
-   for(let s=0;s<=SEG;s++) base.push(bez(p0,p1,p2,p3,s/SEG));
-   const pts=base.map(([x,y],s)=>{const u=s/SEG, a=base[Math.max(0,s-1)], b=base[Math.min(SEG,s+1)], dx=b[0]-a[0], dy=b[1]-a[1], n=Math.hypot(dx,dy)||1;
-    const env=ss(.06,.4,u)*(1-.5*ss(.8,1,u));                         // parallel entry, soft crossings in the middle, calmer at the end
-    const o=env*H*C.amp*(l.a*Math.sin(u*l.f*6.283*C.k+T*l.s+l.ph)+.35*Math.sin(u*9*C.k-T*l.s*1.4+l.ph*2)) + H*.008*Math.sin(u*2.2+T*.12);
-    return [x-dy/n*o, y+dx/n*o]});
-   ls.push({pts,c:l.c,t:l.t,w:l.w*(1+.12*Math.sin(T*.27+l.ph))})}
-  glow(ls)};
- window.__deskFlow=t=>{fit();draw(t)};
+ // ---- glow v3 edge, as on the lines: every shape is laid three times in flat colour, a little larger and fainter each time
+ //      ([extra size in CSS px, opacity]: outer feather -> flat body), normal blending. K fades a piece, SOFT widens its feather (the dissolve). ----
+ const FE=[[3.2,.16],[1.6,.3],[0,.62]];
+ let K=1, SOFT=0;
+ const fillG=(c,a,build)=>{for(const [e,al] of FE){ctx.fillStyle=rgb(c,al*a*K);ctx.beginPath();build(e/2*(1+SOFT*5));ctx.fill()}};
+ const strokeG=(c,a,w,build)=>{ctx.beginPath();build();for(const [e,al] of FE){ctx.strokeStyle=rgb(c,al*a*K);ctx.lineWidth=w+e*(1+SOFT*3);ctx.stroke()}};
+ const poly=(P,g)=>{const n=P.length;let A=0;for(let i=0;i<n;i++){const b=P[(i+1)%n];A+=P[i][0]*b[1]-b[0]*P[i][1]}const sg=A>0?g:-g;   // polygon grown outwards by g
+  for(let i=0;i<n;i++){const a=P[(i+n-1)%n],b=P[(i+1)%n],dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy)||1,x=P[i][0]+dy/l*sg,y=P[i][1]-dx/l*sg;i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.closePath()};
+ const rr=(x,y,w,h,r)=>{ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()};
+
+ // ---- 1 · Register: three halftone plates, printed out of register, slide into one image ----
+ const PL=[{c:RAMP[0],ang:15,o:[-.33,-.09,-.03],d:u=>ss(.76,.06,u)*.8,ph:0},
+           {c:RAMP[3],ang:45,o:[.21,-.15,.026],d:u=>Math.pow(cl(1-Math.abs(u-.5)/.58),1.15)*.7,ph:2.1},
+           {c:RAMP[4],ang:75,o:[.12,.29,.02],d:u=>ss(.34,.98,u)*.82,ph:4.2}];
+ let PB=null, PBK='';                      // each plate baked once per size: [sharp, misted] bitmaps (the dots never change, only where the plate sits)
+ const bake=()=>{const key=S+'|'+D;if(key===PBK)return;PBK=key;const R=.62*S,p=R/13,size=Math.ceil(2*(R+p)+40),ax=Math.cos(-.93),ay=Math.sin(-.93);
+  PB=PL.map(P=>{const a=P.ang*Math.PI/180,ca=Math.cos(a),sa=Math.sin(a),n=Math.ceil(R/p)+1,dots=[];
+   for(let i=-n;i<=n;i++)for(let j=-n;j<=n;j++){const x=(i*ca-j*sa)*p,y=(i*sa+j*ca)*p,d=Math.hypot(x,y);if(d>R+p)continue;
+    const r=p*.57*Math.sqrt(P.d(.5+(x*ax+y*ay)/(2*R)))*ss(R+p*.5,R-p*.7,d);if(r>.35)dots.push(x,y,r)}
+   return {size,img:[0,.62].map(soft=>{const c=document.createElement('canvas'),x=c.getContext('2d');c.width=c.height=Math.round(size*D);x.setTransform(D,0,0,D,c.width/2,c.width/2);
+    for(const [e,al] of FE){x.fillStyle=rgb(P.c,al);x.beginPath();const g=e/2*(1+soft*5)*.6;for(let i=0;i<dots.length;i+=3){const r=dots[i+2]+g;x.moveTo(dots[i]+r,dots[i+1]);x.arc(dots[i],dots[i+1],r,0,6.2832)}x.fill()}return c})}})};
+ const register=t=>{const R=.62*S,bx=R*1.2,g=eio((t-.5)/5.3),loose=1-g,m=.115*S,q=.055*S,sq=.07*S,mist=ss(.04,.7,SOFT);
+  PL.forEach((P,k)=>{const ox=P.o[0]*S*loose+Math.cos(t*.31+P.ph),oy=P.o[1]*S*loose+Math.sin(t*.27+P.ph),B=PB[k],h=B.size/2;
+   ctx.save();ctx.translate(CX+ox,CY+oy);ctx.rotate(P.o[2]*loose);
+   ctx.globalAlpha=K*(1-mist);ctx.drawImage(B.img[0],-h,-h,B.size,B.size);if(mist>.004){ctx.globalAlpha=K*mist;ctx.drawImage(B.img[1],-h,-h,B.size,B.size)}ctx.globalAlpha=1;
+   strokeG(P.c,1,.9,()=>{for(const sx of[-1,1])for(const sy of[-1,1]){ctx.moveTo(sx*bx,sy*(bx+q));ctx.lineTo(sx*bx,sy*(bx+q+m));ctx.moveTo(sx*(bx+q),sy*bx);ctx.lineTo(sx*(bx+q+m),sy*bx)}
+    for(const [tx,ty] of [[0,-bx-q-m*.55],[-bx-q-m*.55,0],[bx+q+m*.55,0]]){const r0=m*.3;ctx.moveTo(tx+r0,ty);ctx.arc(tx,ty,r0,0,6.2832);ctx.moveTo(tx-m*.55,ty);ctx.lineTo(tx+m*.55,ty);ctx.moveTo(tx,ty-m*.55);ctx.lineTo(tx,ty+m*.55)}});
+   fillG(P.c,1,e=>{[[1,0,0],[0,1,0],[0,0,1],[1,1,0],[0,1,1],[1,0,1],[1,1,1]].forEach((mm,i)=>{if(mm[k])rr(-sq*3.5+i*sq-e,bx+q+m*.2-e,sq-1.5+2*e,sq-1.5+2*e,1+e)})});
+   ctx.restore()})};
+
+ // ---- 2 · Collate: hand-cut scraps are trimmed square and collated into one fanned stack ----
+ const NS=13, PV=7, SHT=[]; {const R=prng(23), cs=[[-1,-1],[1,-1],[1,1],[-1,1]];
+  for(let k=0;k<NS;k++){const pts=[],cj=[0,1,2,3].map(()=>[(R()-.5)*.34,(R()-.5)*.34]);
+   for(let s=0;s<4;s++)for(let i=0;i<PV;i++){const f=i/PV,a=cs[s],b=cs[(s+1)%4],ja=cj[s],jb=cj[(s+1)%4];
+    pts.push([lerp(a[0],b[0],f),lerp(a[1],b[1],f),lerp(a[0]+ja[0],b[0]+jb[0],f)+(i?(R()-.5)*.07:0),lerp(a[1]+ja[1],b[1]+jb[1],f)+(i?(R()-.5)*.07:0)])}
+   SHT.push({k,pts,th:(R()-.5)*1.5,sw:.32+R()*.5,sh:.3+R()*.42,ph:R()*6.28,tau:k<2?.3+k*.3:.95+(k-2)*.36,c:k===NS-1?COVER:col(k/(NS-2))})}}
+ const LOOSE=[[.16,.2],[.62,.12],[.36,.5],[.86,.34],[.12,.72],[.5,.84],[.78,.7],[.3,.14],[.92,.86],[.58,.44],[.1,.44],[.24,.86],[.44,.28]];
+ const collate=t=>{const sw=.95*S,sh=sw*1.414,step=.068*S,ang=lerp(.34,.86,.5+.5*Math.sin(t*.16-1.2)),dx=Math.cos(ang)*step,dy=-Math.sin(ang)*step,bx=CX-(NS-1)*dx/2,by=CY-(NS-1)*dy/2;
+  for(const s of SHT){const o=eio((t-s.tau)/1.7),lift=Math.sin(o*Math.PI),lx=CX+(LOOSE[s.k][0]-.5)*Math.min(2.5*S,W-84)+Math.sin(t*.21+s.ph)*4,ly=CY+(LOOSE[s.k][1]-.5)*1.75*S+Math.cos(t*.17+s.ph)*4;
+   const x=lerp(lx,bx+s.k*dx,o),y=lerp(ly,by+s.k*dy,o)-lift*.1*S,th=lerp(s.th+Math.sin(t*.13+s.ph)*.05,0,o),c=Math.cos(th),sn=Math.sin(th),hw=lerp(sw*s.sw*.34,sw/2,o),hh=lerp(sw*s.sh*.47,sh/2,o);
+   const P=s.pts.map(p=>{const px=lerp(p[2],p[0],o)*hw,py=lerp(p[3],p[1],o)*hh;return [x+px*c-py*sn,y+px*sn+py*c]});
+   fillG(s.c,1,e=>poly(P,e))}};
+
+ // ---- 3 · Atlas: a shuffled sheet of swatches sorts itself, chip by chip, into a tint chart ----
+ let GA=null; const makeAtlas=(cols,rows)=>{const R=prng(41),n=cols*rows,slot=[...Array(n).keys()],chips=[];
+  for(let k=0;k<n*3;k++){const a=Math.floor(R()*n),b=cl((a/cols|0)+Math.round((R()-.5)*7),0,rows-1)*cols+cl(a%cols+Math.round((R()-.5)*7),0,cols-1);[slot[a],slot[b]]=[slot[b],slot[a]]}
+  for(let i=0;i<n;i++){const c=i%cols,r=i/cols|0,f=(c+r)/(cols+rows-2)+R()*.13;
+   chips.push({c,r,sc:slot[i]%cols,sr:slot[i]/cols|0,col:col(c/(cols-1)),a:lerp(.3,1,Math.pow(r/(rows-1),.85)),rot:(R()-.5)*.5,jx:(R()-.5)*.3,jy:(R()-.5)*.3,tau:.4+f/1.13*4.2})}
+  return {cols,rows,chips}};
+ const atlas=t=>{const {cols,rows,chips}=GA,gw=Math.min(2.66*S,W*.9),sz=gw/cols*.7,cell=(gw-sz)/(cols-1),x0=CX-gw/2+sz/2,y0=CY-(cell*(rows-1))/2;
+  const it=chips.map(ch=>{const o=eio((t-ch.tau)/1.6);return {ch,o,lift:Math.sin(o*Math.PI),x:lerp(x0+(ch.sc+ch.jx)*cell,x0+ch.c*cell,o),y:lerp(y0+(ch.sr+ch.jy)*cell,y0+ch.r*cell,o)}}).sort((a,b)=>(a.o<1)-(b.o<1)||a.lift-b.lift||a.ch.tau-b.ch.tau);
+  for(const i of it){const s=sz*(1+i.lift*.08);ctx.save();ctx.translate(i.x,i.y-i.lift*4);ctx.rotate(i.ch.rot*(1-i.o));fillG(i.ch.col,i.ch.a,e=>rr(-s/2-e,-s/2-e,s+2*e,s+2*e,1.5+e));ctx.restore()}};
+
+ // ---- 4 · Construct: pencil shapes are drawn true on a construction grid and become a modular mark ----
+ const NG=4, MC=[RAMP[0],RAMP[1],col(.5),RAMP[3],RAMP[4],RAMP[5]];
+ const MARK=[['q',2,0],['s',0,2],['q',3,4],['-',0,0],['d',0,3],['q',1,0],['q',0,1],['q',3,5],['q',1,5],['q',2,2],['d',0,4],['s',0,3],['-',0,0],['q',0,4],['q',1,1],['q',2,0]];
+ const OUTL={q:(()=>{const p=[[-.5,-.5]];for(let i=0;i<=20;i++){const a=i/20*Math.PI/2;p.push([-.5+Math.cos(a),-.5+Math.sin(a)])}return p})(),
+  d:Array.from({length:36},(_,i)=>[.5*Math.cos(i/36*6.2832),.5*Math.sin(i/36*6.2832)]),
+  s:[[-.5,-.5,.5,-.5],[.5,-.5,.5,.5],[.5,.5,-.5,.5],[-.5,.5,-.5,-.5]].flatMap(([a,b,c,d])=>Array.from({length:8},(_,i)=>[lerp(a,c,i/8),lerp(b,d,i/8)]))};
+ const CELLS=MARK.map((m,i)=>{const R=prng(70+i);return {t:m[0],k:m[1],c:m[2],x:i%NG,y:i/NG|0,jx:(R()-.5)*.26,jy:(R()-.5)*.26,jr:(R()-.5)*.5,js:.82+R()*.3,seed:R()*99,ord:R()}}).filter(c=>c.t!=='-');
+ CELLS.slice().sort((a,b)=>a.ord-b.ord).forEach((c,i)=>c.tau=.5+i*.3);
+ const construct=t=>{const cell=.47*S,G=cell*NG,x0=CX-G/2,y0=CY-G/2,all=eio((t-4.1)/1.9),ov=.11*S*all;
+  if(all>.01)strokeG(RAMP[0],.32*all,.7,()=>{for(let i=0;i<=NG;i++){ctx.moveTo(x0+i*cell,y0-ov);ctx.lineTo(x0+i*cell,y0+G+ov);ctx.moveTo(x0-ov,y0+i*cell);ctx.lineTo(x0+G+ov,y0+i*cell)}});
+  for(const c of CELLS){const o=eio((t-c.tau)/1.5),raw=1-o,cx=x0+(c.x+.5)*cell+c.jx*cell*raw,cy=y0+(c.y+.5)*cell+c.jy*cell*raw,rot=c.k*Math.PI/2+c.jr*raw,sc=lerp(c.js,1,o)*cell,co=Math.cos(rot),si=Math.sin(rot);
+   const shape=(sd,amp)=>OUTL[c.t].map((p,i)=>{const w=amp*raw,x=(p[0]+noise(i*.33+sd,t*.25)*w)*sc,y=(p[1]+noise(i*.33+sd+40,t*.25)*w)*sc;return [cx+x*co-y*si,cy+x*si+y*co]});
+   const P=shape(c.seed,.05), f=ss(.45,1,o);
+   if(f>.004)fillG(MC[c.c],f,e=>poly(P,e));
+   if(raw>.01){strokeG(RAMP[0],.95*ss(0,.5,raw),.9,()=>poly(P,0));const Q=shape(c.seed+17,.07);strokeG(RAMP[0],.5*ss(0,.5,raw),.7,()=>poly(Q,0))}}};
+
+ // ---- the cycle: each piece resolves (~6 s), holds, then dissolves while the next one appears ----
+ const PIECES=[register,collate,atlas,construct], PER=7.5, LOOP=PER*PIECES.length, IN=.25;
+ const draw=T=>{if(!W||!H)return;main.clearRect(0,0,W,H);
+  PIECES.forEach((piece,i)=>{const t=(((T-i*PER+IN)%LOOP)+LOOP)%LOOP-IN;if(t>PER+.2||(T<.2&&i))return;
+   const k=ss(-IN,.65,t)*(1-ss(PER-.7,PER+.2,t));if(k<.004)return;SOFT=1-k;K=1;
+   ctx=k>.999?main:lctx;if(ctx===lctx)ctx.clearRect(0,0,W,H);ctx.lineCap='round';ctx.lineJoin='round';
+   piece(t);                                                    // a piece in transition is drawn on its own layer, then laid down as one sheet at opacity k
+   if(ctx===lctx){main.globalAlpha=k;main.drawImage(layer,0,0,W,H);main.globalAlpha=1}ctx=main})};
+ window.__deskFlow=t=>{if(!W)fit();draw(t)};
  fit();
- const still=matchMedia('(prefers-reduced-motion: reduce)');
- let raf=0, visible=true, t0=performance.now(), tAcc=7.3;
- const loop=now=>{tAcc+=(now-t0)/1000; t0=now; draw(tAcc); raf=requestAnimationFrame(loop)};
- const run=()=>{cancelAnimationFrame(raf); if(!box.offsetParent) return; if(still.matches){draw(7.3);return} if(visible&&!document.hidden){t0=performance.now(); raf=requestAnimationFrame(loop)} else draw(tAcc)};
+ const still=matchMedia('(prefers-reduced-motion: reduce)'), STILL=6.4;
+ let raf=0, visible=true, t0=performance.now(), tAcc=-IN;
+ const loop=now=>{tAcc+=Math.min(.1,(now-t0)/1000); t0=now; draw(tAcc); raf=requestAnimationFrame(loop)};
+ const run=()=>{cancelAnimationFrame(raf); if(!box.offsetParent) return; if(still.matches){draw(STILL);return} if(visible&&!document.hidden){t0=performance.now(); raf=requestAnimationFrame(loop)} else draw(Math.max(0,tAcc))};
  new IntersectionObserver(e=>{visible=e[0].isIntersecting; run()}).observe(box);
  document.addEventListener('visibilitychange',run); still.addEventListener?.('change',run);
- new ResizeObserver(()=>{fit(); draw(tAcc); run()}).observe(box);
+ new ResizeObserver(()=>{fit(); draw(still.matches?STILL:tAcc); run()}).observe(box);
  run();
 })();
 </script>
