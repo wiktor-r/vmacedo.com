@@ -3,810 +3,99 @@
 <meta name="description" content="Victor Aguiar-Macedo — design student at Unifor, Fortaleza. Research, visual identity, wayfinding and prototypes.">
 <meta property="og:title" content="Victor Aguiar-Macedo"><meta property="og:description" content="Hello! I'm Victor. I design apps, visual identities and signage, starting from what people actually need."><meta property="og:image" content="https://vmacedo.com/img/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:url" content="https://vmacedo.com/"><meta property="og:type" content="website"><meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://vmacedo.com/">
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://vmacedo.com/#website","url":"https://vmacedo.com/","name":"Victor Aguiar-Macedo","inLanguage":"en","publisher":{"@id":"https://vmacedo.com/#victor"}},{"@type":"Person","@id":"https://vmacedo.com/#victor","name":"Victor Aguiar-Macedo","alternateName":"Carlos Victor Aguiar de Macedo","url":"https://vmacedo.com/","image":"https://vmacedo.com/img/victor.webp","jobTitle":"Design student","email":"mailto:hello@vmacedo.com","affiliation":{"@type":"CollegeOrUniversity","name":"Universidade de Fortaleza (Unifor)"},"address":{"@type":"PostalAddress","addressLocality":"Fortaleza","addressCountry":"BR"}}]}</script><link rel="preload" href="/fonts/EBGaramond-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://vmacedo.com/#website","url":"https://vmacedo.com/","name":"Victor Aguiar-Macedo","inLanguage":"en","publisher":{"@id":"https://vmacedo.com/#victor"}},{"@type":"Person","@id":"https://vmacedo.com/#victor","name":"Victor Aguiar-Macedo","alternateName":"Carlos Victor Aguiar de Macedo","url":"https://vmacedo.com/","image":"https://vmacedo.com/img/victor.webp","jobTitle":"Design student","email":"mailto:hello@vmacedo.com","affiliation":{"@type":"CollegeOrUniversity","name":"Universidade de Fortaleza (Unifor)"},"address":{"@type":"PostalAddress","addressLocality":"Fortaleza","addressCountry":"BR"}}]}</script><link rel="preload" href="/fonts/InstrumentSerif-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preconnect" href="https://api.fontshare.com"><link rel="preconnect" href="https://cdn.fontshare.com" crossorigin><link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=sentient@1,2&amp;display=swap">
 <style>
-@font-face{font-family:'EB Garamond';font-style:normal;font-weight:400 800;font-display:swap;src:url(/fonts/EBGaramond-normal-latin.woff2) format('woff2')}
-@font-face{font-family:'EB Garamond';font-style:italic;font-weight:400 800;font-display:swap;src:url(/fonts/EBGaramond-italic-latin.woff2) format('woff2')}
-:root{--paper:#f4f1ea;--ink:#1a1916;--soft:#4b463e;--mut:#736c60;--wrap:1240px}
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;scroll-padding-top:104px}
-body{background:var(--paper);color:var(--ink);font:400 19px/1.6 "EB Garamond",Georgia,serif;-webkit-font-smoothing:antialiased}
-a{color:inherit} img{display:block;max-width:100%;height:auto}
-:focus-visible{outline:2px solid var(--ink);outline-offset:4px}
-.skip{position:absolute;left:-9999px;top:12px;background:var(--ink);color:var(--paper);padding:8px 14px;z-index:50}.skip:focus{left:12px}
-header.top{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;justify-content:space-between;align-items:baseline;padding:30px 48px 44px;background:linear-gradient(var(--paper) 62%,rgba(244,241,234,0))}
-header.top a{text-decoration:none;font-size:14px;letter-spacing:.2em;text-transform:uppercase}
-header.top nav{display:flex;gap:30px;color:var(--soft)}
-.wrap{max-width:var(--wrap);margin:0 auto;padding-inline:48px}
-@media (min-width:1101px){
- :root{--fpad:clamp(48px,4.5vw,88px);--fout:120px}
- .wrap{max-width:min(var(--wrap),calc(100vw - 2*(var(--fout) + var(--fpad))));padding-inline:0}
- body::after{content:"";position:fixed;top:0;bottom:0;left:50%;transform:translateX(-50%);pointer-events:none;z-index:1;
-  width:calc(min(var(--wrap),calc(100vw - 2*(var(--fout) + var(--fpad)))) + 2*var(--fpad));box-sizing:border-box;
-  border-left:1px solid rgba(120,86,52,.11);border-right:1px solid rgba(120,86,52,.11)}
-}
-.shadow{box-shadow:0 1px 2px rgba(40,30,15,.08),0 26px 50px -18px rgba(40,30,15,.32)}
-/* intro */
-.hello{min-height:min(74svh,720px);align-content:center;display:grid;grid-template-columns:1fr 300px;gap:clamp(36px,5vw,96px);align-items:center;padding-top:110px;padding-bottom:40px}
-.hello h1{font-weight:400;font-size:clamp(42px,4.1vw,78px);line-height:1.03;letter-spacing:-.02em}
-.hello h1 i,.k i{color:var(--soft)}
-.hello p{font-style:italic;font-size:clamp(21px,1.8vw,27px);line-height:1.42;color:var(--soft);margin-top:28px;max-width:26em}
-.hello .print-photo img{aspect-ratio:4/5;object-fit:cover;width:100%}
-
-.print-photo{position:relative;background:#fbfaf6;padding:14px;rotate:-2.2deg;
- box-shadow:0 1px 1px rgba(40,30,15,.10),0 6px 12px -4px rgba(40,30,15,.14),0 28px 50px -22px rgba(40,30,15,.35)}
-.print-photo img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;filter:contrast(.94) saturate(.88) sepia(.06) brightness(1.02)}
-.print-photo::before{content:"";position:absolute;inset:14px;pointer-events:none;mix-blend-mode:soft-light;
- background:linear-gradient(135deg,rgba(255,255,255,.28),rgba(255,255,255,0) 38%,rgba(0,0,0,0) 70%,rgba(0,0,0,.12))}
-
-/* desk compositions: real pieces lying on the paper */
-.desk{position:relative;aspect-ratio:16/11}
-.desk img{position:absolute;display:block;height:auto;box-shadow:0 1px 1px rgba(40,30,15,.10),0 6px 12px -4px rgba(40,30,15,.14),0 28px 50px -22px rgba(40,30,15,.34)}
-/**/.desk.rk .pf{left:2%;top:2%;width:42%;transform:rotate(-4deg)}
-.desk.rk .cb{left:40%;top:16%;width:56%;transform:rotate(3deg)}
-.desk.rk .cf{left:33%;top:52%;width:56%;transform:rotate(-6deg)}
-.desk.ira{aspect-ratio:16/12}
-.desk.ira .s1{left:0;top:2%;width:80%;transform:rotate(-4deg);background:#fff}
-.desk.ira .s2{left:20%;top:30%;width:80%;transform:rotate(3deg);background:#fff}
-@supports (animation-timeline: view()) { @media (prefers-reduced-motion: no-preference) {
- .desk img{animation:dk linear both;animation-timeline:view()}
- .desk img:nth-child(2){animation-name:dk2}.desk img:nth-child(3){animation-name:dk3}
- @keyframes dk{from{translate:4% 8%;rotate:-1.5deg}to{translate:-2% -4%;rotate:1deg}}
- @keyframes dk2{from{translate:-4% 14%;rotate:2deg}to{translate:3% -6%;rotate:-1deg}}
- @keyframes dk3{from{translate:6% 18%;rotate:-2deg}to{translate:-3% -8%;rotate:1.5deg}}
-}}
-@media (max-width:820px){.desk{margin:6px 4px 18px}}
-
-
-p,li{text-wrap:pretty}
-.work h2,.sec h2,.play h2{text-wrap:balance}
-
-@media (min-width:1101px){}
-@media (min-width:1101px) and (max-width:1679px){:root{--fout:140px}}
-@media (max-width:1279px){}
-@media (min-width:1680px){:root{--fout:248px}}
-/* photo stack behind the portrait (placeholders for now) */
-@media (min-width:821px){.hello>div:first-child{padding-right:clamp(48px,6vw,110px)}}
-.stack{position:relative;isolation:isolate}
-.stack>.print-photo:not(.back){position:relative;z-index:3}
-.stack .print-photo.back img{aspect-ratio:auto;width:100%;filter:none}
-.stack .print-photo.back{position:absolute;padding:9px;box-shadow:0 1px 1px rgba(40,30,15,.10),0 10px 24px -8px rgba(40,30,15,.30)}
-.stack .ph{background:linear-gradient(135deg,#d9d3c6,#c9c1b2);display:flex;align-items:center;justify-content:center}
-.stack .ph span{font-style:italic;font-size:14px;letter-spacing:.06em;color:rgba(60,52,40,.45)}
-.stack .print-photo.b1{width:62%;left:-28%;top:20%;transform:rotate(-9deg);z-index:1}
-.stack .print-photo.b2{width:52%;right:-26%;top:-12%;transform:rotate(8deg);z-index:2}
-.stack .print-photo.b3{width:42%;left:-20%;bottom:-14%;transform:rotate(5deg);z-index:4}
-@media (max-width:820px){
- .hello{grid-template-columns:1fr min(38%,230px)!important;gap:clamp(22px,5vw,48px)!important;padding-bottom:56px!important;align-items:center;padding-bottom:36px}
- .hello h1{font-size:clamp(24px,6.4vw,40px)}
- .hello>div:first-child{position:relative;z-index:5}
- .stack .print-photo.b2{right:-3%}
- html,body{overflow-x:clip}
- .hello>div:last-child{order:0!important}
- .stack{width:100%;margin:10px 0 18px}.stack>.print-photo:not(.back){width:100%!important;margin:0!important;padding:6px}
- .stack .print-photo.back{padding:5px}
- .stack .print-photo.b1{width:50%;left:-9%;top:30%}.stack .print-photo.b2{width:52%;right:-14%;top:-10%}.stack .print-photo.b3{width:44%;left:-12%;bottom:-14%}
-}
-
-@media (min-width:821px) and (max-width:1100px){.hello{grid-template-columns:1fr 260px!important}.stack .print-photo.b2{right:-10%}}
-@media (max-width:820px){.stack{width:88%!important;margin-right:0;margin-left:auto}.stack .print-photo.b2{right:-8%!important}}
-/* projects */
-@media (max-width:1100px){.sec{border-top:0;position:relative}.sec::before{content:"";position:absolute;top:0;left:48px;right:48px;height:1px;background:rgba(26,25,22,.22)}}
-@media (max-width:820px){.sec::before{left:22px;right:22px}}
-.sec+.work::before,.work+.work::before{content:"";position:absolute;top:0;left:48px;right:48px;height:1px;background:rgba(120,86,52,.16)}
-.work{padding-block:clamp(48px,7vh,88px)}
-@media (min-width:1101px){.sec+.work::before,.work+.work::before{left:0;right:0}}
-@media (max-width:820px){.sec+.work::before,.work+.work::before{left:22px;right:22px}.work+.work{padding-top:40px;margin-top:40px}}
-
-.work{position:relative;display:grid;grid-template-columns:1.05fr 1fr;gap:clamp(40px,6vw,96px);align-items:center;padding-block:clamp(36px,5vh,72px)}
-.work.flip{grid-template-columns:1fr 1.05fr}.work.flip .media{order:-1}
-.work:not(.flip) .media{order:1}
-.k{font-size:14.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--mut)}
-.work h2{font-weight:400;font-size:clamp(30px,2.8vw,46px);line-height:1.1;letter-spacing:-.012em;margin-top:14px}
-.work p{font-size:21px;line-height:1.5;color:var(--soft);margin-top:16px;max-width:30em}
-a.go{display:inline-block;margin-top:20px;font-size:20px;text-decoration:none;border-bottom:1.5px solid var(--ink);padding-bottom:1px}
-a.go:hover{border-bottom-width:3px}
-.paper{position:relative;display:grid;grid-template-columns:1fr 1fr;align-items:start;padding:3% 2%}
-.paper img{background:#fff}.paper img:first-child{transform:rotate(-6deg)}.paper img:last-child{transform:rotate(5deg) translate(-8%,8%)}
-.sec{border-top:1px solid rgba(26,25,22,.22);padding-top:clamp(36px,5vh,64px);margin-top:clamp(16px,3vh,36px)}
-.sec h2,.play h2{font-weight:400;font-size:clamp(32px,3.4vw,50px);line-height:1.1;margin-top:12px}
-/* play */
-.play{padding-block:clamp(44px,6vh,80px) 4vh;margin-top:clamp(28px,4vh,52px);border-top:1px solid rgba(26,25,22,.22)}
-.play h2{font-weight:400;font-size:clamp(32px,3.4vw,50px);line-height:1.1;margin-top:12px}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:44px 32px;margin-top:44px;list-style:none}
-.grid a{display:block;text-decoration:none}.grid a img{transition:transform .35s ease,box-shadow .35s ease}
-.grid a:hover img{transform:translateY(-4px)}
-.grid .t{display:flex;justify-content:space-between;align-items:baseline;margin-top:16px;font-size:20px}.grid .t span:last-child{font-style:italic;color:var(--mut);font-size:17px}
-/* gentle reveal, only with JS and only if motion is welcome */
-.js .rv{opacity:0;transform:translateY(28px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.7,.2,1)}
-.js .rv.in{opacity:1;transform:none}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.js .rv{opacity:1;transform:none;transition:none}.grid a img{transition:none}}
-footer{position:relative;z-index:25;background:var(--ink);color:#f3efe6;padding:clamp(80px,18vh,200px) 48px 0;overflow:hidden}
-footer .line{font-size:clamp(36px,4.6vw,70px);line-height:1.06;letter-spacing:-.015em;max-width:15em}
-footer .mail{display:inline-block;margin-top:36px;font-style:italic;font-size:clamp(22px,2.4vw,34px);color:#f3efe6;text-underline-offset:8px}
-footer .links{display:flex;flex-wrap:wrap;gap:12px 34px;margin-top:64px;padding-top:22px;border-top:1px solid rgba(243,239,230,.18);color:rgba(243,239,230,.7);font-size:18px}
-footer .links a{text-decoration:none}
-footer .name{font-size:min(200px,calc((100vw - 96px) / 8.3));line-height:.8;letter-spacing:-.03em;white-space:nowrap;margin-top:70px;color:rgba(243,239,230,.08);transform:translateY(.12em)}
-footer .name::before{content:attr(data-name)}
-footer{margin-top:clamp(40px,7vh,88px)}
-
-
-footer{position:relative;z-index:25;box-shadow:0 -40px 80px -20px rgba(26,25,22,.28)}
-/* ---- depth ---- */
-html{background-color:var(--paper)}
-html.at-end{background-color:var(--ink)}
-body{background:var(--paper);position:relative;isolation:isolate}
-body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
- background:radial-gradient(ellipse 80% 60% at 22% 8%,rgba(255,252,244,.95),rgba(255,252,244,0) 60%),
-            radial-gradient(ellipse 90% 70% at 85% 105%,rgba(120,100,70,.10),rgba(120,100,70,0) 60%)}
-.shadow{box-shadow:0 1px 1px rgba(40,30,15,.06),0 4px 10px -3px rgba(40,30,15,.10),0 30px 60px -22px rgba(40,30,15,.34),0 60px 90px -50px rgba(40,30,15,.22)}
-.work .media img,.grid a img{transition:translate .45s cubic-bezier(.2,.7,.2,1),box-shadow .45s}
-.work .media:hover img:only-child,.grid a:hover img{translate:0 -6px;box-shadow:0 1px 1px rgba(40,30,15,.06),0 8px 16px -4px rgba(40,30,15,.12),0 44px 80px -24px rgba(40,30,15,.38),0 90px 130px -50px rgba(40,30,15,.32)}
-@supports (animation-timeline: view()) { @media (prefers-reduced-motion: no-preference) {
- .paper img:first-child{animation:pa linear both;animation-timeline:view()}
- @keyframes pa{from{rotate:-3deg;translate:8% 14%}to{rotate:3deg;translate:-4% -8%}}
- .paper img:last-child{animation:pb linear both;animation-timeline:view()}
- @keyframes pb{from{rotate:4deg;translate:-6% 22%}to{rotate:-3deg;translate:6% -12%}}
-}}
-@media (max-width:1100px){}
-@media (max-width:820px){
- header.top{padding:16px 22px;background:var(--paper);box-shadow:0 1px 0 rgba(26,25,22,.08)}header.top a{font-size:12px;letter-spacing:.16em;white-space:nowrap}header.top nav a.wide{display:none}
- .wrap{padding:0 22px}
- .hello{grid-template-columns:1fr;min-height:0;padding-top:100px;gap:32px}
- .work,.work.flip{grid-template-columns:1fr;min-height:0;padding-block:72px 0;gap:24px}.work .media,.work.flip .media,.work:not(.flip) .media{order:-1}
-.work p{font-size:18px}.paper{padding:4% 6% 10%}
- .play{padding-block:64px 0;margin-top:56px}
- .sec{padding-top:56px;margin-top:8px}.work,.work.flip{padding-block:48px 0}.grid{grid-template-columns:1fr 1fr;gap:28px 14px;margin-top:28px}.grid .t{font-size:15px}.grid .t span:last-child{display:none}
- footer{padding:clamp(64px,12vh,140px) 22px 0}
- footer .name{font-size:calc((100vw - 44px) / 8.3)}
-}
-
-/* footer follows the page's content strip */
-@media (min-width:1101px){
- footer{padding-inline:max(48px,calc((100% - min(var(--wrap),calc(100vw - 2*(var(--fout) + var(--fpad))))) / 2))}
- footer .name{font-size:min(200px,calc(min(var(--wrap),calc(100vw - 2*(var(--fout) + var(--fpad)))) / 8.3))}
-}
-/* background depth: grain + lighter page/deeper margins + window light */
-
-body::before{background:
-  linear-gradient(115deg,rgba(255,251,240,.0) 40%,rgba(255,251,240,.55) 52%,rgba(255,251,240,0) 64%),
-  radial-gradient(ellipse 120% 90% at 50% 50%,rgba(0,0,0,0) 55%,rgba(110,85,50,.16) 100%),
-  radial-gradient(ellipse 70% 60% at 90% 100%,rgba(120,95,60,.14),rgba(120,95,60,0) 65%)
-!important}
-/* separators sit under the floating props */
-.sec+.work::before,.work+.work::before{z-index:1}
-.sec+.work::before{content:"";position:absolute;top:0;height:1px;background:rgba(120,86,52,.16)}
-#voar{z-index:3}#kennedy{z-index:1}#iracema{z-index:2}.sec{position:relative;z-index:5}
-.sec{padding-bottom:clamp(28px,4vh,48px)}
-/* B: no rule above the heading */
-.sec{border-top:0!important}.sec::before{display:none!important}
-/* B phone gap */
-@media (max-width:820px){.hello{min-height:0!important;padding-bottom:24px!important}.sec{padding-top:28px!important;margin-top:0!important}}
-
-
-/* ending: dusk — the paper dims to warm grey as the footer arrives (scroll-driven) */
-footer{background:transparent;color:var(--ink);box-shadow:none}
-footer .mail{color:var(--ink)}
-footer .links{border-top-color:rgba(120,86,52,.18);color:var(--soft)}
-footer .name{color:rgba(26,25,22,.06)}
-html.at-end{background-color:var(--paper)}
-
-.dusk{position:fixed;inset:0;z-index:40;pointer-events:none;background:#e3dccf;mix-blend-mode:multiply;opacity:0}
-body{timeline-scope:--foot,--hello}
-.hello{view-timeline:--hello block;view-timeline-inset:0}
-footer{view-timeline:--foot block}
-@supports (animation-timeline: view()){.dusk{animation:dusk linear both;animation-timeline:--foot;animation-range:entry 0% entry 100%}}
-@keyframes dusk{to{opacity:.85}}
-@supports (animation-timeline: view()){.dusk.d1{animation:dusk1 linear both;animation-timeline:--hello;animation-range:exit 0% exit 100%}}
-@keyframes dusk1{from{opacity:0}to{opacity:.5}}
-footer .name{color:rgba(26,25,22,.07)}
-
-/* ---- desktop at ~150%: the whole page is zoomed; sizes below are in zoomed px, widths in %, so nothing relies on vw/vh ---- */
-@media (min-width:1101px){
- html{zoom:var(--z)}
- :root{--z:1.3;--fout:56px;--fpad:40px;--cmax:1100px}
- .wrap{max-width:none;width:min(calc(100% - 2*(var(--fout) + var(--fpad))),var(--cmax));margin-inline:auto;padding-inline:0}
- body::after{width:min(calc(100% - 2*var(--fout)),calc(var(--cmax) + 2*var(--fpad)))}
- header.top{padding:22px 32px 34px}
- .hello{min-height:calc(78svh / var(--z));grid-template-columns:1fr 250px;gap:40px;padding-top:96px;padding-bottom:24px}
- .hello>div:first-child{padding-right:24px}
- .hello h1{font-size:42px}
- .stack .print-photo.b2{right:-12%}
- .hello p{font-size:21px}
- .sec{padding-top:28px;margin-top:8px;padding-bottom:16px}
- .sec h2{font-size:34px}
- .work{gap:48px;padding-block:36px}
- .work h2{font-size:30px}
- .work p{font-size:19px}
- a.go{font-size:18px}
- .k{font-size:12.5px}
- footer{container-type:inline-size;margin-top:24px;padding:110px max(calc(var(--fout) + var(--fpad)),calc((100% - var(--cmax)) / 2)) 0}
- footer .line{font-size:44px}
- footer .mail{font-size:24px;margin-top:28px}
- footer .links{font-size:16px;margin-top:48px}
- footer .name{font-size:calc(100cqi / 8.3);margin-top:56px}
-}
-@media (min-width:1340px){:root{--z:1.5}}
-@media (min-width:1600px){:root{--z:1.6}}
-@media (min-width:1920px){:root{--z:1.75}}
-@media (min-width:2400px){:root{--z:2}}
-
-/* ---- intro: a full-screen detective board ---- */
-footer .credit{margin-top:18px;font-size:13px;color:var(--mut)}footer .credit a{color:inherit}
-@font-face{font-family:'Caveat';font-style:normal;font-weight:400 700;font-display:swap;src:url(/fonts/Caveat-latin.woff2) format('woff2')}
-.hello{display:block!important;position:relative;min-height:100svh!important;padding:0!important;margin:0}
-.hello-in{position:absolute;left:39%;top:50%;translate:-50% -50%;width:min(15.5em,40%);z-index:950;pointer-events:none}
-.hello-in h1{font-weight:400;font-size:clamp(30px,3.3vw,58px);line-height:1.04;letter-spacing:-.02em}
-.hello{overflow-x:clip}
-.board,.hello>.board{position:absolute!important;inset:0;padding:0!important;z-index:auto!important;container-type:size;--str:#a8231c}
-.strings,.pins{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:visible}.pins{z-index:900}
-.str{fill:none;stroke:var(--str);stroke-width:1.3;stroke-linecap:round;opacity:.9;filter:drop-shadow(0 2px 1.2px rgba(40,20,10,.28))}
-.pin .hd{fill:#b52a20}.pin .sh{fill:rgba(40,20,10,.28)}.pin .hl{fill:rgba(255,255,255,.65)}
-.ev{--W:var(--w);position:absolute;left:calc(var(--x) * 1%);top:calc(var(--y) * 1%);width:calc(var(--W) * 1cqw);translate:-50% -50%;rotate:var(--r);
- box-shadow:0 1px 1px rgba(40,30,15,.10),0 5px 10px -4px rgba(40,30,15,.16),0 22px 34px -20px rgba(40,30,15,.34);
- transition:rotate .35s cubic-bezier(.2,.7,.2,1),scale .25s ease,box-shadow .25s ease;user-select:none;-webkit-user-select:none}
-.ev img,.ev svg{display:block;width:100%;height:auto;pointer-events:none}
-.polaroid{background:#fbfaf6;padding:calc(var(--W) * .05cqw) calc(var(--W) * .05cqw) 0}
-.polaroid img{aspect-ratio:1/1;object-fit:cover;filter:contrast(.95) saturate(.82) sepia(.08)}
-.polaroid.wide img{aspect-ratio:4/3}.polaroid.tall img{aspect-ratio:4/5}
-#ev-me img{object-position:50% 30%}
-.cap,.lbl,.note p,.index p,.scrawl{font-family:'Caveat',cursive;line-height:1.05;color:#2b2723;margin:0;font-style:normal;max-width:none}
-.cap{display:block;padding:calc(var(--W) * .05cqw) 2px calc(var(--W) * .07cqw);font-size:max(11px,1.25cqw);text-align:center}
-.note{aspect-ratio:1;padding:calc(var(--W) * .11cqw);display:flex;align-items:center}
-.note p{font-size:max(12px,1.55cqw);font-weight:500}
-.note u{text-decoration-color:var(--str);text-decoration-thickness:1.5px;text-underline-offset:3px}
-.note.yellow{background:linear-gradient(#efe1a2,#ead993)}.note.rose{background:linear-gradient(#f0c6b8,#e9b9aa)}
-.index{background:#fbfaf6 repeating-linear-gradient(transparent 0 calc(1.15cqw - 1px),rgba(70,110,170,.22) calc(1.15cqw - 1px) 1.15cqw);background-position:0 .8cqw;border-top:3px solid rgba(181,42,32,.55);padding:calc(var(--W) * .06cqw) calc(var(--W) * .08cqw) calc(var(--W) * .08cqw)}
-.index .hd{font-size:max(12px,1.5cqw);font-weight:700}.index p{font-size:max(11px,1.3cqw)}
-.graph{background:#fbfaf6;background-image:linear-gradient(rgba(70,110,170,.16) 1px,transparent 1px),linear-gradient(90deg,rgba(70,110,170,.16) 1px,transparent 1px);background-size:calc(var(--W) * .08cqw) calc(var(--W) * .08cqw);padding:calc(var(--W) * .06cqw) calc(var(--W) * .06cqw) 2px}
-.lbl{display:block;font-size:max(11px,1.2cqw);padding:4px 0 2px;text-align:center}
-.taped{background:#fff;padding:calc(var(--W) * .04cqw)}.taped img{aspect-ratio:1;object-fit:cover}
-.taped::before,.taped::after{content:"";position:absolute;width:38%;height:12%;background:rgba(236,226,196,.75);box-shadow:0 1px 2px rgba(0,0,0,.08)}
-.taped::before{top:-5%;left:-8%;rotate:-32deg}.taped::after{bottom:-5%;right:-8%;rotate:-32deg}
-.scrawl{position:absolute;left:calc(var(--x) * 1%);top:calc(var(--y) * 1%);translate:-50% -50%;rotate:var(--r);font-size:max(12px,1.45cqw);color:#5a4f45;opacity:.85;pointer-events:none;white-space:nowrap;text-align:center}
-.scrawl::after{content:"";position:absolute;inset:-20% -14%;border:1.3px solid rgba(181,42,32,.55);border-radius:50%;rotate:-4deg}
-@media (hover:hover) and (pointer:fine){.ev{cursor:grab}.ev:hover{scale:1.03;box-shadow:0 1px 1px rgba(40,30,15,.10),0 10px 18px -6px rgba(40,30,15,.2),0 34px 50px -24px rgba(40,30,15,.4)}
- .ev.held{cursor:grabbing;scale:1.07;rotate:0deg;transition:scale .2s ease,box-shadow .2s ease;box-shadow:0 2px 2px rgba(40,30,15,.10),0 18px 28px -8px rgba(40,30,15,.28),0 50px 70px -30px rgba(40,30,15,.45)}}
-.board.pinning .ev{animation:land .55s cubic-bezier(.2,.7,.2,1) both}
-.board.pinning .str{stroke-dasharray:1600;animation:pull 1.1s ease-out 1s both}
-.board.pinning .pin{animation:pinin .3s ease-out both}
-@keyframes land{from{opacity:0;translate:-50% -62%;scale:1.08}}
-@keyframes pull{from{stroke-dashoffset:1600}to{stroke-dashoffset:0}}
-@keyframes pinin{from{opacity:0}}
-.board.pinning #ev-me{animation-delay:0.00s}.board.pinning #ev-stickies{animation-delay:0.08s}.board.pinning #ev-door{animation-delay:0.16s}.board.pinning #ev-heur{animation-delay:0.24s}.board.pinning #ev-q1{animation-delay:0.32s}.board.pinning #ev-q2{animation-delay:0.40s}.board.pinning #ev-sign{animation-delay:0.48s}.board.pinning #ev-wire{animation-delay:0.56s}.board.pinning #ev-phone{animation-delay:0.64s}.board.pinning #ev-lens{animation-delay:0.72s}
-@media (min-width:1101px){ .hello{min-height:calc(100svh / var(--z))!important} .hello-in h1{font-size:46px} }
-@media (max-width:820px){
- .hello-in{left:50%;top:24%;width:calc(100% - 44px)}
- .hello-in h1{font-size:clamp(30px,8.4vw,40px)}
- .ev{--W:var(--mw);left:calc(var(--mx) * 1%);top:calc(var(--my) * 1%);rotate:var(--mr)}
- .ev.nm,.scrawl.nm{display:none}
- .cap{font-size:max(11px,3.4cqw)}.note p{font-size:max(13px,4.6cqw)}
-}
-
-/* only the portrait and the headline are at full strength; the rest of the board recedes */
-.ev:not(#ev-me){opacity:.4;filter:saturate(.55)}
-.str{opacity:.38}.pin:not(.me){opacity:.4}.scrawl{opacity:.32}
-.ev{transition:rotate .35s cubic-bezier(.2,.7,.2,1),scale .25s ease,box-shadow .25s ease,opacity .3s ease,filter .3s ease}
-@media (hover:hover) and (pointer:fine){.ev:hover,.ev.held{opacity:1;filter:none}}
-
-/* denser board, further back: only the portrait and headline read at full strength */
-.ev:not(#ev-me){opacity:.24;filter:saturate(.45)}
-.str{opacity:.26}.pin:not(.me){opacity:.3}.scrawl{opacity:.26}
-.note.green{background:linear-gradient(#cfe0b4,#c3d6a6)}.note.blue{background:linear-gradient(#c6d8e8,#b9cde0)}
-.receipt{background:#fbfaf6;padding:calc(var(--W) * .1cqw) calc(var(--W) * .09cqw) calc(var(--W) * .14cqw);clip-path:polygon(0 0,100% 0,100% 96%,90% 100%,80% 96%,70% 100%,60% 96%,50% 100%,40% 96%,30% 100%,20% 96%,10% 100%,0 96%)}
-.receipt .mono{font:500 max(9px,.82cqw)/1.45 ui-monospace,Menlo,monospace;color:#3a352f;margin:0;white-space:nowrap}
-.index .av{width:34%;margin:4% 0}
-.chips{background:#fbfaf6;padding:calc(var(--W) * .08cqw);display:grid;gap:calc(var(--W) * .06cqw)}
-.chips i{display:block;aspect-ratio:2/1}
-.hello-in::before{content:"";position:absolute;inset:-14% -10%;z-index:-1;background:radial-gradient(closest-side,rgba(244,241,234,.75),rgba(244,241,234,0));pointer-events:none}
-
-/* ---- hero without the portrait: plain headline, the board clears around it ---- */
-.hello-in{left:50%;width:min(620px,64%)}
-.hello-in::before{display:none}
-.board{-webkit-mask-image:radial-gradient(ellipse 44% 30% at 47% 50%,transparent 48%,#000 100%);mask-image:radial-gradient(ellipse 44% 30% at 47% 50%,transparent 48%,#000 100%)}
-.ev{opacity:.3}
-@media (min-width:1101px){.hello-in h1{font-size:50px}}
-@media (max-width:820px){.hello-in{top:25%;width:calc(100% - 44px)}.board{-webkit-mask-image:linear-gradient(transparent 30%,#000 44%);mask-image:linear-gradient(transparent 30%,#000 44%)}}
-/* ---- about: the portrait clipped into a case folder ---- */
-.about{display:grid;grid-template-columns:1fr 1.05fr;gap:clamp(40px,6vw,96px);align-items:center;padding-block:clamp(48px,8vh,96px)}
-.about-text h2{font-weight:400;font-size:clamp(30px,2.8vw,46px);line-height:1.1;letter-spacing:-.012em;margin-top:14px;text-wrap:balance}
-.about-text p{font-size:21px;line-height:1.5;color:var(--soft);margin-top:16px;max-width:30em}
-@supports (animation-timeline: view()) { @media (prefers-reduced-motion: no-preference) {
- .about-photo .print-photo{animation:dk2 linear both;animation-timeline:view()}
-}}
-@media (min-width:1101px){ .about{gap:48px;padding-block:44px} .about-text h2{font-size:32px} .about-text p{font-size:19px} }
-@media (max-width:820px){ .about{grid-template-columns:1fr;gap:28px;padding-block:56px 0} .about-text p{font-size:18px} }
-
-/* hero type: Instrument Serif for the statement only (body stays EB Garamond) */
+/* home 'Stack' (23/11): every part of the home is a sheet of one stack — sheets to come wait at the bottom with their tabs showing, read sheets pile at the top, the last is the peach cover with the address */
 @font-face{font-family:'Instrument Serif';font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/InstrumentSerif-normal-latin.woff2) format('woff2')}
-@font-face{font-family:'Instrument Serif';font-style:italic;font-weight:400;font-display:swap;src:url(/fonts/InstrumentSerif-italic-latin.woff2) format('woff2')}
-.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-.hello-in{width:min(600px,66%)}
-.hello-in h1{font-family:'Instrument Serif',Georgia,serif!important;font-weight:400;font-size:clamp(40px,5.2vw,76px)!important;line-height:.95;letter-spacing:-.018em}
-.hello-in h1 i{color:var(--soft)}
-.hello-in h1{text-wrap:balance}
-@media (min-width:1101px){.hello-in h1{font-size:68px!important}}
-@media (max-width:820px){.hello-in{width:calc(100% - 44px)}.hello-in h1{font-size:clamp(38px,11vw,50px)!important}}
+:root{--paper:#f4f1ea;--ink:#1a1916;--soft:#4b463e;--mut:#736c60;--hair:rgba(120,86,52,.2);
+ --c0:79,122,147;--c1:150,180,196;--c2:240,220,203;--c3:232,160,122;--c4:201,74,91;--c5:192,57,43;
+ --display:'Instrument Serif',Georgia,serif;--text:'Sentient',Georgia,serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--paper);-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font:400 18px/1.55 var(--text);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:inherit}img,video{display:block;max-width:100%;height:auto}
+h1,h2,h3{font-weight:400}
+.d{font-family:var(--display);font-weight:400;letter-spacing:-.015em}
+.go{text-decoration:none;border-bottom:1.5px solid var(--ink);padding-bottom:2px;white-space:nowrap}
+.go:hover{border-bottom-width:3px;padding-bottom:.5px}
+.pl{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.22em}
+.pl:hover{text-decoration-thickness:2px}
+.cover{display:block;aspect-ratio:16/10;width:100%;object-fit:cover;border-radius:3px;background:#eeeae0}
+.piece{position:relative;pointer-events:none}.piece canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.skip{position:absolute;left:-9999px}.skip:focus{left:12px;top:12px;z-index:99;background:var(--paper);padding:8px 12px}
+:focus-visible{outline:2px solid rgb(var(--c0));outline-offset:3px}
 
-/* about: just the portrait, as a taped print */
-.about-photo{display:flex;justify-content:center;padding:4% 8%}
-.about-photo .print-photo{width:min(100%,360px);rotate:-2.5deg}
-.taped-print::after{content:"";position:absolute;top:-16px;left:50%;width:34%;height:30px;translate:-50% 0;rotate:3deg;background:rgba(236,226,196,.78);box-shadow:0 1px 2px rgba(0,0,0,.08)}
-@media (max-width:820px){.about-photo{padding:10px 18% 0}}
-/* phone hero: the board fills the screen around a centred headline */
+:root{--T:30px;--L:12px;--m:clamp(28px,4.4vw,64px)}
+html{scroll-behavior:smooth}
+.sheet{position:sticky;top:calc(var(--i)*var(--T));bottom:calc((15 - var(--i))*var(--T) - 100vh);margin-left:calc(var(--i)*var(--L));min-height:calc(100vh - 7*var(--T));background:var(--paper);display:flex;flex-direction:column;--c:var(--c0)}
+/* the edge of each sheet: flat ramp colour with the soft edge of the pieces, along the top (its tab) and the left */
+.sheet::before{content:"";position:absolute;left:0;top:var(--T);bottom:0;width:var(--L);background:rgba(var(--c),.62);box-shadow:0 0 0 .8px rgba(var(--c),.3),0 0 0 1.6px rgba(var(--c),.16)}
+.tab{position:relative;display:flex;justify-content:space-between;align-items:center;height:var(--T);flex:none;padding:0 var(--m) 0 calc(var(--L) + 14px);background:rgba(var(--c),.62);box-shadow:0 0 0 .8px rgba(var(--c),.3),0 0 0 1.6px rgba(var(--c),.16);
+ font-size:12px;letter-spacing:.16em;text-transform:uppercase;text-decoration:none;white-space:nowrap}
+.tab nav{display:flex;gap:28px}.tab a{text-decoration:none}
+a.tab:hover span{text-decoration:underline;text-underline-offset:4px}
+.in{flex:1;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(32px,4.5vw,72px);align-items:center;padding:clamp(24px,4.4vh,48px) var(--m) clamp(24px,4.4vh,48px) calc(var(--L) + var(--m))}
+.fig{width:min(100%,calc((100vh - 8*var(--T) - 2*clamp(24px,4.4vh,48px))*1.6));justify-self:end}
+.fig.piece{aspect-ratio:16/10}
+h1{font:400 clamp(44px,min(5vw,8.6vh),76px)/1 var(--display);letter-spacing:-.02em;text-wrap:balance}
+.sheet h2{font:400 clamp(34px,3.5vw,52px)/1.04 var(--display);letter-spacing:-.015em;text-wrap:balance}
+.sheet p{font-size:19px;line-height:1.5;color:var(--soft);margin-top:18px;max-width:30em;text-wrap:pretty}
+.sheet .go{display:inline-block;margin-top:22px;font-size:17px}
+.more .in{grid-template-columns:repeat(4,minmax(0,1fr));align-items:start;align-content:center;gap:clamp(20px,2.4vw,36px)}
+.more h2{font-size:clamp(26px,2.4vw,34px);margin-top:16px}.more h2 a{text-decoration:none}.more h2 a:hover{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:5px}
+.more p{font-size:16px;margin-top:8px}
+.about img{width:min(100%,210px);height:auto;border-radius:3px;justify-self:start}
+.about .in{grid-template-columns:210px minmax(0,1fr);gap:clamp(32px,4vw,64px)}.about .in>div{order:2}
+.about p{font-size:21px;max-width:31em}.about p:first-child{margin-top:0}
+.end{--c:var(--c2);background:linear-gradient(rgba(var(--c2),.62),rgba(var(--c2),.62)),var(--paper)}
+.end .t{font:400 clamp(36px,4vw,60px)/1.02 var(--display);letter-spacing:-.015em;color:var(--ink);margin:0;text-wrap:balance}
+.end .mail{display:inline-block;margin-top:30px;font:400 clamp(30px,3vw,44px)/1.1 var(--display);text-decoration:none;border-bottom:1.5px solid var(--ink);padding-bottom:3px}
+.end nav{display:flex;gap:24px;margin-top:22px;font-size:16px}.end nav a{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.25em}
+.flat .sheet{position:relative!important;top:auto!important;bottom:auto!important}
 @media (max-width:820px){
- .hello-in{top:46%}
- .board{-webkit-mask-image:radial-gradient(ellipse 62% 17% at 50% 46%,transparent 50%,#000 100%);mask-image:radial-gradient(ellipse 62% 17% at 50% 46%,transparent 50%,#000 100%)}
- .cap{font-size:max(10px,3cqw)}.note p{font-size:max(11px,3.6cqw)}
+ :root{--T:22px;--L:4px;--m:18px}
+ .tab{font-size:10px;letter-spacing:.14em;padding-left:calc(var(--L) + 10px)}.tab nav{gap:16px}
+ .in{display:block;padding:22px var(--m) 26px calc(var(--L) + var(--m))}
+ .fig{width:100%;margin-top:22px}.fig.piece{aspect-ratio:1/1;margin-top:6px}
+ h1{font-size:clamp(38px,11vw,48px)}.sheet h2{font-size:32px}.sheet p{font-size:17px;margin-top:12px}.sheet .go{margin-top:14px}
+ .more .in{display:grid;grid-template-columns:1fr 1fr;gap:20px 16px}.more h2{font-size:23px;margin-top:10px}.more p{font-size:14.5px;line-height:1.42;margin-top:5px}
+ .about img{height:auto;width:34%;margin-bottom:16px}.about p{font-size:17px}
+ .end .t{font-size:33px}.end .mail{font-size:29px;margin-top:22px}
 }
-
-/* hero as a caption: name large, role and focus quietly underneath */
-.hello-in{width:min(720px,72%)}
-@media (min-width:1101px){.hello-in h1{font-size:80px!important}}
-.hello-in h1{line-height:.95;letter-spacing:-.022em}
-.hello-in .hero-cap{margin:18px 0 0;max-width:24em;font-style:normal;font-size:22px;line-height:1.4;color:var(--soft);text-wrap:balance}
-.hello-in .hero-cap i{font-style:italic;color:var(--ink)}
-@media (max-width:820px){.hello-in{width:calc(100% - 44px)}.hello-in h1{font-size:clamp(40px,12vw,54px)!important}.hello-in .hero-cap{font-size:18px;margin-top:12px}}
-.desk.sap{aspect-ratio:16/12}.desk.sap .s1{left:0;top:4%;width:78%;transform:rotate(-3deg);background:#fff}.desk.sap .s2{left:20%;top:40%;width:80%;transform:rotate(2.5deg);background:#fff;z-index:2}
-#sappin{z-index:4}
-.go+.go2{margin-left:28px}
-
-/* phones: a single intro section (line, a messy pile of prints with the portrait on top, About); the board hero is desktop-only */
-.m-intro,.pile-b{display:none}
-@media (max-width:820px){
- .hello{display:none!important}
- .about{padding-top:96px!important}
- .m-intro{display:block;font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:clamp(34px,10vw,44px);line-height:1;letter-spacing:-.015em;text-wrap:balance}
- .m-intro i{color:var(--soft)}
- .about-photo{position:relative;padding:30px 24% 26px;isolation:isolate}
- .about-photo .print-photo:not(.pile-b){position:relative;z-index:6;width:100%;padding:8px;rotate:-2deg}
- .about-photo .pile-b{display:none!important}
- .about-photo .pile-b img{aspect-ratio:1;object-fit:cover;filter:contrast(.95) saturate(.8) sepia(.08)}
- .about-photo .pb1{left:1%;top:12%;rotate:-12deg}.about-photo .pb2{right:0;top:3%;width:44%;rotate:10deg}.about-photo .pb2 img{aspect-ratio:4/5}
- .about-photo .pb3{left:4%;bottom:6%;rotate:7deg;z-index:2}.about-photo .pb4{right:2%;bottom:2%;width:40%;rotate:-8deg;z-index:3}.about-photo .pb4 img{aspect-ratio:4/5}
- .about-photo .pb5{left:30%;top:0;width:40%;rotate:4deg;z-index:0}
- .about-text p{text-wrap:pretty}.about-text h2{text-wrap:balance}
-}
-
-
-/* hero name: a wider gap between the two words, so the hyphen doesn't read as the bigger break */
-.hello-in h1{word-spacing:.3em}
-
-.desk.rkm{aspect-ratio:16/11;display:flex;align-items:center;justify-content:center}.desk.rkm .s1{position:relative;left:auto;top:auto;width:92%;transform:rotate(-2deg);background:#fff;padding:10px;box-shadow:0 1px 2px rgba(40,30,20,.12),0 18px 40px -12px rgba(40,30,20,.28)}
-
-/* ---- 19/11 pass ---- */
-/* grain belongs to the paper: it scrolls with the page (the fixed layer keeps only the soft light) */
-body{background:var(--paper) url(/img/grain-light.webp) 0 0/128px}
-/* stronger headings, matching the posts (EB Garamond 600) */
-.work h2,.sec h2,.about-text h2{font-weight:600;letter-spacing:-.01em}
-/* hero: the text block is as wide as its text and sits in the true centre; the board clears around that centre */
-.hello-in{width:max-content!important;max-width:min(720px,calc(100% - 44px))}
-.board{-webkit-mask-image:radial-gradient(ellipse 44% 30% at 50% 50%,transparent 48%,#000 100%);mask-image:radial-gradient(ellipse 44% 30% at 50% 50%,transparent 48%,#000 100%)}
-/* hero: one quiet fade on load instead of items landing one by one */
-@media (prefers-reduced-motion:no-preference){.hello{animation:hero-in .8s ease both}}
-@keyframes hero-in{from{opacity:0}}
-.desk.sapv{aspect-ratio:16/12;display:flex;align-items:center;justify-content:center}.desk.sapv .s1{position:relative;left:auto;top:auto;width:100%;height:auto;border-radius:6px;transform:rotate(-2deg);box-shadow:0 1px 2px rgba(40,30,20,.12),0 22px 44px -16px rgba(40,30,20,.35)}
-/* cardv */.media.cardv{display:block}.media.cardv video{width:100%;height:auto;aspect-ratio:16/10;display:block;border-radius:4px;box-shadow:0 1px 2px rgba(40,30,20,.10),0 22px 44px -18px rgba(40,30,20,.30);background:#eeeae0}
-
-/* About after the projects; on phones the opening line stays on top */
-.m-open{display:none}
-.about-end{position:relative}
-.work+.about-end::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:rgba(120,86,52,.16)}
-@media (min-width:821px){.about-end .about-photo{order:1}}
-@media (max-width:820px){
- .m-open{display:grid}
- .about-end{padding-top:72px!important}
- .work+.about-end::before{left:22px;right:22px}
-}
-
-
-/* phones: the opening is just the line; the portrait lives in About as the taped print (same tape as desktop), above the text */
-@media (max-width:820px){
- .m-open{padding-bottom:8px}
- .about-end .about-photo{padding:34px 22% 10px}
- .about-end .taped-print img{aspect-ratio:auto;object-fit:contain}
-}
-
-/* desktop: the About portrait small (~45% of the original width); the text gets the room */
-@media (min-width:821px){
- .about-end{grid-template-columns:1.55fr 1fr}
- .about-end .about-photo{padding:4% 4%}
-}
-@media (min-width:821px) and (max-width:1100px){ .about-end .about-photo .print-photo{width:min(100%,170px)} }
-@media (min-width:1101px){ .about-end .about-photo .print-photo{width:min(100%,140px)} }
-
-/* ---- desktop hero C: the phone opening for wide screens (replaces the board; phones keep .m-open + .flowlines) ---- */
-.dh{display:none}
-@media (min-width:821px){
- .dh{display:block;position:relative;overflow:hidden;view-timeline:--hello block;height:max(500px,calc(100svh - 190px))}
- .dh-in{position:relative;z-index:2;padding-top:clamp(112px,15vh,150px)}
- .dh h1{font-family:'Instrument Serif',Georgia,serif;font-weight:400;letter-spacing:-.015em;font-size:clamp(40px,4.5vw,56px);line-height:1.02;max-width:8.4em;text-wrap:balance}
- .dh h1 i{color:var(--soft)}
- /* the lines live in the right half only: they rise from the bottom middle into the upper right */
- .dflow{position:absolute;left:50%;right:0;top:64px;bottom:0;pointer-events:none;z-index:1;
-  -webkit-mask-image:linear-gradient(to right,transparent 0,#000 6%),linear-gradient(to bottom,transparent 0,#000 5%,#000 70%,transparent 99%);-webkit-mask-composite:source-in;
-  mask-image:linear-gradient(to right,transparent 0,#000 6%),linear-gradient(to bottom,transparent 0,#000 5%,#000 70%,transparent 99%);mask-composite:intersect}
- .dflow canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-}
-/* desktop: the home is zoomed (html{zoom:var(--z)}), so heights are divided by --z */
-@media (min-width:1101px){
- .dh{height:max(470px,calc(100svh / var(--z) - 150px))}
- .dh-in{padding-top:96px}
- .dh h1{font-size:46px}
-}
-
-/* the dusk dim starts at zero at the top (scroll-padding must not shift the hero's exit range); after the hero's view-timeline shorthand */
-@media (min-width:821px){.dh{view-timeline-inset:0}}
-</style><link rel="preconnect" href="https://api.fontshare.com"><link rel="preconnect" href="https://cdn.fontshare.com" crossorigin><link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=sentient@1,2&amp;display=swap">
-<style>
-/* ==== type: preset 12 'Ensaio' (Victor, 22/11) ====
-   Instrument Serif for the opening sentence and the closing line; Sentient (Fontshare, ITF FFL — served by the Fontshare CDN,
-   never committed: the licence forbids copies in a public repository) for everything else.
-   Sizes are the live ones; font-size-adjust keeps each font optically at the old size (text by x-height, headings by cap height).
-   Italic only for quotations, titles of works and asides; never headings, captions or the address.
-   One label style: 12px tracked capitals. */
-html body{font-family:'Sentient',Georgia,serif;font-size-adjust:ex-height .43}
-html body #h-work,
-html body #h-about,
-html body .sechead h2{font-family:'Sentient',Georgia,serif;font-weight:500;letter-spacing:-.018em;font-size-adjust:cap-height .653;font-style:normal;}
-html body section.work h2,
-html body .art-head h1,
-html body .case-hero h1{font-family:'Sentient',Georgia,serif;font-weight:500;letter-spacing:-.018em;font-size-adjust:cap-height .653;font-style:normal;}
-html body .prose h2,
-html body .fx h3,
-html body .fx h3.t,
-html body .callout h3{font-family:'Sentient',Georgia,serif;font-weight:500;letter-spacing:-.01em;font-size-adjust:cap-height .653;font-style:normal;}
-html body footer#contact .line,
-html body footer#contact .name{font-family:'Instrument Serif',Georgia,serif;font-weight:400;letter-spacing:-.015em;font-size-adjust:cap-height .72;font-style:normal;}
-html body .pull,
-html body .fx-03 .q p,
-html body .fx-v2 .q p,
-html body .fx-05 .ep,
-html body .fx-09 .ideas li,
-html body .rk-line{font-family:'Instrument Serif',Georgia,serif;font-weight:400;letter-spacing:0;font-style:italic;}
-html body .kicker,
-html body .meta b,
-html body .sc,
-html body .fx .sc,
-html body .fx-02 .k,
-html body .fx-v0 .k,
-html body .fx-v2 .ctx,
-html body .fx-06 .q,
-html body .pull .who,
-html body .fx-05 .row .c:first-child::before,
-html body .fx-05 .row .fn::before{font-family:'Sentient',Georgia,serif;font-weight:500;letter-spacing:.1em;font-variant:normal;text-transform:uppercase;font-size:12px;font-size-adjust:none;}
-html body header.top a,
-html body footer#contact .links,
-html body footer#contact .links a{font-family:'Sentient',Georgia,serif;font-weight:400;letter-spacing:.16em;font-size-adjust:cap-height .653;font-variant:normal;}
-html body figcaption,
-html body .fx-fig figcaption,
-html body figcaption::before,
-html body footer#contact .mail{font-style:normal}
-html body .list li span:first-child{font-variant:normal;text-transform:none;letter-spacing:0}
-
-/* no dusk (Victor, 22/11): the page keeps the same light cream from top to footer; it no longer darkens on scroll */
-.dusk{display:none!important}
-</style>
-<link rel="stylesheet" href="/footer.css">
-</head><body>
-<a class="skip" href="#work">Skip to the work</a>
-<header class="top"><a href="/">Victor Aguiar-Macedo</a><nav aria-label="Main"><a class="wide" href="#work">Work</a><a href="#contact">Contact</a></nav></header>
-
-<main>
-<section class="dh" id="intro" aria-label="Introduction"><div class="wrap dh-in"><h1>Hello! I'm Victor.<br> I&nbsp;design apps, visual identities and signage, starting from what people actually&nbsp;need.</h1></div>
-<div class="dflow" aria-hidden="true" data-cfg='{"mode": "C", "n": 15, "x0": 0.03, "x1": 0.3, "lean": 0.28, "cy": 0.66, "cx": 0.5, "ye0": 0.0, "ye1": 0.66, "rp": 0.6, "amp": 0.03, "k": 1.5}'><canvas></canvas></div></section>
-<section class="wrap about m-open" aria-label="Introduction">
-  <h1 class="m-intro">Hello! I'm Victor. I&nbsp;design apps, visual identities and signage, starting from what people actually&nbsp;need.</h1>
-<!-- Alternating opening (Construct -> Collate -> Atlas), drawn with the glow v3 edge of the lines. Replaces the live .flowlines block right after h1.m-intro (div + style + script). Same box as the lines; only the mask stops moved from 16%/84% to 7%/93% because the pieces are contained. Self-contained, no dependencies. -->
-<div class="flowlines" aria-hidden="true"><canvas></canvas></div>
-<style>
-.flowlines{display:none}
-@media (max-width:820px){
- .flowlines{display:block;position:relative;margin:18px -22px 0;height:min(100vw,400px);pointer-events:none;
-  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 7%,#000 93%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 7%,#000 93%,transparent 100%)}
- .flowlines canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-}
-</style>
-<script>
-(()=>{const box=document.querySelector('.flowlines'); if(!box) return; const cv=box.querySelector('canvas'), main=cv.getContext('2d'), layer=document.createElement('canvas'), lctx=layer.getContext('2d'); let ctx=main;
- // the lines' ramp: sea blue -> sea light -> peach -> orange -> rose -> red
- const RAMP=[[79,122,147],[150,180,196],[240,220,203],[232,160,122],[201,74,91],[192,57,43]], COVER=[240,220,203];
- const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)), lerp=(a,b,t)=>a+(b-a)*t, ss=(a,b,v)=>{const x=cl((v-a)/(b-a));return x*x*(3-2*x)};
- const eio=t=>{t=cl(t);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2};
- const col=t=>{const v=cl(t)*(RAMP.length-1),i=Math.min(RAMP.length-2,Math.floor(v)),f=v-i;return RAMP[i].map((c,k)=>c+(RAMP[i+1][k]-c)*f)};
- const rgb=(c,a)=>`rgba(${Math.round(c[0])},${Math.round(c[1])},${Math.round(c[2])},${Math.round(cl(a)*1000)/1000})`;
- const prng=s=>()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
- const h2=(x,y)=>{const s=Math.sin(x*127.1+y*311.7)*43758.5453;return s-Math.floor(s)};
- const noise=(x,y)=>{const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi,u=xf*xf*(3-2*xf),v=yf*yf*(3-2*yf);return lerp(lerp(h2(xi,yi),h2(xi+1,yi),u),lerp(h2(xi,yi+1),h2(xi+1,yi+1),u),v)*2-1};
- let W=0,H=0,D=1,CX=0,CY=0,S=1;     // S: half the height of the composition, in CSS px
- // keep every piece inside the page's content column (never touching the frame lines): the widest piece reaches ±1.38·S (with its soft edge) from CX,
- // so S shrinks and CX shifts until that span fits between the content edges, with 10px of air for the soft edge
- const FITC=()=>{const el=document.querySelector('#work');if(!el)return;const cr=cv.getBoundingClientRect();if(!cr.width)return;const k=cr.width/W,r=el.getBoundingClientRect(),cs=getComputedStyle(el);
-  const cl=(r.left+parseFloat(cs.paddingLeft)*k-cr.left)/k, cR=(r.right-parseFloat(cs.paddingRight)*k-cr.left)/k, HX=1.38, PAD=10;
-  const a0=Math.max(W*.06,cl)+PAD, a1=Math.min(W,cR)-PAD; if(a1-a0<2*HX*S)S=Math.max(20,(a1-a0)/(2*HX)); CX=Math.min(Math.max(CX,a0+HX*S),a1-HX*S)};
- const fit=()=>{const r=cv.getBoundingClientRect();D=Math.min(2,window.devicePixelRatio||1);W=r.width;H=r.height;
-  cv.width=layer.width=Math.round(W*D);cv.height=layer.height=Math.round(H*D);main.setTransform(D,0,0,D,0,0);lctx.setTransform(D,0,0,D,0,0);CX=W*.5;CY=H*.5;S=Math.min(W*.38,H*.42);FITC();GA=makeAtlas(10,9);bake()};
-
- // ---- glow v3 edge, as on the lines: every shape is laid three times in flat colour, a little larger and fainter each time
- //      ([extra size in CSS px, opacity]: outer feather -> flat body), normal blending. K fades a piece, SOFT widens its feather (the dissolve). ----
- const FE=[[3.2,.16],[1.6,.3],[0,.62]];
- let K=1, SOFT=0;
- const fillG=(c,a,build)=>{for(const [e,al] of FE){ctx.fillStyle=rgb(c,al*a*K);ctx.beginPath();build(e/2*(1+SOFT*5));ctx.fill()}};
- const strokeG=(c,a,w,build)=>{ctx.beginPath();build();for(const [e,al] of FE){ctx.strokeStyle=rgb(c,al*a*K);ctx.lineWidth=w+e*(1+SOFT*3);ctx.stroke()}};
- const poly=(P,g)=>{const n=P.length;let A=0;for(let i=0;i<n;i++){const b=P[(i+1)%n];A+=P[i][0]*b[1]-b[0]*P[i][1]}const sg=A>0?g:-g;   // polygon grown outwards by g
-  for(let i=0;i<n;i++){const a=P[(i+n-1)%n],b=P[(i+1)%n],dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy)||1,x=P[i][0]+dy/l*sg,y=P[i][1]-dx/l*sg;i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.closePath()};
- const rr=(x,y,w,h,r)=>{ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()};
-
- // ---- 1 · Register: three halftone plates, printed out of register, slide into one image ----
- const PL=[{c:RAMP[0],ang:15,o:[-.33,-.09,-.03],d:u=>ss(.76,.06,u)*.8,ph:0},
-           {c:RAMP[3],ang:45,o:[.21,-.15,.026],d:u=>Math.pow(cl(1-Math.abs(u-.5)/.58),1.15)*.7,ph:2.1},
-           {c:RAMP[4],ang:75,o:[.12,.29,.02],d:u=>ss(.34,.98,u)*.82,ph:4.2}];
- let PB=null, PBK='';                      // each plate baked once per size: [sharp, misted] bitmaps (the dots never change, only where the plate sits)
- const bake=()=>{const key=S+'|'+D;if(key===PBK)return;PBK=key;const R=.62*S,p=R/13,size=Math.ceil(2*(R+p)+40),ax=Math.cos(-.93),ay=Math.sin(-.93);
-  PB=PL.map(P=>{const a=P.ang*Math.PI/180,ca=Math.cos(a),sa=Math.sin(a),n=Math.ceil(R/p)+1,dots=[];
-   for(let i=-n;i<=n;i++)for(let j=-n;j<=n;j++){const x=(i*ca-j*sa)*p,y=(i*sa+j*ca)*p,d=Math.hypot(x,y);if(d>R+p)continue;
-    const r=p*.57*Math.sqrt(P.d(.5+(x*ax+y*ay)/(2*R)))*ss(R+p*.5,R-p*.7,d);if(r>.35)dots.push(x,y,r)}
-   return {size,img:[0,.62].map(soft=>{const c=document.createElement('canvas'),x=c.getContext('2d');c.width=c.height=Math.round(size*D);x.setTransform(D,0,0,D,c.width/2,c.width/2);
-    for(const [e,al] of FE){x.fillStyle=rgb(P.c,al);x.beginPath();const g=e/2*(1+soft*5)*.6;for(let i=0;i<dots.length;i+=3){const r=dots[i+2]+g;x.moveTo(dots[i]+r,dots[i+1]);x.arc(dots[i],dots[i+1],r,0,6.2832)}x.fill()}return c})}})};
- const register=t=>{const R=.62*S,bx=R*1.2,g=eio((t-.5)/5.3),loose=1-g,m=.115*S,q=.055*S,sq=.07*S,mist=ss(.04,.7,SOFT);
-  PL.forEach((P,k)=>{const ox=P.o[0]*S*loose+Math.cos(t*.31+P.ph),oy=P.o[1]*S*loose+Math.sin(t*.27+P.ph),B=PB[k],h=B.size/2;
-   ctx.save();ctx.translate(CX+ox,CY+oy);ctx.rotate(P.o[2]*loose);
-   ctx.globalAlpha=K*(1-mist);ctx.drawImage(B.img[0],-h,-h,B.size,B.size);if(mist>.004){ctx.globalAlpha=K*mist;ctx.drawImage(B.img[1],-h,-h,B.size,B.size)}ctx.globalAlpha=1;
-   strokeG(P.c,1,.9,()=>{for(const sx of[-1,1])for(const sy of[-1,1]){ctx.moveTo(sx*bx,sy*(bx+q));ctx.lineTo(sx*bx,sy*(bx+q+m));ctx.moveTo(sx*(bx+q),sy*bx);ctx.lineTo(sx*(bx+q+m),sy*bx)}
-    for(const [tx,ty] of [[0,-bx-q-m*.55],[-bx-q-m*.55,0],[bx+q+m*.55,0]]){const r0=m*.3;ctx.moveTo(tx+r0,ty);ctx.arc(tx,ty,r0,0,6.2832);ctx.moveTo(tx-m*.55,ty);ctx.lineTo(tx+m*.55,ty);ctx.moveTo(tx,ty-m*.55);ctx.lineTo(tx,ty+m*.55)}});
-   fillG(P.c,1,e=>{[[1,0,0],[0,1,0],[0,0,1],[1,1,0],[0,1,1],[1,0,1],[1,1,1]].forEach((mm,i)=>{if(mm[k])rr(-sq*3.5+i*sq-e,bx+q+m*.2-e,sq-1.5+2*e,sq-1.5+2*e,1+e)})});
-   ctx.restore()})};
-
- // ---- 2 · Collate: hand-cut scraps are trimmed square and collated into one fanned stack ----
- const NS=13, PV=7, SHT=[]; {const R=prng(23), cs=[[-1,-1],[1,-1],[1,1],[-1,1]];
-  for(let k=0;k<NS;k++){const pts=[],cj=[0,1,2,3].map(()=>[(R()-.5)*.34,(R()-.5)*.34]);
-   for(let s=0;s<4;s++)for(let i=0;i<PV;i++){const f=i/PV,a=cs[s],b=cs[(s+1)%4],ja=cj[s],jb=cj[(s+1)%4];
-    pts.push([lerp(a[0],b[0],f),lerp(a[1],b[1],f),lerp(a[0]+ja[0],b[0]+jb[0],f)+(i?(R()-.5)*.07:0),lerp(a[1]+ja[1],b[1]+jb[1],f)+(i?(R()-.5)*.07:0)])}
-   SHT.push({k,pts,th:(R()-.5)*1.5,sw:.32+R()*.5,sh:.3+R()*.42,ph:R()*6.28,tau:k<2?.3+k*.3:.95+(k-2)*.36,c:k===NS-1?COVER:col(k/(NS-2))})}}
- const LOOSE=[[.16,.2],[.62,.12],[.36,.5],[.86,.34],[.12,.72],[.5,.84],[.78,.7],[.3,.14],[.92,.86],[.58,.44],[.1,.44],[.24,.86],[.44,.28]];
- const collate=t=>{const sw=.95*S,sh=sw*1.414,step=.068*S,ang=lerp(.34,.86,.5+.5*Math.sin(t*.16-1.2)),dx=Math.cos(ang)*step,dy=-Math.sin(ang)*step,bx=CX-(NS-1)*dx/2,by=CY-(NS-1)*dy/2;
-  for(const s of SHT){const o=eio((t-s.tau)/1.7),lift=Math.sin(o*Math.PI),lx=CX+(LOOSE[s.k][0]-.5)*Math.min(2.5*S,W-84)+Math.sin(t*.21+s.ph)*4,ly=CY+(LOOSE[s.k][1]-.5)*1.75*S+Math.cos(t*.17+s.ph)*4;
-   const x=lerp(lx,bx+s.k*dx,o),y=lerp(ly,by+s.k*dy,o)-lift*.1*S,th=lerp(s.th+Math.sin(t*.13+s.ph)*.05,0,o),c=Math.cos(th),sn=Math.sin(th),hw=lerp(sw*s.sw*.34,sw/2,o),hh=lerp(sw*s.sh*.47,sh/2,o);
-   const P=s.pts.map(p=>{const px=lerp(p[2],p[0],o)*hw,py=lerp(p[3],p[1],o)*hh;return [x+px*c-py*sn,y+px*sn+py*c]});
-   fillG(s.c,1,e=>poly(P,e))}};
-
- // ---- 3 · Atlas: a shuffled sheet of swatches sorts itself, chip by chip, into a tint chart ----
- let GA=null; const makeAtlas=(cols,rows)=>{const R=prng(41),n=cols*rows,slot=[...Array(n).keys()],chips=[];
-  for(let k=0;k<n*3;k++){const a=Math.floor(R()*n),b=cl((a/cols|0)+Math.round((R()-.5)*7),0,rows-1)*cols+cl(a%cols+Math.round((R()-.5)*7),0,cols-1);[slot[a],slot[b]]=[slot[b],slot[a]]}
-  for(let i=0;i<n;i++){const c=i%cols,r=i/cols|0,f=(c+r)/(cols+rows-2)+R()*.13;
-   chips.push({c,r,sc:slot[i]%cols,sr:slot[i]/cols|0,col:col(c/(cols-1)),a:lerp(.3,1,Math.pow(r/(rows-1),.85)),rot:(R()-.5)*.5,jx:(R()-.5)*.3,jy:(R()-.5)*.3,tau:.4+f/1.13*4.2})}
-  return {cols,rows,chips}};
- const atlas=t=>{const {cols,rows,chips}=GA,gw=Math.min(2.66*S,W*.9),sz=gw/cols*.7,cell=(gw-sz)/(cols-1),x0=CX-gw/2+sz/2,y0=CY-(cell*(rows-1))/2;
-  const it=chips.map(ch=>{const o=eio((t-ch.tau)/1.6);return {ch,o,lift:Math.sin(o*Math.PI),x:lerp(x0+(ch.sc+ch.jx)*cell,x0+ch.c*cell,o),y:lerp(y0+(ch.sr+ch.jy)*cell,y0+ch.r*cell,o)}}).sort((a,b)=>(a.o<1)-(b.o<1)||a.lift-b.lift||a.ch.tau-b.ch.tau);
-  for(const i of it){const s=sz*(1+i.lift*.08);ctx.save();ctx.translate(i.x,i.y-i.lift*4);ctx.rotate(i.ch.rot*(1-i.o));fillG(i.ch.col,i.ch.a,e=>rr(-s/2-e,-s/2-e,s+2*e,s+2*e,1.5+e));ctx.restore()}};
-
- // ---- 4 · Construct: pencil shapes are drawn true on a construction grid and become a modular mark ----
- const NG=4, MC=[RAMP[0],RAMP[1],col(.5),RAMP[3],RAMP[4],RAMP[5]];
- const MARK=[['q',2,0],['s',0,2],['q',3,4],['-',0,0],['d',0,3],['q',1,0],['q',0,1],['q',3,5],['q',1,5],['q',2,2],['d',0,4],['s',0,3],['-',0,0],['q',0,4],['q',1,1],['q',2,0]];
- const OUTL={q:(()=>{const p=[[-.5,-.5]];for(let i=0;i<=20;i++){const a=i/20*Math.PI/2;p.push([-.5+Math.cos(a),-.5+Math.sin(a)])}return p})(),
-  d:Array.from({length:36},(_,i)=>[.5*Math.cos(i/36*6.2832),.5*Math.sin(i/36*6.2832)]),
-  s:[[-.5,-.5,.5,-.5],[.5,-.5,.5,.5],[.5,.5,-.5,.5],[-.5,.5,-.5,-.5]].flatMap(([a,b,c,d])=>Array.from({length:8},(_,i)=>[lerp(a,c,i/8),lerp(b,d,i/8)]))};
- const CELLS=MARK.map((m,i)=>{const R=prng(70+i);return {t:m[0],k:m[1],c:m[2],x:i%NG,y:i/NG|0,jx:(R()-.5)*.26,jy:(R()-.5)*.26,jr:(R()-.5)*.5,js:.82+R()*.3,seed:R()*99,ord:R()}}).filter(c=>c.t!=='-');
- CELLS.slice().sort((a,b)=>a.ord-b.ord).forEach((c,i)=>c.tau=.5+i*.3);
- const construct=t=>{const cell=.47*S,G=cell*NG,x0=CX-G/2,y0=CY-G/2,all=eio((t-4.1)/1.9),ov=.11*S*all;
-  if(all>.01)strokeG(RAMP[0],.32*all,.7,()=>{for(let i=0;i<=NG;i++){ctx.moveTo(x0+i*cell,y0-ov);ctx.lineTo(x0+i*cell,y0+G+ov);ctx.moveTo(x0-ov,y0+i*cell);ctx.lineTo(x0+G+ov,y0+i*cell)}});
-  for(const c of CELLS){const o=eio((t-c.tau)/1.5),raw=1-o,cx=x0+(c.x+.5)*cell+c.jx*cell*raw,cy=y0+(c.y+.5)*cell+c.jy*cell*raw,rot=c.k*Math.PI/2+c.jr*raw,sc=lerp(c.js,1,o)*cell,co=Math.cos(rot),si=Math.sin(rot);
-   const shape=(sd,amp)=>OUTL[c.t].map((p,i)=>{const w=amp*raw,x=(p[0]+noise(i*.33+sd,t*.25)*w)*sc,y=(p[1]+noise(i*.33+sd+40,t*.25)*w)*sc;return [cx+x*co-y*si,cy+x*si+y*co]});
-   const P=shape(c.seed,.05), f=ss(.45,1,o);
-   if(f>.004)fillG(MC[c.c],f,e=>poly(P,e));
-   if(raw>.01){strokeG(RAMP[0],.95*ss(0,.5,raw),.9,()=>poly(P,0));const Q=shape(c.seed+17,.07);strokeG(RAMP[0],.5*ss(0,.5,raw),.7,()=>poly(Q,0))}}};
-
- // ---- the cycle: each piece resolves (~6 s), holds, then dissolves while the next one appears ----
- const PIECES=[construct,collate,atlas], PER=7.5, LOOP=PER*PIECES.length, IN=.25;
- const draw=T=>{if(!W||!H)return;main.clearRect(0,0,W,H);
-  PIECES.forEach((piece,i)=>{const t=(((T-i*PER+IN)%LOOP)+LOOP)%LOOP-IN;if(t>PER+.2||(T<.2&&i))return;
-   const k=ss(-IN,.65,t)*(1-ss(PER-.7,PER+.2,t));if(k<.004)return;SOFT=1-k;K=1;
-   ctx=k>.999?main:lctx;if(ctx===lctx)ctx.clearRect(0,0,W,H);ctx.lineCap='round';ctx.lineJoin='round';
-   piece(t);                                                    // a piece in transition is drawn on its own layer, then laid down as one sheet at opacity k
-   if(ctx===lctx){main.globalAlpha=k;main.drawImage(layer,0,0,W,H);main.globalAlpha=1}ctx=main})};
- window.__flowPaint=t=>{if(!W)fit();draw(t)};
- fit();
- const still=matchMedia('(prefers-reduced-motion: reduce)'), STILL=6.4;
- let raf=0, visible=true, t0=performance.now(), tAcc=-IN;
- const loop=now=>{tAcc+=Math.min(.1,(now-t0)/1000); t0=now; draw(tAcc); raf=requestAnimationFrame(loop)};
- const run=()=>{cancelAnimationFrame(raf); if(!box.offsetParent) return; if(still.matches){draw(STILL);return} if(visible&&!document.hidden){t0=performance.now(); raf=requestAnimationFrame(loop)} else draw(Math.max(0,tAcc))};
- new IntersectionObserver(e=>{visible=e[0].isIntersecting; run()}).observe(box);
- document.addEventListener('visibilitychange',run); still.addEventListener?.('change',run);
- new ResizeObserver(()=>{fit(); draw(still.matches?STILL:tAcc); run()}).observe(box); addEventListener('orientationchange',()=>{fit(); draw(tAcc)});
- run();
-})();
-</script>
-</section>
-<section class="wrap sec" id="work" aria-labelledby="h-work"><h2 class="rv" id="h-work">Selected&nbsp;work</h2></section>
-<section class="wrap work" id="sappin" aria-labelledby="h-sap">
- <div class="rv"><h2 id="h-sap">What do small illustrators in Ceará need?</h2><p>Sappin, an app for local illustrators: interviews, requirements, task flows and a site map, in a team of&nbsp;students.</p><a class="go" href="/work/sappin" aria-label="Read the article about Sappin">Read the article</a></div>
- <div class="media cardv rv"><video class="cover-vid" autoplay muted loop playsinline preload="none" poster="/img/cover-sappin-poster.webp" width="1600" height="1000" style="background:#F0DCCC" aria-label="Sappin concept screens on a phone"><source data-src="/img/cover-sappin.webm" type="video/webm"><source data-src="/img/cover-sappin.mp4" type="video/mp4"></video></div>
-</section>
-<section class="wrap work flip" id="voar" aria-labelledby="h-voar">
- <div class="rv"><h2 id="h-voar">How can an NGO stay close to its individual&nbsp;donors?</h2><p>For Associação Voar, an NGO in Fortaleza: field visit, interviews, usability testing — published as a&nbsp;paper.</p><a class="go" href="/work/voar" aria-label="Read the article about Voar">Read the article</a></div>
- <div class="media cardv rv"><video class="cover-vid" autoplay muted loop playsinline preload="none" poster="/img/cover-voar-poster.webp" width="1600" height="1000" style="background:#E9D8D8" aria-label="The Voar paper's pages open and a phone with the app rises between them"><source data-src="/img/cover-voar.webm" type="video/webm"><source data-src="/img/cover-voar.mp4" type="video/mp4"></video></div>
-</section>
-<section class="wrap work" id="iracema" aria-labelledby="h-ira">
- <div class="rv"><h2 id="h-ira">Praia de Iracema: a wayfinding&nbsp;case</h2><p>For Praia de Iracema, Fortaleza's waterfront: a shared 3D survey and a sign family drawn from the&nbsp;shore.</p><a class="go" href="/work/iracema" aria-label="Read the article about Praia de Iracema wayfinding">Read the article</a></div>
- <div class="media cardv rv"><video class="cover-vid" autoplay muted loop playsinline preload="none" poster="/img/cover-iracema-poster.webp" width="1600" height="1000" style="background:#DBE6EA" aria-label="The delivered location map draws itself and the 37 sign pieces appear by type"><source data-src="/img/cover-iracema.webm" type="video/webm"><source data-src="/img/cover-iracema.mp4" type="video/mp4"></video></div>
-</section>
-<section class="wrap work flip" id="kennedy" aria-labelledby="h-rk">
- <div class="rv"><h2 id="h-rk">Roberto Kennedy: visual identity for a&nbsp;photographer</h2><p>For Roberto Kennedy, a photographer: a monogram where two columns frame a single point of&nbsp;light.</p><a class="go" href="/work/roberto-kennedy" aria-label="Read the article about the Roberto Kennedy identity">Read the article</a></div>
- <div class="media cardv rv"><video class="cover-vid" autoplay muted loop playsinline preload="none" poster="/img/cover-rk-poster.webp" width="1600" height="1000" style="background:#0E0E0E" aria-label="The RK monogram draws itself, the spark lights and the frame closes over a photograph"><source data-src="/img/cover-rk.webm" type="video/webm"><source data-src="/img/cover-rk.mp4" type="video/mp4"></video></div>
-</section>
-<section class="wrap about about-end" id="about" aria-labelledby="h-about">
- <div class="about-photo rv"><figure class="print-photo taped-print"><img src="/img/victor.webp" width="604" height="800" alt="Portrait of Victor" loading="lazy" decoding="async"></figure></div>
- <div class="about-text rv">
-  <h2 id="h-about">About</h2>
-  <p>I'm a design student at the University of Fortaleza (Unifor). I'm broadly interested in using design to express ideas and intent as clearly as possible. I enjoy working on wicked problems and exploring different problem&nbsp;spaces.</p>
-  <p>Before design, I studied computer science, and I kept those skills: I build websites and applications, program in JavaScript, work in the Godot engine, do sysadmin work on Linux, and work with AI tools more&nbsp;broadly.</p>
-  <a class="go" href="/cv">Read the CV</a>
- </div>
-</section>
+</style></head><body>
+<a class="skip" href="#sappin">Skip to the work</a>
+<main class="stack">
+<section class="sheet" id="hello" style="--i:0;--c:79,122,147"><a class="tab" href="#hello"><span>Victor Aguiar-Macedo</span></a>
+ <div class="in"><h1>Hello! I'm Victor. I&nbsp;design apps, visual identities and signage, starting from what people actually&nbsp;need.</h1><div class="fig piece" data-piece="cycle" data-cfg='{"inset":0.86}' aria-hidden="true"></div></div></section>
+<section class="sheet" id="sappin" style="--i:1;--c:150,180,196"><a class="tab" href="#sappin"><span>Sappin</span></a>
+ <div class="in"><div><h2>What do small illustrators in Ceará&nbsp;need?</h2><p>Sappin, an app for local illustrators: interviews, requirements, task flows and a site map, in a team of&nbsp;students.</p><a class="go" href="/work/sappin" aria-label="Read the article about Sappin">Read the article</a></div><div class="fig"><video class="cover cover-vid" autoplay muted loop playsinline preload="none" poster="/img/cover-sappin-poster.webp" width="1600" height="1000" style="background:#F0DCCC" aria-label="Sappin concept screens on a phone" ><source data-src="/img/cover-sappin.webm" type="video/webm"><source data-src="/img/cover-sappin.mp4" type="video/mp4"></video></div></div></section><section class="sheet" id="voar" style="--i:2;--c:240,220,203"><a class="tab" href="#voar"><span>Voar</span></a>
+ <div class="in"><div><h2>How can an NGO stay close to its individual&nbsp;donors?</h2><p>For Associação Voar, an NGO in Fortaleza: field visit, interviews, usability testing — published as a&nbsp;paper.</p><a class="go" href="/work/voar" aria-label="Read the article about Voar">Read the article</a></div><div class="fig"><video class="cover cover-vid" autoplay muted loop playsinline preload="none" poster="/img/cover-voar-poster.webp" width="1600" height="1000" style="background:#E9D8D8" aria-label="The Voar paper's pages open and a phone with the app rises between them" ><source data-src="/img/cover-voar.webm" type="video/webm"><source data-src="/img/cover-voar.mp4" type="video/mp4"></video></div></div></section><section class="sheet" id="iracema" style="--i:3;--c:236,190,162"><a class="tab" href="#iracema"><span>Praia de Iracema</span></a>
+ <div class="in"><div><h2>Praia de Iracema: a wayfinding&nbsp;case</h2><p>For Praia de Iracema, Fortaleza's waterfront: a shared 3D survey and a sign family drawn from the&nbsp;shore.</p><a class="go" href="/work/iracema" aria-label="Read the article about Praia de Iracema wayfinding">Read the article</a></div><div class="fig"><video class="cover cover-vid" autoplay muted loop playsinline preload="none" poster="/img/cover-iracema-poster.webp" width="1600" height="1000" style="background:#DBE6EA" aria-label="The delivered location map draws itself and the 37 sign pieces appear by type" ><source data-src="/img/cover-iracema.webm" type="video/webm"><source data-src="/img/cover-iracema.mp4" type="video/mp4"></video></div></div></section><section class="sheet" id="rk" style="--i:4;--c:232,160,122"><a class="tab" href="#rk"><span>Roberto Kennedy</span></a>
+ <div class="in"><div><h2>Roberto Kennedy: visual identity for a&nbsp;photographer</h2><p>For Roberto Kennedy, a photographer: a monogram where two columns frame a single point of&nbsp;light.</p><a class="go" href="/work/roberto-kennedy" aria-label="Read the article about the Roberto Kennedy identity">Read the article</a></div><div class="fig"><video class="cover cover-vid" autoplay muted loop playsinline preload="none" poster="/img/cover-rk-poster.webp" width="1600" height="1000" style="background:#0E0E0E" aria-label="The RK monogram draws itself, the spark lights and the frame closes over a photograph" ><source data-src="/img/cover-rk.webm" type="video/webm"><source data-src="/img/cover-rk.mp4" type="video/mp4"></video></div></div></section>
+<section class="sheet more" id="more" style="--i:5;--c:201,74,91"><a class="tab" href="#more"><span>RUPTURA · Flatland · Vansire · Prototypes</span></a><div class="in"><article><img class="cover" src="/img/kv-ed.webp" width="1600" height="1000" alt="RUPTURA magazine cover and a spread" loading="lazy" decoding="async"><h2><a href="/work/ruptura">RUPTURA</a></h2><p>A magazine about decolonial music, built on a strict grid that its pages keep trying to&nbsp;break.</p></article><article><img class="cover" src="/img/kv-flatland.webp" width="1600" height="1000" alt="The Flatland edition open at Part I" loading="lazy" decoding="async"><h2><a href="/work/flatland">Flatland</a></h2><p>An A5 edition of Edwin A. Abbott's Flatland, set by rule and laid out by&nbsp;script.</p></article><article><img class="cover" src="/img/kv-vansire.webp" width="1600" height="1000" alt="The Vansire folder, front and back" loading="lazy" decoding="async"><h2><a href="/work/vansire">Vansire</a></h2><p>A two-colour folder for a Vansire show in Fortaleza, taken all the way to a press-ready&nbsp;file.</p></article><article><img class="cover" src="/img/kv-proto.webp" width="1600" height="1000" alt="One of the prototypes on a laptop" loading="lazy" decoding="async"><h2><a href="/work/prototypes">Prototypes</a></h2><p>Twenty small apps where a skill is learned by doing, and the twenty principles that came out of building&nbsp;them.</p></article></div></section>
+<section class="sheet about" id="about" style="--i:6;--c:192,57,43"><a class="tab" href="#about"><span>About</span></a>
+ <div class="in"><div><p>I'm a design student at the University of Fortaleza (Unifor). I'm broadly interested in using design to express ideas and intent as clearly as possible. I enjoy working on wicked problems and exploring different problem&nbsp;spaces.</p><p>Before design, I studied computer science, and I kept those skills: I build websites and applications, program in JavaScript, work in the Godot engine, do sysadmin work on Linux, and work with AI tools more&nbsp;broadly.</p><a class="go" href="/cv">Read the CV</a></div><img src="/img/victor.webp" width="604" height="800" alt="Portrait of Victor"></div></section>
+<section class="sheet end" id="contact" style="--i:7"><a class="tab" href="#contact"><span>Contact</span></a>
+ <div class="in"><div><p class="t">Thanks for stopping by. If you&rsquo;d like to talk about a project, or just say hello, I&rsquo;d love to hear from&nbsp;you.</p><a class="mail" href="mailto:hello@vmacedo.com">hello@vmacedo.com</a><nav aria-label="CV and profiles"><a href="/cv">CV</a><a href="/files/curriculo-carlos-victor-aguiar-de-macedo.pdf">CV (PDF)</a><a href="https://www.linkedin.com/in/victor-aguiar-macedo/" target="_blank" rel="noopener">LinkedIn</a></nav></div><div class="fig piece" data-piece="cycle" data-cfg='{"inset":0.86}' aria-hidden="true"></div></div></section>
 </main>
-<footer id="contact" class="nf nf1">
- <div class="fflow" aria-hidden="true" data-cfg='{"mode": "C", "n": 15, "x0": 0.03, "x1": 0.3, "lean": 0.28, "cy": 0.66, "cx": 0.5, "ye0": 0.0, "ye1": 0.66, "rp": 0.6, "amp": 0.03, "k": 1.5}'><canvas></canvas></div>
- <div class="fflow-m" aria-hidden="true"><canvas></canvas></div>
- <div class="wrap nf1-in"><div class="nf1-txt">
-  <p class="nf-line">Thanks for stopping by. If you&rsquo;d like to talk about a project, or just say hello, I&rsquo;d love to hear from&nbsp;you.</p>
-  <a class="nf-mail" href="mailto:hello@vmacedo.com">hello@vmacedo.com</a>
-  <nav class="nf-links" aria-label="CV and profiles"><a href="/cv">CV</a><a href="/files/curriculo-carlos-victor-aguiar-de-macedo.pdf">CV (PDF)</a><a href="https://www.linkedin.com/in/victor-aguiar-macedo/" target="_blank" rel="noopener">LinkedIn</a></nav>
- </div></div>
-</footer>
+<script src="/pieces.js"></script>
 <script>
-document.documentElement.classList.add('js');
+Pieces.auto();
+// a piece under a later sheet is on screen but hidden: pause it (Pieces draws only uncovered pieces)
+(()=>{const P=[...document.querySelectorAll('[data-piece]')];let q=0;
+ const check=()=>{q=0;let any=false;for(const b of P){const i=b._piece;if(!i)continue;const r=b.getBoundingClientRect();
+   const pts=[[.5,.5],[.2,.2],[.8,.8]].map(([fx,fy])=>document.elementFromPoint(r.left+r.width*fx,r.top+r.height*fy));
+   const was=i.covered;i.covered=!pts.some(h=>h&&b.closest('.sheet').contains(h));if(was&&!i.covered)any=true}if(any)Pieces.kick()};
+ addEventListener('scroll',()=>{if(!q)q=requestAnimationFrame(check)},{passive:true});addEventListener('resize',check);setTimeout(check,50)})();
 
-
-const endFlag=()=>document.documentElement.classList.toggle('at-end', scrollY > (document.documentElement.scrollHeight-innerHeight)/2);
-addEventListener('scroll',endFlag,{passive:true}); addEventListener('resize',endFlag); endFlag();
-
-const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{rootMargin:'0px 0px -8% 0px'});
-document.querySelectorAll('.rv').forEach(el=>io.observe(el));
-
-// detective board: red string between pins, items can be picked up and re-pinned (mouse/trackpad)
-(()=>{const board=document.querySelector('.board'); if(!board) return;
- const svg=board.querySelector('.strings'), NS='http://www.w3.org/2000/svg';
- const links=[['door','q2'],['q2','sign'],['wire','phone'],['stickies','q1'],['q1','heur'],['heur','handle'],['handle','door'],['journey','q3'],['journey','heur'],['persona','flow'],['flow','wire'],['flow','sign'],['fitts','sign'],['q4','wire'],['q4','phone'],['coffee','stickies'],['sign2','q2']];
- const ev=id=>board.querySelector('#ev-'+id);
- const pinOf=el=>{const cs=getComputedStyle(el), x=el.offsetLeft, y=el.offsetTop;
-   const r=(parseFloat(cs.rotate)||0)*Math.PI/180, dy=-el.offsetHeight/2+9;
-   return [x - dy*Math.sin(r), y + dy*Math.cos(r)]};
- const paths=links.map(()=>{const p=document.createElementNS(NS,'path');p.setAttribute('class','str');svg.appendChild(p);return p});
- const psvg=document.createElementNS(NS,'svg');psvg.setAttribute('class','pins');psvg.setAttribute('aria-hidden','true');board.appendChild(psvg);
- const pins=[...board.querySelectorAll('[data-pin]')].map(el=>{const g=document.createElementNS(NS,'g');g.setAttribute('class','pin');
-   g.innerHTML='<circle class="sh" r="4.6" cx="1.6" cy="2.4"/><circle class="hd" r="4.6"/><circle class="hl" r="1.5" cx="-1.4" cy="-1.5"/>';if(el.id==='ev-me')g.classList.add('me');psvg.appendChild(g);return [el,g]});
- const draw=()=>{const W=board.offsetWidth,H=board.offsetHeight;svg.setAttribute('viewBox',`0 0 ${W} ${H}`);psvg.setAttribute('viewBox',`0 0 ${W} ${H}`);
-   links.forEach(([a,b],i)=>{const A=ev(a),B=ev(b); paths[i].style.display=(A.offsetParent&&B.offsetParent)?'':'none'; if(paths[i].style.display) return; const [x1,y1]=pinOf(ev(a)),[x2,y2]=pinOf(ev(b)),d=Math.hypot(x2-x1,y2-y1);
-     paths[i].setAttribute('d',`M${x1.toFixed(1)} ${y1.toFixed(1)} Q${((x1+x2)/2).toFixed(1)} ${((y1+y2)/2+d*.09).toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}`)});
-   pins.forEach(([el,g])=>{g.style.display=el.offsetParent?'':'none'; const [x,y]=pinOf(el);g.setAttribute('transform',`translate(${x.toFixed(1)} ${y.toFixed(1)})`)})};
- addEventListener('resize',draw); new ResizeObserver(draw).observe(board); board.querySelectorAll('img').forEach(i=>i.addEventListener('load',draw)); draw();
- 
- if(!matchMedia('(hover:hover) and (pointer:fine)').matches) return;
- let top=10;
- board.querySelectorAll('.ev').forEach(el=>{
-  el.addEventListener('pointerdown',e=>{if(e.button!==0)return; e.preventDefault(); el.setPointerCapture(e.pointerId);
-   const k=board.getBoundingClientRect().width/board.offsetWidth, W=board.offsetWidth, H=board.offsetHeight, cs=getComputedStyle(el);
-   let x=parseFloat(cs.getPropertyValue('--x')), y=parseFloat(cs.getPropertyValue('--y')); const sx=e.clientX, sy=e.clientY, x0=x, y0=y;
-   el.style.zIndex=++top; el.classList.add('held');
-   const move=m=>{x=Math.min(98,Math.max(2,x0+(m.clientX-sx)/k/W*100)); y=Math.min(98,Math.max(2,y0+(m.clientY-sy)/k/H*100));
-     el.style.setProperty('--x',x.toFixed(2)); el.style.setProperty('--y',y.toFixed(2)); draw()};
-   const up=()=>{el.removeEventListener('pointermove',move); el.classList.remove('held');
-     const r=(Math.random()*10-5).toFixed(1); el.style.setProperty('--r',r+'deg'); el.dataset.r=r; draw()};
-   el.addEventListener('pointermove',move); el.addEventListener('pointerup',up,{once:true}); el.addEventListener('pointercancel',up,{once:true});});
- });
-})();
-
+// one stack: sheets already read pile at the top, sheets to come wait at the bottom, tabs showing. A sheet taller than the room between
+// the two piles scrolls to its end before the next one rises; a tab brings its sheet up.
+(()=>{const S=[...document.querySelectorAll('.sheet')],N=S.length,T=()=>parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--T'));
+ const lay=()=>{const t=T(),vh=innerHeight;S.forEach((s,i)=>{const h=s.offsetHeight;s.style.top=Math.min(i*t,vh-(N-1-i)*t-h)+'px';s.style.bottom=((N-i)*t-h)+'px'})};
+ const go=i=>{const t=T();let y=S[0].parentElement.offsetTop;for(let j=0;j<i;j++)y+=S[j].offsetHeight;scrollTo({top:y-i*t,behavior:'smooth'})};
+ document.addEventListener('click',e=>{const a=e.target.closest('a[href^="#"]');if(!a)return;const i=S.findIndex(s=>'#'+s.id===a.getAttribute('href'));if(i<0)return;e.preventDefault();go(i);history.replaceState(null,'',a.getAttribute('href'))});
+ addEventListener('resize',lay);new ResizeObserver(lay).observe(document.body);lay();window.__still=()=>document.documentElement.classList.add('flat')})();
 </script>
-<script>/* lazy cover videos */(function(){var vs=document.querySelectorAll('video.cover-vid[preload=none]');if(matchMedia('(prefers-reduced-motion:reduce)').matches){return}var io=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;var v=e.target;v.querySelectorAll('source[data-src]').forEach(function(s){s.src=s.dataset.src;s.removeAttribute('data-src')});v.load();v.play&&v.play().catch(function(){});io.unobserve(v)})},{rootMargin:'200px'});vs.forEach(function(v){io.observe(v)})})();
-// desktop hero C: flowing lines in the right half
-// desktop hero C: alternating pieces in the right half (glow v3 edge)
-(()=>{const box=document.querySelector('.dflow'); if(!box) return; const cv=box.querySelector('canvas'), main=cv.getContext('2d'), layer=document.createElement('canvas'), lctx=layer.getContext('2d'); let ctx=main;
- // the lines' ramp: sea blue -> sea light -> peach -> orange -> rose -> red
- const RAMP=[[79,122,147],[150,180,196],[240,220,203],[232,160,122],[201,74,91],[192,57,43]], COVER=[240,220,203];
- const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)), lerp=(a,b,t)=>a+(b-a)*t, ss=(a,b,v)=>{const x=cl((v-a)/(b-a));return x*x*(3-2*x)};
- const eio=t=>{t=cl(t);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2};
- const col=t=>{const v=cl(t)*(RAMP.length-1),i=Math.min(RAMP.length-2,Math.floor(v)),f=v-i;return RAMP[i].map((c,k)=>c+(RAMP[i+1][k]-c)*f)};
- const rgb=(c,a)=>`rgba(${Math.round(c[0])},${Math.round(c[1])},${Math.round(c[2])},${Math.round(cl(a)*1000)/1000})`;
- const prng=s=>()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
- const h2=(x,y)=>{const s=Math.sin(x*127.1+y*311.7)*43758.5453;return s-Math.floor(s)};
- const noise=(x,y)=>{const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi,u=xf*xf*(3-2*xf),v=yf*yf*(3-2*yf);return lerp(lerp(h2(xi,yi),h2(xi+1,yi),u),lerp(h2(xi,yi+1),h2(xi+1,yi+1),u),v)*2-1};
- let W=0,H=0,D=1,CX=0,CY=0,S=1;     // S: half the height of the composition, in CSS px
- // keep every piece inside the page's content column (never touching the frame lines): the widest piece reaches ±1.38·S (with its soft edge) from CX,
- // so S shrinks and CX shifts until that span fits between the content edges, with 10px of air for the soft edge
- const FITC=()=>{const el=document.querySelector('#work');if(!el)return;const cr=cv.getBoundingClientRect();if(!cr.width)return;const k=cr.width/W,r=el.getBoundingClientRect(),cs=getComputedStyle(el);
-  const cl=(r.left+parseFloat(cs.paddingLeft)*k-cr.left)/k, cR=(r.right-parseFloat(cs.paddingRight)*k-cr.left)/k, HX=1.38, PAD=10;
-  const a0=Math.max(W*.06,cl)+PAD, a1=Math.min(W,cR)-PAD; if(a1-a0<2*HX*S)S=Math.max(20,(a1-a0)/(2*HX)); CX=Math.min(Math.max(CX,a0+HX*S),a1-HX*S)};
- const fit=()=>{const z=parseFloat(getComputedStyle(document.documentElement).zoom)||1;W=box.clientWidth;H=box.clientHeight;D=Math.min(2,window.devicePixelRatio||1)*z;
-  cv.width=layer.width=Math.round(W*D);cv.height=layer.height=Math.round(H*D);main.setTransform(D,0,0,D,0,0);lctx.setTransform(D,0,0,D,0,0);CX=W*.52;CY=H*.395;S=Math.min(W*.3,H*.33);FITC();GA=makeAtlas(12,9);bake()};
-
- // ---- glow v3 edge, as on the lines: every shape is laid three times in flat colour, a little larger and fainter each time
- //      ([extra size in CSS px, opacity]: outer feather -> flat body), normal blending. K fades a piece, SOFT widens its feather (the dissolve). ----
- const FE=[[3.2,.16],[1.6,.3],[0,.62]];
- let K=1, SOFT=0;
- const fillG=(c,a,build)=>{for(const [e,al] of FE){ctx.fillStyle=rgb(c,al*a*K);ctx.beginPath();build(e/2*(1+SOFT*5));ctx.fill()}};
- const strokeG=(c,a,w,build)=>{ctx.beginPath();build();for(const [e,al] of FE){ctx.strokeStyle=rgb(c,al*a*K);ctx.lineWidth=w+e*(1+SOFT*3);ctx.stroke()}};
- const poly=(P,g)=>{const n=P.length;let A=0;for(let i=0;i<n;i++){const b=P[(i+1)%n];A+=P[i][0]*b[1]-b[0]*P[i][1]}const sg=A>0?g:-g;   // polygon grown outwards by g
-  for(let i=0;i<n;i++){const a=P[(i+n-1)%n],b=P[(i+1)%n],dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy)||1,x=P[i][0]+dy/l*sg,y=P[i][1]-dx/l*sg;i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.closePath()};
- const rr=(x,y,w,h,r)=>{ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()};
-
- // ---- 1 · Register: three halftone plates, printed out of register, slide into one image ----
- const PL=[{c:RAMP[0],ang:15,o:[-.33,-.09,-.03],d:u=>ss(.76,.06,u)*.8,ph:0},
-           {c:RAMP[3],ang:45,o:[.21,-.15,.026],d:u=>Math.pow(cl(1-Math.abs(u-.5)/.58),1.15)*.7,ph:2.1},
-           {c:RAMP[4],ang:75,o:[.12,.29,.02],d:u=>ss(.34,.98,u)*.82,ph:4.2}];
- let PB=null, PBK='';                      // each plate baked once per size: [sharp, misted] bitmaps (the dots never change, only where the plate sits)
- const bake=()=>{const key=S+'|'+D;if(key===PBK)return;PBK=key;const R=.62*S,p=R/13,size=Math.ceil(2*(R+p)+40),ax=Math.cos(-.93),ay=Math.sin(-.93);
-  PB=PL.map(P=>{const a=P.ang*Math.PI/180,ca=Math.cos(a),sa=Math.sin(a),n=Math.ceil(R/p)+1,dots=[];
-   for(let i=-n;i<=n;i++)for(let j=-n;j<=n;j++){const x=(i*ca-j*sa)*p,y=(i*sa+j*ca)*p,d=Math.hypot(x,y);if(d>R+p)continue;
-    const r=p*.57*Math.sqrt(P.d(.5+(x*ax+y*ay)/(2*R)))*ss(R+p*.5,R-p*.7,d);if(r>.35)dots.push(x,y,r)}
-   return {size,img:[0,.62].map(soft=>{const c=document.createElement('canvas'),x=c.getContext('2d');c.width=c.height=Math.round(size*D);x.setTransform(D,0,0,D,c.width/2,c.width/2);
-    for(const [e,al] of FE){x.fillStyle=rgb(P.c,al);x.beginPath();const g=e/2*(1+soft*5)*.6;for(let i=0;i<dots.length;i+=3){const r=dots[i+2]+g;x.moveTo(dots[i]+r,dots[i+1]);x.arc(dots[i],dots[i+1],r,0,6.2832)}x.fill()}return c})}})};
- const register=t=>{const R=.62*S,bx=R*1.2,g=eio((t-.5)/5.3),loose=1-g,m=.115*S,q=.055*S,sq=.07*S,mist=ss(.04,.7,SOFT);
-  PL.forEach((P,k)=>{const ox=P.o[0]*S*loose+Math.cos(t*.31+P.ph),oy=P.o[1]*S*loose+Math.sin(t*.27+P.ph),B=PB[k],h=B.size/2;
-   ctx.save();ctx.translate(CX+ox,CY+oy);ctx.rotate(P.o[2]*loose);
-   ctx.globalAlpha=K*(1-mist);ctx.drawImage(B.img[0],-h,-h,B.size,B.size);if(mist>.004){ctx.globalAlpha=K*mist;ctx.drawImage(B.img[1],-h,-h,B.size,B.size)}ctx.globalAlpha=1;
-   strokeG(P.c,1,.9,()=>{for(const sx of[-1,1])for(const sy of[-1,1]){ctx.moveTo(sx*bx,sy*(bx+q));ctx.lineTo(sx*bx,sy*(bx+q+m));ctx.moveTo(sx*(bx+q),sy*bx);ctx.lineTo(sx*(bx+q+m),sy*bx)}
-    for(const [tx,ty] of [[0,-bx-q-m*.55],[-bx-q-m*.55,0],[bx+q+m*.55,0]]){const r0=m*.3;ctx.moveTo(tx+r0,ty);ctx.arc(tx,ty,r0,0,6.2832);ctx.moveTo(tx-m*.55,ty);ctx.lineTo(tx+m*.55,ty);ctx.moveTo(tx,ty-m*.55);ctx.lineTo(tx,ty+m*.55)}});
-   fillG(P.c,1,e=>{[[1,0,0],[0,1,0],[0,0,1],[1,1,0],[0,1,1],[1,0,1],[1,1,1]].forEach((mm,i)=>{if(mm[k])rr(-sq*3.5+i*sq-e,bx+q+m*.2-e,sq-1.5+2*e,sq-1.5+2*e,1+e)})});
-   ctx.restore()})};
-
- // ---- 2 · Collate: hand-cut scraps are trimmed square and collated into one fanned stack ----
- const NS=13, PV=7, SHT=[]; {const R=prng(23), cs=[[-1,-1],[1,-1],[1,1],[-1,1]];
-  for(let k=0;k<NS;k++){const pts=[],cj=[0,1,2,3].map(()=>[(R()-.5)*.34,(R()-.5)*.34]);
-   for(let s=0;s<4;s++)for(let i=0;i<PV;i++){const f=i/PV,a=cs[s],b=cs[(s+1)%4],ja=cj[s],jb=cj[(s+1)%4];
-    pts.push([lerp(a[0],b[0],f),lerp(a[1],b[1],f),lerp(a[0]+ja[0],b[0]+jb[0],f)+(i?(R()-.5)*.07:0),lerp(a[1]+ja[1],b[1]+jb[1],f)+(i?(R()-.5)*.07:0)])}
-   SHT.push({k,pts,th:(R()-.5)*1.5,sw:.32+R()*.5,sh:.3+R()*.42,ph:R()*6.28,tau:k<2?.3+k*.3:.95+(k-2)*.36,c:k===NS-1?COVER:col(k/(NS-2))})}}
- const LOOSE=[[.16,.2],[.62,.12],[.36,.5],[.86,.34],[.12,.72],[.5,.84],[.78,.7],[.3,.14],[.92,.86],[.58,.44],[.1,.44],[.24,.86],[.44,.28]];
- const collate=t=>{const sw=.95*S,sh=sw*1.414,step=.068*S,ang=lerp(.34,.86,.5+.5*Math.sin(t*.16-1.2)),dx=Math.cos(ang)*step,dy=-Math.sin(ang)*step,bx=CX-(NS-1)*dx/2,by=CY-(NS-1)*dy/2;
-  for(const s of SHT){const o=eio((t-s.tau)/1.7),lift=Math.sin(o*Math.PI),lx=CX+(LOOSE[s.k][0]-.5)*Math.min(2.5*S,W-84)+Math.sin(t*.21+s.ph)*4,ly=CY+(LOOSE[s.k][1]-.5)*1.75*S+Math.cos(t*.17+s.ph)*4;
-   const x=lerp(lx,bx+s.k*dx,o),y=lerp(ly,by+s.k*dy,o)-lift*.1*S,th=lerp(s.th+Math.sin(t*.13+s.ph)*.05,0,o),c=Math.cos(th),sn=Math.sin(th),hw=lerp(sw*s.sw*.34,sw/2,o),hh=lerp(sw*s.sh*.47,sh/2,o);
-   const P=s.pts.map(p=>{const px=lerp(p[2],p[0],o)*hw,py=lerp(p[3],p[1],o)*hh;return [x+px*c-py*sn,y+px*sn+py*c]});
-   fillG(s.c,1,e=>poly(P,e))}};
-
- // ---- 3 · Atlas: a shuffled sheet of swatches sorts itself, chip by chip, into a tint chart ----
- let GA=null; const makeAtlas=(cols,rows)=>{const R=prng(41),n=cols*rows,slot=[...Array(n).keys()],chips=[];
-  for(let k=0;k<n*3;k++){const a=Math.floor(R()*n),b=cl((a/cols|0)+Math.round((R()-.5)*7),0,rows-1)*cols+cl(a%cols+Math.round((R()-.5)*7),0,cols-1);[slot[a],slot[b]]=[slot[b],slot[a]]}
-  for(let i=0;i<n;i++){const c=i%cols,r=i/cols|0,f=(c+r)/(cols+rows-2)+R()*.13;
-   chips.push({c,r,sc:slot[i]%cols,sr:slot[i]/cols|0,col:col(c/(cols-1)),a:lerp(.3,1,Math.pow(r/(rows-1),.85)),rot:(R()-.5)*.5,jx:(R()-.5)*.3,jy:(R()-.5)*.3,tau:.4+f/1.13*4.2})}
-  return {cols,rows,chips}};
- const atlas=t=>{const {cols,rows,chips}=GA,gw=Math.min(2.66*S,W*.9),sz=gw/cols*.7,cell=(gw-sz)/(cols-1),x0=CX-gw/2+sz/2,y0=CY-(cell*(rows-1))/2;
-  const it=chips.map(ch=>{const o=eio((t-ch.tau)/1.6);return {ch,o,lift:Math.sin(o*Math.PI),x:lerp(x0+(ch.sc+ch.jx)*cell,x0+ch.c*cell,o),y:lerp(y0+(ch.sr+ch.jy)*cell,y0+ch.r*cell,o)}}).sort((a,b)=>(a.o<1)-(b.o<1)||a.lift-b.lift||a.ch.tau-b.ch.tau);
-  for(const i of it){const s=sz*(1+i.lift*.08);ctx.save();ctx.translate(i.x,i.y-i.lift*4);ctx.rotate(i.ch.rot*(1-i.o));fillG(i.ch.col,i.ch.a,e=>rr(-s/2-e,-s/2-e,s+2*e,s+2*e,1.5+e));ctx.restore()}};
-
- // ---- 4 · Construct: pencil shapes are drawn true on a construction grid and become a modular mark ----
- const NG=4, MC=[RAMP[0],RAMP[1],col(.5),RAMP[3],RAMP[4],RAMP[5]];
- const MARK=[['q',2,0],['s',0,2],['q',3,4],['-',0,0],['d',0,3],['q',1,0],['q',0,1],['q',3,5],['q',1,5],['q',2,2],['d',0,4],['s',0,3],['-',0,0],['q',0,4],['q',1,1],['q',2,0]];
- const OUTL={q:(()=>{const p=[[-.5,-.5]];for(let i=0;i<=20;i++){const a=i/20*Math.PI/2;p.push([-.5+Math.cos(a),-.5+Math.sin(a)])}return p})(),
-  d:Array.from({length:36},(_,i)=>[.5*Math.cos(i/36*6.2832),.5*Math.sin(i/36*6.2832)]),
-  s:[[-.5,-.5,.5,-.5],[.5,-.5,.5,.5],[.5,.5,-.5,.5],[-.5,.5,-.5,-.5]].flatMap(([a,b,c,d])=>Array.from({length:8},(_,i)=>[lerp(a,c,i/8),lerp(b,d,i/8)]))};
- const CELLS=MARK.map((m,i)=>{const R=prng(70+i);return {t:m[0],k:m[1],c:m[2],x:i%NG,y:i/NG|0,jx:(R()-.5)*.26,jy:(R()-.5)*.26,jr:(R()-.5)*.5,js:.82+R()*.3,seed:R()*99,ord:R()}}).filter(c=>c.t!=='-');
- CELLS.slice().sort((a,b)=>a.ord-b.ord).forEach((c,i)=>c.tau=.5+i*.3);
- const construct=t=>{const cell=.47*S,G=cell*NG,x0=CX-G/2,y0=CY-G/2,all=eio((t-4.1)/1.9),ov=.11*S*all;
-  if(all>.01)strokeG(RAMP[0],.32*all,.7,()=>{for(let i=0;i<=NG;i++){ctx.moveTo(x0+i*cell,y0-ov);ctx.lineTo(x0+i*cell,y0+G+ov);ctx.moveTo(x0-ov,y0+i*cell);ctx.lineTo(x0+G+ov,y0+i*cell)}});
-  for(const c of CELLS){const o=eio((t-c.tau)/1.5),raw=1-o,cx=x0+(c.x+.5)*cell+c.jx*cell*raw,cy=y0+(c.y+.5)*cell+c.jy*cell*raw,rot=c.k*Math.PI/2+c.jr*raw,sc=lerp(c.js,1,o)*cell,co=Math.cos(rot),si=Math.sin(rot);
-   const shape=(sd,amp)=>OUTL[c.t].map((p,i)=>{const w=amp*raw,x=(p[0]+noise(i*.33+sd,t*.25)*w)*sc,y=(p[1]+noise(i*.33+sd+40,t*.25)*w)*sc;return [cx+x*co-y*si,cy+x*si+y*co]});
-   const P=shape(c.seed,.05), f=ss(.45,1,o);
-   if(f>.004)fillG(MC[c.c],f,e=>poly(P,e));
-   if(raw>.01){strokeG(RAMP[0],.95*ss(0,.5,raw),.9,()=>poly(P,0));const Q=shape(c.seed+17,.07);strokeG(RAMP[0],.5*ss(0,.5,raw),.7,()=>poly(Q,0))}}};
-
- // ---- the cycle: each piece resolves (~6 s), holds, then dissolves while the next one appears ----
- const PIECES=[construct,collate,atlas], PER=7.5, LOOP=PER*PIECES.length, IN=.25;
- const draw=T=>{if(!W||!H)return;main.clearRect(0,0,W,H);
-  PIECES.forEach((piece,i)=>{const t=(((T-i*PER+IN)%LOOP)+LOOP)%LOOP-IN;if(t>PER+.2||(T<.2&&i))return;
-   const k=ss(-IN,.65,t)*(1-ss(PER-.7,PER+.2,t));if(k<.004)return;SOFT=1-k;K=1;
-   ctx=k>.999?main:lctx;if(ctx===lctx)ctx.clearRect(0,0,W,H);ctx.lineCap='round';ctx.lineJoin='round';
-   piece(t);                                                    // a piece in transition is drawn on its own layer, then laid down as one sheet at opacity k
-   if(ctx===lctx){main.globalAlpha=k;main.drawImage(layer,0,0,W,H);main.globalAlpha=1}ctx=main})};
- window.__deskFlow=t=>{if(!W)fit();draw(t)};
- fit();
- const still=matchMedia('(prefers-reduced-motion: reduce)'), STILL=6.4;
- let raf=0, visible=true, t0=performance.now(), tAcc=-IN;
- const loop=now=>{tAcc+=Math.min(.1,(now-t0)/1000); t0=now; draw(tAcc); raf=requestAnimationFrame(loop)};
- const run=()=>{cancelAnimationFrame(raf); if(!box.offsetParent) return; if(still.matches){draw(STILL);return} if(visible&&!document.hidden){t0=performance.now(); raf=requestAnimationFrame(loop)} else draw(Math.max(0,tAcc))};
- new IntersectionObserver(e=>{visible=e[0].isIntersecting; run()}).observe(box);
- document.addEventListener('visibilitychange',run); still.addEventListener?.('change',run);
- new ResizeObserver(()=>{fit(); draw(still.matches?STILL:tAcc); run()}).observe(box);
- run();
-})();
-</script>
-<script src="/footer-lines.js" defer></script>
+<script>/* lazy cover videos */(function(){var vs=document.querySelectorAll('video.cover-vid[preload=none]');if(matchMedia('(prefers-reduced-motion:reduce)').matches){return}var io=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;var v=e.target;v.querySelectorAll('source[data-src]').forEach(function(s){s.src=s.dataset.src;s.removeAttribute('data-src')});v.load();v.play&&v.play().catch(function(){});io.unobserve(v)})},{rootMargin:'200px'});vs.forEach(function(v){io.observe(v)})})();</script>
 </body></html>
