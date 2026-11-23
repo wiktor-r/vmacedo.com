@@ -315,3 +315,19 @@ header.top .lang a[aria-current]{opacity:.55;text-decoration:none;pointer-events
 /* widows, 23/11: balance titles, pretty text */
 html body h1,html body h2,html body h3,html body .lede{text-wrap:balance}
 html body p,html body li,html body figcaption,html body blockquote,html body dd,html body td{text-wrap:pretty}
+
+/* phones, 23/11: titles never overflow; header always fits */
+@media (max-width:820px){
+ html body h1{overflow-wrap:break-word}
+ html body h2,html body h3{overflow-wrap:break-word}
+ html body .art-head h1,html body main h1{font-size:min(38px,8.8vw);line-height:1.08}
+ html body .prose h2{font-size:min(25px,7vw)}
+ html body .prose h3{font-size:min(20px,6vw)}
+ html body .fx h3.t,html body .fx h3{font-size:min(28px,6.2vw)}
+}
+@media (max-width:420px){
+ header.top{gap:12px;align-items:center}
+ header.top > a{white-space:normal!important;max-width:9em;line-height:1.4;letter-spacing:.12em!important}
+ header.top nav{gap:14px}
+ header.top nav a,header.top .lang{letter-spacing:.12em!important}
+}

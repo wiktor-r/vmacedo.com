@@ -66,7 +66,9 @@
    for(const p of this.pts){const a=ss(p.tau-.07,p.tau+.02,P);if(a<.01)continue;ctx.fillStyle=rgb(INK,.6*a);ctx.beginPath();ctx.arc(p.x,p.y,2,0,6.2832);ctx.fill()}}};
  // 3 · Clearing: the small things gather, and the form is the room they leave
  S.clearing={init(g){const R=prng(31),F=g.F,c=g.phone?cl(g.H/15.5,28,40):cl(g.H/17,24,40);   /* phones ~190 chips, desktop ~600 (vmacedo.com 23/11) */
-   this.c=c;this.V=g.phone?{x:g.W*.5,y:g.H*.5,a:g.W*.39,b:g.H*.2}:{x:F.x+F.w*.5,y:g.H*.5,a:Math.min(F.w*.26,400),b:g.H*.2};this.n=g.phone?3.4:4.6;this.ch=[];
+   this.c=c;this.V=g.phone?{x:g.W*.5,y:g.H*.5,a:g.W*.39,b:g.H*.2}:{x:F.x+F.w*.5,y:g.H*.5,a:Math.min(F.w*.26,400),b:g.H*.2};
+   if(g.cs){const V=this.V;V.a=Math.min(Math.max(V.a,g.cs.w/2+(g.phone?26:48)),(g.phone?g.W:F.w)*.47);V.b=Math.min(Math.max(V.b,g.cs.h/2+(g.phone?34:44)),g.H*.44)}   // the room holds the whole address block, with air
+   this.n=g.phone?3.4:4.6;this.ch=[];
    const x0=g.phone?0:Math.max(0,F.x-F.w*.5);
    for(let y=c*.5;y<g.H+c*.3;y+=c)for(let x=x0+c*.5;x<g.W+c*.3;x+=c){const u=g.phone?1:cl((x-x0)/(F.x-x0+F.w*.12));if(R()>Math.pow(u,1.5)*.97+.03)continue;
      this.ch.push({x:x+(R()-.5)*c*.5,y:y+(R()-.5)*c*.5,rot:(R()-.5)*1.3,a:.42+R()*.58,s:c*(.5+R()*.2),k:R()})}
@@ -112,11 +114,13 @@
  // the viewport height, which must not clear or restart the picture.
  function mount(kind,opt={}){const bay=document.querySelector(opt.root||'#need'),box=bay.querySelector('.endart'),cv=box.querySelector('canvas'),cta=bay.querySelector('.cta'),sc=S[kind],wide=matchMedia('(min-width:821px)'),still=matchMedia('(prefers-reduced-motion: reduce)');
   ctx=cv.getContext('2d');let g={},P=0,t0=null,raf=0,forced=null,done=false,seen=false;const DUR=2.4;
-  const size=()=>{const r=cv.getBoundingClientRect();if(!r.width||!r.height)return false;const phone=!wide.matches;
-   if(g.W&&Math.abs(r.width-g.W)<1&&(phone||Math.abs(r.height-g.H)<1)&&g.phone===phone)return false;
+  let csKey='';
+  const size=(force)=>{const r=cv.getBoundingClientRect();if(!r.width||!r.height)return false;const phone=!wide.matches;
+   if(!force&&g.W&&Math.abs(r.width-g.W)<1&&(phone||Math.abs(r.height-g.H)<1)&&g.phone===phone)return false;
    let D=Math.min(2,devicePixelRatio||1);while(r.width*r.height*D*D>(phone?2.2e6:7e6)&&D>1)D-=.25;
    cv.width=Math.round(r.width*D);cv.height=Math.round(r.height*D);ctx.setTransform(D,0,0,D,0,0);const W=r.width,H=r.height,fw=Math.min(W,innerWidth);
-   g={W,H,D,phone,F:phone?{x:0,y:0,w:W,h:H}:{x:W-fw,y:0,w:fw,h:H},Z:null,place:(x,y)=>{const b=bay.getBoundingClientRect();bay.style.setProperty('--vx',(r.left-b.left+x)+'px');bay.style.setProperty('--vy',(r.top-b.top+y)+'px')}};
+   const cb=cta&&cta.getBoundingClientRect(),cs=cb&&cb.width?{w:cb.width,h:cb.height}:null;csKey=cs?Math.round(cs.w)+'x'+Math.round(cs.h):'';
+   g={W,H,D,phone,cs,F:phone?{x:0,y:0,w:W,h:H}:{x:W-fw,y:0,w:fw,h:H},Z:null,place:(x,y)=>{const b=bay.getBoundingClientRect();bay.style.setProperty('--vx',(r.left-b.left+x)+'px');bay.style.setProperty('--vy',(r.top-b.top+y)+'px')}};
    if(cta&&kind!=='clearing'){const c=cta.getBoundingClientRect();if(c.bottom>r.top&&c.top<r.bottom)g.Z={x:c.left-r.left-26,y:c.top-r.top-40,w:c.width+70,h:c.height+70}}
    sc.init(g);return true};
   const paint=()=>{ctx.setTransform(g.D,0,0,g.D,0,0);ctx.clearRect(0,0,g.W,g.H);sc.draw(g,P)};
@@ -127,7 +131,8 @@
   const play=()=>{if(done||raf||!seen)return;raf=requestAnimationFrame(step)};
   new IntersectionObserver(e=>{for(const x of e)if(x.isIntersecting&&x.intersectionRatio>=.3){seen=true;play()}},{threshold:[0,.3,.6]}).observe(box);
   const resized=()=>{if(size()){if(done||P>0)paint();else paint()}};
-  new ResizeObserver(resized).observe(box);matchMedia('(orientation: portrait)').addEventListener?.('change',resized);
+  new ResizeObserver(resized).observe(box);
+  if(cta)new ResizeObserver(()=>{const b=cta.getBoundingClientRect(),k=Math.round(b.width)+'x'+Math.round(b.height);if(b.width&&k!==csKey&&size(true))paint()}).observe(cta);matchMedia('(orientation: portrait)').addEventListener?.('change',resized);
   document.fonts&&document.fonts.ready.then(resized);
   if(size()){if(still.matches){done=true;P=1}paint()}
   window.__endFrame=step;window.__endSet=p=>{forced=p;size();if(p!==null){P=p;paint()}else{P=done?1:P;paint()}};return {kind}}
