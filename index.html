@@ -497,7 +497,7 @@ html body .list li span:first-child{font-variant:normal;text-transform:none;lett
 <div class="dflow" aria-hidden="true" data-cfg='{"mode": "C", "n": 15, "x0": 0.03, "x1": 0.3, "lean": 0.28, "cy": 0.66, "cx": 0.5, "ye0": 0.0, "ye1": 0.66, "rp": 0.6, "amp": 0.03, "k": 1.5}'><canvas></canvas></div></section>
 <section class="wrap about m-open" aria-label="Introduction">
   <h1 class="m-intro">Hello! I'm Victor. I&nbsp;design apps, visual identities and signage, starting from what people actually&nbsp;need.</h1>
-<!-- Alternating opening (Construct -> Register -> Collate -> Atlas), drawn with the glow v3 edge of the lines. Replaces the live .flowlines block right after h1.m-intro (div + style + script). Same box as the lines; only the mask stops moved from 16%/84% to 7%/93% because the pieces are contained. Self-contained, no dependencies. -->
+<!-- Alternating opening (Construct -> Collate -> Atlas), drawn with the glow v3 edge of the lines. Replaces the live .flowlines block right after h1.m-intro (div + style + script). Same box as the lines; only the mask stops moved from 16%/84% to 7%/93% because the pieces are contained. Self-contained, no dependencies. -->
 <div class="flowlines" aria-hidden="true"><canvas></canvas></div>
 <style>
 .flowlines{display:none}
@@ -519,8 +519,13 @@ html body .list li span:first-child{font-variant:normal;text-transform:none;lett
  const h2=(x,y)=>{const s=Math.sin(x*127.1+y*311.7)*43758.5453;return s-Math.floor(s)};
  const noise=(x,y)=>{const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi,u=xf*xf*(3-2*xf),v=yf*yf*(3-2*yf);return lerp(lerp(h2(xi,yi),h2(xi+1,yi),u),lerp(h2(xi,yi+1),h2(xi+1,yi+1),u),v)*2-1};
  let W=0,H=0,D=1,CX=0,CY=0,S=1;     // S: half the height of the composition, in CSS px
+ // keep every piece inside the page's content column (never touching the frame lines): the widest piece reaches ±1.38·S (with its soft edge) from CX,
+ // so S shrinks and CX shifts until that span fits between the content edges, with 10px of air for the soft edge
+ const FITC=()=>{const el=document.querySelector('#work');if(!el)return;const cr=cv.getBoundingClientRect();if(!cr.width)return;const k=cr.width/W,r=el.getBoundingClientRect(),cs=getComputedStyle(el);
+  const cl=(r.left+parseFloat(cs.paddingLeft)*k-cr.left)/k, cR=(r.right-parseFloat(cs.paddingRight)*k-cr.left)/k, HX=1.38, PAD=10;
+  const a0=Math.max(W*.06,cl)+PAD, a1=Math.min(W,cR)-PAD; if(a1-a0<2*HX*S)S=Math.max(20,(a1-a0)/(2*HX)); CX=Math.min(Math.max(CX,a0+HX*S),a1-HX*S)};
  const fit=()=>{const r=cv.getBoundingClientRect();D=Math.min(2,window.devicePixelRatio||1);W=r.width;H=r.height;
-  cv.width=layer.width=Math.round(W*D);cv.height=layer.height=Math.round(H*D);main.setTransform(D,0,0,D,0,0);lctx.setTransform(D,0,0,D,0,0);CX=W*.5;CY=H*.5;S=Math.min(W*.38,H*.42);GA=makeAtlas(10,9);bake()};
+  cv.width=layer.width=Math.round(W*D);cv.height=layer.height=Math.round(H*D);main.setTransform(D,0,0,D,0,0);lctx.setTransform(D,0,0,D,0,0);CX=W*.5;CY=H*.5;S=Math.min(W*.38,H*.42);FITC();GA=makeAtlas(10,9);bake()};
 
  // ---- glow v3 edge, as on the lines: every shape is laid three times in flat colour, a little larger and fainter each time
  //      ([extra size in CSS px, opacity]: outer feather -> flat body), normal blending. K fades a piece, SOFT widens its feather (the dissolve). ----
@@ -592,7 +597,7 @@ html body .list li span:first-child{font-variant:normal;text-transform:none;lett
    if(raw>.01){strokeG(RAMP[0],.95*ss(0,.5,raw),.9,()=>poly(P,0));const Q=shape(c.seed+17,.07);strokeG(RAMP[0],.5*ss(0,.5,raw),.7,()=>poly(Q,0))}}};
 
  // ---- the cycle: each piece resolves (~6 s), holds, then dissolves while the next one appears ----
- const PIECES=[construct,register,collate,atlas], PER=7.5, LOOP=PER*PIECES.length, IN=.25;
+ const PIECES=[construct,collate,atlas], PER=7.5, LOOP=PER*PIECES.length, IN=.25;
  const draw=T=>{if(!W||!H)return;main.clearRect(0,0,W,H);
   PIECES.forEach((piece,i)=>{const t=(((T-i*PER+IN)%LOOP)+LOOP)%LOOP-IN;if(t>PER+.2||(T<.2&&i))return;
    const k=ss(-IN,.65,t)*(1-ss(PER-.7,PER+.2,t));if(k<.004)return;SOFT=1-k;K=1;
@@ -706,8 +711,13 @@ document.querySelectorAll('.rv').forEach(el=>io.observe(el));
  const h2=(x,y)=>{const s=Math.sin(x*127.1+y*311.7)*43758.5453;return s-Math.floor(s)};
  const noise=(x,y)=>{const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi,u=xf*xf*(3-2*xf),v=yf*yf*(3-2*yf);return lerp(lerp(h2(xi,yi),h2(xi+1,yi),u),lerp(h2(xi,yi+1),h2(xi+1,yi+1),u),v)*2-1};
  let W=0,H=0,D=1,CX=0,CY=0,S=1;     // S: half the height of the composition, in CSS px
+ // keep every piece inside the page's content column (never touching the frame lines): the widest piece reaches ±1.38·S (with its soft edge) from CX,
+ // so S shrinks and CX shifts until that span fits between the content edges, with 10px of air for the soft edge
+ const FITC=()=>{const el=document.querySelector('#work');if(!el)return;const cr=cv.getBoundingClientRect();if(!cr.width)return;const k=cr.width/W,r=el.getBoundingClientRect(),cs=getComputedStyle(el);
+  const cl=(r.left+parseFloat(cs.paddingLeft)*k-cr.left)/k, cR=(r.right-parseFloat(cs.paddingRight)*k-cr.left)/k, HX=1.38, PAD=10;
+  const a0=Math.max(W*.06,cl)+PAD, a1=Math.min(W,cR)-PAD; if(a1-a0<2*HX*S)S=Math.max(20,(a1-a0)/(2*HX)); CX=Math.min(Math.max(CX,a0+HX*S),a1-HX*S)};
  const fit=()=>{const z=parseFloat(getComputedStyle(document.documentElement).zoom)||1;W=box.clientWidth;H=box.clientHeight;D=Math.min(2,window.devicePixelRatio||1)*z;
-  cv.width=layer.width=Math.round(W*D);cv.height=layer.height=Math.round(H*D);main.setTransform(D,0,0,D,0,0);lctx.setTransform(D,0,0,D,0,0);CX=W*.52;CY=H*.395;S=Math.min(W*.3,H*.33);GA=makeAtlas(12,9);bake()};
+  cv.width=layer.width=Math.round(W*D);cv.height=layer.height=Math.round(H*D);main.setTransform(D,0,0,D,0,0);lctx.setTransform(D,0,0,D,0,0);CX=W*.52;CY=H*.395;S=Math.min(W*.3,H*.33);FITC();GA=makeAtlas(12,9);bake()};
 
  // ---- glow v3 edge, as on the lines: every shape is laid three times in flat colour, a little larger and fainter each time
  //      ([extra size in CSS px, opacity]: outer feather -> flat body), normal blending. K fades a piece, SOFT widens its feather (the dissolve). ----
@@ -779,7 +789,7 @@ document.querySelectorAll('.rv').forEach(el=>io.observe(el));
    if(raw>.01){strokeG(RAMP[0],.95*ss(0,.5,raw),.9,()=>poly(P,0));const Q=shape(c.seed+17,.07);strokeG(RAMP[0],.5*ss(0,.5,raw),.7,()=>poly(Q,0))}}};
 
  // ---- the cycle: each piece resolves (~6 s), holds, then dissolves while the next one appears ----
- const PIECES=[construct,register,collate,atlas], PER=7.5, LOOP=PER*PIECES.length, IN=.25;
+ const PIECES=[construct,collate,atlas], PER=7.5, LOOP=PER*PIECES.length, IN=.25;
  const draw=T=>{if(!W||!H)return;main.clearRect(0,0,W,H);
   PIECES.forEach((piece,i)=>{const t=(((T-i*PER+IN)%LOOP)+LOOP)%LOOP-IN;if(t>PER+.2||(T<.2&&i))return;
    const k=ss(-IN,.65,t)*(1-ss(PER-.7,PER+.2,t));if(k<.004)return;SOFT=1-k;K=1;
