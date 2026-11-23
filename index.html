@@ -497,7 +497,7 @@ html body .list li span:first-child{font-variant:normal;text-transform:none;lett
 <div class="dflow" aria-hidden="true" data-cfg='{"mode": "C", "n": 15, "x0": 0.03, "x1": 0.3, "lean": 0.28, "cy": 0.66, "cx": 0.5, "ye0": 0.0, "ye1": 0.66, "rp": 0.6, "amp": 0.03, "k": 1.5}'><canvas></canvas></div></section>
 <section class="wrap about m-open" aria-label="Introduction">
   <h1 class="m-intro">Hello! I'm Victor. I&nbsp;design apps, visual identities and signage, starting from what people actually&nbsp;need.</h1>
-<!-- Alternating opening (Register -> Collate -> Atlas -> Construct), drawn with the glow v3 edge of the lines. Replaces the live .flowlines block right after h1.m-intro (div + style + script). Same box as the lines; only the mask stops moved from 16%/84% to 7%/93% because the pieces are contained. Self-contained, no dependencies. -->
+<!-- Alternating opening (Collate -> Atlas -> Construct -> Register), drawn with the glow v3 edge of the lines. Replaces the live .flowlines block right after h1.m-intro (div + style + script). Same box as the lines; only the mask stops moved from 16%/84% to 7%/93% because the pieces are contained. Self-contained, no dependencies. -->
 <div class="flowlines" aria-hidden="true"><canvas></canvas></div>
 <style>
 .flowlines{display:none}
@@ -592,7 +592,7 @@ html body .list li span:first-child{font-variant:normal;text-transform:none;lett
    if(raw>.01){strokeG(RAMP[0],.95*ss(0,.5,raw),.9,()=>poly(P,0));const Q=shape(c.seed+17,.07);strokeG(RAMP[0],.5*ss(0,.5,raw),.7,()=>poly(Q,0))}}};
 
  // ---- the cycle: each piece resolves (~6 s), holds, then dissolves while the next one appears ----
- const PIECES=[register,collate,atlas,construct], PER=7.5, LOOP=PER*PIECES.length, IN=.25;
+ const PIECES=[collate,atlas,construct,register], PER=7.5, LOOP=PER*PIECES.length, IN=.25;
  const draw=T=>{if(!W||!H)return;main.clearRect(0,0,W,H);
   PIECES.forEach((piece,i)=>{const t=(((T-i*PER+IN)%LOOP)+LOOP)%LOOP-IN;if(t>PER+.2||(T<.2&&i))return;
    const k=ss(-IN,.65,t)*(1-ss(PER-.7,PER+.2,t));if(k<.004)return;SOFT=1-k;K=1;
@@ -779,7 +779,7 @@ document.querySelectorAll('.rv').forEach(el=>io.observe(el));
    if(raw>.01){strokeG(RAMP[0],.95*ss(0,.5,raw),.9,()=>poly(P,0));const Q=shape(c.seed+17,.07);strokeG(RAMP[0],.5*ss(0,.5,raw),.7,()=>poly(Q,0))}}};
 
  // ---- the cycle: each piece resolves (~6 s), holds, then dissolves while the next one appears ----
- const PIECES=[register,collate,atlas,construct], PER=7.5, LOOP=PER*PIECES.length, IN=.25;
+ const PIECES=[collate,atlas,construct,register], PER=7.5, LOOP=PER*PIECES.length, IN=.25;
  const draw=T=>{if(!W||!H)return;main.clearRect(0,0,W,H);
   PIECES.forEach((piece,i)=>{const t=(((T-i*PER+IN)%LOOP)+LOOP)%LOOP-IN;if(t>PER+.2||(T<.2&&i))return;
    const k=ss(-IN,.65,t)*(1-ss(PER-.7,PER+.2,t));if(k<.004)return;SOFT=1-k;K=1;
