@@ -1,8 +1,9 @@
 /* Endings for the Line home: five abstract pictures of "starting from what people actually need", drawn in the soft-edge language
    of the live pieces (flat ramp colour, every shape laid three times: body .62, +1.6 px at .30, +3.2 px at .16).
-   One canvas under the last stretch of the line. Its progress (0 loose .. 1 resolved) follows the page as the last screen comes in
-   (sideways on desktop, downwards on phone) and never moves the page; arriving in one jump still plays it, in about 2.4 s.
-   Endings.mount('consensus'|'relief'|'clearing'|'rings'|'weave') */
+   One canvas under the last stretch of the line. It plays once (0 loose .. 1 resolved, 2.4 s) when it comes into view, then stays still;
+   it never moves the page and does no work while the page scrolls.
+   Endings.mount('consensus'|'relief'|'clearing'|'rings'|'weave')
+   Endings.mount(kind,{root:'#contact',axis:'y'}) mounts it in another element (posts, CV); it plays when it comes into view on either axis, so axis is accepted for compatibility. */
 (()=>{
  const RAMP=[[79,122,147],[150,180,196],[240,220,203],[232,160,122],[201,74,91],[192,57,43]], PAPER=[244,241,234], INK=[26,25,22];
  const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)), lerp=(a,b,t)=>a+(b-a)*t, ss=(a,b,v)=>{const x=cl((v-a)/(b-a));return x*x*(3-2*x)};
@@ -64,18 +65,24 @@
     for(const [e,al] of FE){ctx.fillStyle=rgb(b?solid(RAMP[b]):RAMP[0],b?(e?al:1):al);ctx.beginPath();for(const l of loops)poly(l,e/2);ctx.fill('evenodd')}});
    for(const p of this.pts){const a=ss(p.tau-.07,p.tau+.02,P);if(a<.01)continue;ctx.fillStyle=rgb(INK,.6*a);ctx.beginPath();ctx.arc(p.x,p.y,2,0,6.2832);ctx.fill()}}};
  // 3 · Clearing: the small things gather, and the form is the room they leave
- S.clearing={init(g){const R=prng(31),F=g.F,c=g.phone?cl(g.H/20,20,34):cl(g.H/17,24,40);   /* desktop: a coarser grid, ~30% fewer chips (vmacedo.com, 23/11: holds 60 fps at 1440@2) */
-   this.c=c;
-   this.V=g.phone?{x:g.W*.5,y:g.H*.5,a:g.W*.39,b:g.H*.17}:{x:F.x+F.w*.5,y:g.H*.5,a:Math.min(F.w*.26,400),b:g.H*.2};this.n=g.phone?3.4:4.6;this.ch=[];
+ S.clearing={init(g){const R=prng(31),F=g.F,c=g.phone?cl(g.H/15.5,28,40):cl(g.H/17,24,40);   /* phones ~190 chips, desktop ~600 (vmacedo.com 23/11) */
+   this.c=c;this.V=g.phone?{x:g.W*.5,y:g.H*.5,a:g.W*.39,b:g.H*.2}:{x:F.x+F.w*.5,y:g.H*.5,a:Math.min(F.w*.26,400),b:g.H*.2};this.n=g.phone?3.4:4.6;this.ch=[];
    const x0=g.phone?0:Math.max(0,F.x-F.w*.5);
    for(let y=c*.5;y<g.H+c*.3;y+=c)for(let x=x0+c*.5;x<g.W+c*.3;x+=c){const u=g.phone?1:cl((x-x0)/(F.x-x0+F.w*.12));if(R()>Math.pow(u,1.5)*.97+.03)continue;
      this.ch.push({x:x+(R()-.5)*c*.5,y:y+(R()-.5)*c*.5,rot:(R()-.5)*1.3,a:.42+R()*.58,s:c*(.5+R()*.2),k:R()})}
+   // the soft-edge chip, pre-rendered once per colour step: body .62, +1.6 px at .30, +3.2 px at .16 (the pieces' edge), so a frame is only drawImage calls
+   const s0=c*.6,pad=4,side=s0+2*pad,D=g.D,NC=32;this.s0=s0;this.side=side;this.spr=[];
+   for(let i=0;i<NC;i++){const cv=document.createElement('canvas');cv.width=cv.height=Math.ceil(side*D);const x=cv.getContext('2d');x.setTransform(D,0,0,D,side*D/2,side*D/2);
+    const cc=col(i/(NC-1));for(const [e,al] of FE){const h=s0/2+e/2,r=1.5+e/2;x.fillStyle=rgb(cc,al);x.beginPath();x.moveTo(-h+r,-h);x.arcTo(h,-h,h,h,r);x.arcTo(h,h,-h,h,r);x.arcTo(-h,h,-h,-h,r);x.arcTo(-h,-h,h,-h,r);x.closePath();x.fill()}
+    this.spr.push(cv)}
    g.place&&g.place(this.V.x,this.V.y)},
-  draw(g,P){const V=this.V,n=this.n,o=eio(P/.52),set=eio((P-.2)/.7);
+  draw(g,P){const V=this.V,n=this.n,o=eio(P/.52),set=eio((P-.2)/.7),D=g.D,NC=this.spr.length,side=this.side,s0=this.s0;
    for(const q of this.ch){const dx=(q.x-V.x)/V.a,dy=(q.y-V.y)/V.b,m=Math.pow(Math.pow(Math.abs(dx),n)+Math.pow(Math.abs(dy),n),1/n)||1e-4,m2=Math.pow(1.18+Math.pow(m,3.2),1/3.2)+.04,me=lerp(m,m2,o);
-    const x=V.x+dx/m*me*V.a,y=V.y+dy/m*me*V.b,d=me-1,t=cl(1-d/1.5),c=col(lerp(.0,1,Math.pow(t,1.6))),al=q.a*lerp(.5,1,t);
+    const x=V.x+dx/m*me*V.a,y=V.y+dy/m*me*V.b,d=me-1,t=cl(1-d/1.5),u=Math.pow(t,1.6),al=q.a*lerp(.5,1,t);
     if(x<-20||x>g.W+20||y<-20||y>g.H+20)continue;const top=ss(6,g.c0||46,y);if(top<.02)continue;
-    ctx.save();ctx.translate(x,y);ctx.rotate(q.rot*(1-set));const s=q.s;fillG(c,al*top,e=>rr(-s/2-e,-s/2-e,s+2*e,s+2*e,1.5+e));ctx.restore()}}};
+    const k=q.s/s0*D,th=q.rot*(1-set),co=Math.cos(th)*k,si=Math.sin(th)*k;
+    ctx.globalAlpha=al*top;ctx.setTransform(co,si,-si,co,x*D,y*D);ctx.drawImage(this.spr[Math.round(u*(NC-1))],-side/2,-side/2,side,side)}
+   ctx.globalAlpha=1;ctx.setTransform(D,0,0,D,0,0)}};
  // 4 · Rings: it starts from a core and everything after is laid around it, one layer at a time
  S.rings={init(g){const R=prng(53),n=15;this.n=n;this.K=g.phone?{x:g.W*.5,y:g.H*.52}:{x:g.F.x+g.F.w*.36,y:g.H*.585};this.Rm=g.phone?Math.min(g.W*.45,g.H*.455):Math.min(g.H*.5,g.F.w*.265);
    let u=.1;this.u=[u];for(let j=1;j<n;j++){u+=.6+R()*.9;this.u.push(u)}const top=this.u[n-1];this.u=this.u.map(v=>v/top);this.u[0]=.085;this.sd=R()*50;let ox=0,oy=0;this.off=this.u.map((u,j)=>{if(j){ox+=(R()-.42)*.03*this.Rm*(.4+u);oy+=(R()-.5)*.028*this.Rm*(.4+u)}return [ox,oy]})},
@@ -100,22 +107,29 @@
    // plain weave: at every other crossing the weft runs over the warp
    wf.forEach((t,j)=>{if(t.o<=.002)return;ctx.strokeStyle=rgb(solid(t.w.c));ctx.lineWidth=tw;ctx.beginPath();wp.forEach((v,i)=>{if((i+j)%2||v.y1<t.y+tw/2||t.x1<v.x+p*.5)return;const d=Math.sin(((v.x-t.w.xs)/(t.x1-t.w.xs))*5+t.w.ph)*wobF;ctx.moveTo(v.x-p*.52,t.y+d);ctx.lineTo(v.x+p*.52,t.y+d)});ctx.stroke()})}};
 
- function mount(kind){const bay=document.querySelector('#need'),box=bay.querySelector('.endart'),cv=box.querySelector('canvas'),cta=bay.querySelector('.cta'),sc=S[kind],wide=matchMedia('(min-width:821px)'),still=matchMedia('(prefers-reduced-motion: reduce)');
-  ctx=cv.getContext('2d');let g={},P=0,tPrev=null,raf=0,forced=null;const DUR=2.4;
-  const size=()=>{const r=cv.getBoundingClientRect();if(!r.width||!r.height)return;let D=Math.min(2,devicePixelRatio||1);while(r.width*r.height*D*D>7e6&&D>1)D-=.25;
-   cv.width=Math.round(r.width*D);cv.height=Math.round(r.height*D);ctx.setTransform(D,0,0,D,0,0);const phone=!wide.matches,W=r.width,H=r.height,fw=Math.min(W,innerWidth);
-   g={W,H,phone,F:phone?{x:0,y:0,w:W,h:H}:{x:W-fw,y:0,w:fw,h:H},Z:null,place:(x,y)=>{const b=bay.getBoundingClientRect();bay.style.setProperty('--vx',(r.left-b.left+x)+'px');bay.style.setProperty('--vy',(r.top-b.top+y)+'px')}};
+ // mount: the picture plays once, in DUR seconds, when its canvas comes into view (IntersectionObserver; nothing runs on scroll), then stays still.
+ // The canvas is re-sized only when its width changes (or, on wide screens, its height): a phone's address bar showing or hiding changes only
+ // the viewport height, which must not clear or restart the picture.
+ function mount(kind,opt={}){const bay=document.querySelector(opt.root||'#need'),box=bay.querySelector('.endart'),cv=box.querySelector('canvas'),cta=bay.querySelector('.cta'),sc=S[kind],wide=matchMedia('(min-width:821px)'),still=matchMedia('(prefers-reduced-motion: reduce)');
+  ctx=cv.getContext('2d');let g={},P=0,t0=null,raf=0,forced=null,done=false,seen=false;const DUR=2.4;
+  const size=()=>{const r=cv.getBoundingClientRect();if(!r.width||!r.height)return false;const phone=!wide.matches;
+   if(g.W&&Math.abs(r.width-g.W)<1&&(phone||Math.abs(r.height-g.H)<1)&&g.phone===phone)return false;
+   let D=Math.min(2,devicePixelRatio||1);while(r.width*r.height*D*D>(phone?2.2e6:7e6)&&D>1)D-=.25;
+   cv.width=Math.round(r.width*D);cv.height=Math.round(r.height*D);ctx.setTransform(D,0,0,D,0,0);const W=r.width,H=r.height,fw=Math.min(W,innerWidth);
+   g={W,H,D,phone,F:phone?{x:0,y:0,w:W,h:H}:{x:W-fw,y:0,w:fw,h:H},Z:null,place:(x,y)=>{const b=bay.getBoundingClientRect();bay.style.setProperty('--vx',(r.left-b.left+x)+'px');bay.style.setProperty('--vy',(r.top-b.top+y)+'px')}};
    if(cta&&kind!=='clearing'){const c=cta.getBoundingClientRect();if(c.bottom>r.top&&c.top<r.bottom)g.Z={x:c.left-r.left-26,y:c.top-r.top-40,w:c.width+70,h:c.height+70}}
-   sc.init(g)};
-  const target=()=>{const r=cv.getBoundingClientRect();if(forced!==null)return forced;if(still.matches)return 1;return g.phone?cl((innerHeight-r.top)/(r.height*.96)):cl(1-(r.left+g.F.x)/innerWidth)};
-  const paint=()=>{ctx.clearRect(0,0,g.W,g.H);sc.draw(g,P)};
+   sc.init(g);return true};
+  const paint=()=>{ctx.setTransform(g.D,0,0,g.D,0,0);ctx.clearRect(0,0,g.W,g.H);sc.draw(g,P)};
   const clock=()=>window.__endT!=null?window.__endT:performance.now()/1000;
-  const step=()=>{raf=0;if(!g.W)size();if(!g.W)return;const t=clock(),dt=tPrev===null?1/60:Math.min(.1,t-tPrev);tPrev=t;const PT=target(),d=PT-P,m=dt/DUR;P+=Math.max(-m*2.5,Math.min(m,d));if(still.matches||forced!==null)P=PT;paint();
-   if(Math.abs(PT-P)>.0004&&window.__endT==null)raf=requestAnimationFrame(step);else if(window.__endT==null)tPrev=null};
-  const kick=()=>{if(!raf&&window.__endT==null)raf=requestAnimationFrame(step)};
-  addEventListener('scroll',kick,{passive:true});addEventListener('resize',()=>{size();kick()});new ResizeObserver(()=>{size();kick()}).observe(box);
-  document.fonts&&document.fonts.ready.then(()=>{size();kick()});
-  size();kick();
-  window.__endFrame=step;window.__endSet=p=>{forced=p;if(p!==null){size();step()}};return {kind}}
+  const step=()=>{raf=0;if(!g.W&&!size())return;if(forced!==null){P=forced;paint();return}
+   if(still.matches||done){P=1;done=true;paint();return}
+   const t=clock();if(t0===null)t0=t;P=cl((t-t0)/DUR);paint();if(P>=1){done=true;return}if(window.__endT==null)raf=requestAnimationFrame(step)};
+  const play=()=>{if(done||raf||!seen)return;raf=requestAnimationFrame(step)};
+  new IntersectionObserver(e=>{for(const x of e)if(x.isIntersecting&&x.intersectionRatio>=.3){seen=true;play()}},{threshold:[0,.3,.6]}).observe(box);
+  const resized=()=>{if(size()){if(done||P>0)paint();else paint()}};
+  new ResizeObserver(resized).observe(box);matchMedia('(orientation: portrait)').addEventListener?.('change',resized);
+  document.fonts&&document.fonts.ready.then(resized);
+  if(size()){if(still.matches){done=true;P=1}paint()}
+  window.__endFrame=step;window.__endSet=p=>{forced=p;size();if(p!==null){P=p;paint()}else{P=done?1:P;paint()}};return {kind}}
  window.Endings={mount,kinds:Object.keys(S)};
 })();

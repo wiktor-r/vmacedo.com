@@ -86,7 +86,7 @@
     sheet(piece,t,ss(-IN,.65,t)*(1-ss(PER-.7,PER+.2,t)))})};
   const inst={box,draw,fit,visible:true,animated:mode!=='scrub',set(p){if(Math.abs(p-P)<.002)return;P=p;draw(now())},redraw(){fit();draw(now())}};
   fit(); draw(now()); insts.push(inst);
-  new IntersectionObserver(e=>{inst.visible=e[0].isIntersecting;kick()},{rootMargin:'80px'}).observe(box);
+  new IntersectionObserver(e=>{inst.visible=e[0].isIntersecting;kick()},{rootMargin:'0px'}).observe(box);
   new ResizeObserver(()=>{fit();draw(now())}).observe(box);
   kick(); return inst}
 
