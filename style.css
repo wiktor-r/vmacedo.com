@@ -327,7 +327,9 @@ html body p,html body li,html body figcaption,html body blockquote,html body dd,
 }
 @media (max-width:420px){
  header.top{gap:12px;align-items:center}
- header.top > a{white-space:normal!important;max-width:9em;line-height:1.4;letter-spacing:.12em!important}
+ header.top > a{white-space:normal!important;max-width:none;line-height:1.4;letter-spacing:.12em!important}
+ header.top .nw{white-space:nowrap}
+ header.top > a{flex:0 1 auto;min-width:0}
  header.top nav{gap:14px}
  header.top nav a,header.top .lang{letter-spacing:.12em!important}
 }
